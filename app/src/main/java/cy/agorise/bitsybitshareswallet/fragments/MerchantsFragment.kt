@@ -22,7 +22,7 @@ class MerchantsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.merchants_fragment, container, false)
+        return inflater.inflate(R.layout.fragment_merchants, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
