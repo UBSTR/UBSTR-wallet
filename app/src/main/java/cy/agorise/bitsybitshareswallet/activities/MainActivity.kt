@@ -43,13 +43,7 @@ class MainActivity : AppCompatActivity() {
         tabLayout.setupWithViewPager(viewPager)
 
         // Force first tab to show BTS icon
-        tabLayout.getTabAt(0)?.setIcon(R.drawable.bts_logo)
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
-
+        tabLayout.getTabAt(0)?.setIcon(R.drawable.tab_home_selector)
     }
 
 
