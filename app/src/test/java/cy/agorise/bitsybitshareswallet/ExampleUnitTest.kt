@@ -1,4 +1,4 @@
-package cy.agorise.bitsywallet
+package cy.agorise.bitsybitshareswallet
 
 import org.junit.Test
 

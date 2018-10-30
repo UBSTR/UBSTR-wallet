@@ -1,6 +1,5 @@
-package cy.agorise.bitsywallet.activities
+package cy.agorise.bitsybitshareswallet.activities
 
-import android.support.design.widget.TabLayout
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 
@@ -13,7 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import cy.agorise.bitsywallet.R
+import cy.agorise.bitsybitshareswallet.R
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_main.view.*
@@ -34,16 +33,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setSupportActionBar(toolbar)
+        //setSupportActionBar(toolbar)
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
         // Set up the ViewPager with the sections adapter.
-        container.adapter = mSectionsPagerAdapter
+        viewPager.adapter = mSectionsPagerAdapter
+        tabLayout.setupWithViewPager(viewPager)
 
-        container.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabs))
-        tabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(container))
+        // Force first tab to show BTS icon
+        tabLayout.getTabAt(0)?.setIcon(R.drawable.bts_logo)
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -88,6 +88,14 @@ class MainActivity : AppCompatActivity() {
         override fun getCount(): Int {
             // Show 3 total pages.
             return 3
+        }
+
+        override fun getPageTitle(position: Int): CharSequence? {
+            return when (position) {
+                0 -> ""
+                1 -> "Transactions"
+                else -> "Merchants"
+            }
         }
     }
 
