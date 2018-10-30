@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import cy.agorise.bitsybitshareswallet.BuildConfig
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.fragments.BalancesFragment
 import cy.agorise.bitsybitshareswallet.fragments.MerchantsFragment
@@ -42,6 +43,8 @@ class MainActivity : AppCompatActivity() {
 
         // Force first tab to show BTS icon
         tabLayout.getTabAt(0)?.setIcon(R.drawable.tab_home_selector)
+
+        tvBuildVersion.text = String.format("v%s", BuildConfig.VERSION_NAME)
     }
 
 
