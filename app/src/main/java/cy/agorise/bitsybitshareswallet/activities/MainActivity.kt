@@ -1,13 +1,12 @@
 package cy.agorise.bitsybitshareswallet.activities
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import cy.agorise.bitsybitshareswallet.BuildConfig
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.fragments.BalancesFragment
@@ -32,7 +31,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //setSupportActionBar(toolbar)
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
@@ -44,29 +42,23 @@ class MainActivity : AppCompatActivity() {
         // Force first tab to show BTS icon
         tabLayout.getTabAt(0)?.setIcon(R.drawable.tab_home_selector)
 
-        tvBuildVersion.text = String.format("v%s", BuildConfig.VERSION_NAME)
-    }
+        initBottomBar()
 
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        val id = item.itemId
-
-        if (id == R.id.action_settings) {
-            return true
+        ivSettings.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
         }
-
-        return super.onOptionsItemSelected(item)
     }
 
+    private fun initBottomBar() {
+        // Show app version number in bottom bar
+        tvBuildVersion.text = String.format("v%s", BuildConfig.VERSION_NAME)
+
+        // Show block number in bottom bar
+        tvBlockNumber.text = getString(R.string.block_number_bottom_bar, "-----")
+
+        // TODO add listener to update block number
+    }
 
     /**
      * A [FragmentPagerAdapter] that returns a fragment corresponding to
