@@ -1,0 +1,3 @@
+[submodule "graphenej"]
+	path = graphenej
+	url = git@github.com:bitshares/graphenej.git
