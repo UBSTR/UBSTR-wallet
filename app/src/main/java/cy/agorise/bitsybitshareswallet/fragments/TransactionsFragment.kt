@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.viewmodels.TransactionsViewModel
 
-class TransactionsFragment : androidx.fragment.app.Fragment() {
+class TransactionsFragment : Fragment() {
 
     companion object {
         fun newInstance() = TransactionsFragment()

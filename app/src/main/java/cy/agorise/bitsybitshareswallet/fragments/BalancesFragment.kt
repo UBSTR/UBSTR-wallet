@@ -14,7 +14,7 @@ import cy.agorise.bitsybitshareswallet.activities.SendTransactionActivity
 import cy.agorise.bitsybitshareswallet.viewmodels.BalancesViewModel
 import kotlinx.android.synthetic.main.fragment_balances.*
 
-class BalancesFragment : androidx.fragment.app.Fragment() {
+class BalancesFragment : Fragment() {
 
     companion object {
         fun newInstance() = BalancesFragment()
