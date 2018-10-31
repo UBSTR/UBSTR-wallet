@@ -1,6 +1,6 @@
 package cy.agorise.bitsybitshareswallet.viewmodels
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 
 class TransactionsViewModel : ViewModel() {
     // TODO: Implement the ViewModel

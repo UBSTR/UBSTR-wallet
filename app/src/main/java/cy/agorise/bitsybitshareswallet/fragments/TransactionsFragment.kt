@@ -1,8 +1,8 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.viewmodels.TransactionsViewModel
 
-class TransactionsFragment : Fragment() {
+class TransactionsFragment : androidx.fragment.app.Fragment() {
 
     companion object {
         fun newInstance() = TransactionsFragment()

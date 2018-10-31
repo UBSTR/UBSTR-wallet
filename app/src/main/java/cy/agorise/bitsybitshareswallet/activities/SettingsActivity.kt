@@ -3,7 +3,7 @@ package cy.agorise.bitsybitshareswallet.activities
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.MenuItem
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import kotlinx.android.synthetic.main.activity_settings.*
