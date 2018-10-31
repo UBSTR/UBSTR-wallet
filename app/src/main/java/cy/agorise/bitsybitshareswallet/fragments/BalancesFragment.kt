@@ -1,6 +1,7 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -8,7 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 
 import cy.agorise.bitsybitshareswallet.R
+import cy.agorise.bitsybitshareswallet.activities.ReceiveTransactionActivity
+import cy.agorise.bitsybitshareswallet.activities.SendTransactionActivity
 import cy.agorise.bitsybitshareswallet.viewmodels.BalancesViewModel
+import kotlinx.android.synthetic.main.fragment_balances.*
 
 class BalancesFragment : Fragment() {
 
@@ -29,6 +33,20 @@ class BalancesFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(BalancesViewModel::class.java)
         // TODO: Use the ViewModel
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        btnReceive.setOnClickListener {
+            val intent = Intent(view.context, ReceiveTransactionActivity::class.java)
+            startActivity(intent)
+        }
+
+        btnSend.setOnClickListener {
+            val intent = Intent(view.context, SendTransactionActivity::class.java)
+            startActivity(intent)
+        }
     }
 
 }

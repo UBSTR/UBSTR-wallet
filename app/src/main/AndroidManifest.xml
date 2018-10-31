@@ -25,6 +25,10 @@
             android:name=".activities.SettingsActivity"
             android:label="@string/title_settings">
         </activity>
+        <activity android:name=".activities.SendTransactionActivity">
+        </activity>
+        <activity android:name=".activities.ReceiveTransactionActivity">
+        </activity>
     </application>
 
 </manifest>
