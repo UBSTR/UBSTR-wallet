@@ -10,6 +10,7 @@ import cy.agorise.bitsybitshareswallet.models.Asset
 abstract class BitsyDatabase : RoomDatabase() {
 
     abstract fun assetDao(): AssetDao
+    abstract fun balanceDao(): BalanceDao
 
     companion object {
 
