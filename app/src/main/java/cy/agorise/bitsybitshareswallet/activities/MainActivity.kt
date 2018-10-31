@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
      * {@link FragmentPagerAdapter} derivative, which will keep every
      * loaded fragment in memory. If this becomes too memory intensive, it
      * may be best to switch to a
-     * [android.support.v4.app.FragmentStatePagerAdapter].
+     * [android.support.v4.app.FragmentStatePagerAdapter]..
      */
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
 
