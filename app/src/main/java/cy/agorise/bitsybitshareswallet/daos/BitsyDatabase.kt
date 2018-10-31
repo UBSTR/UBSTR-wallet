@@ -12,6 +12,7 @@ abstract class BitsyDatabase : RoomDatabase() {
     abstract fun assetDao(): AssetDao
     abstract fun balanceDao(): BalanceDao
     abstract fun userAccountDao(): UserAccountDao
+    abstract fun authorityDao(): AuthorityDao
 
     companion object {
 
