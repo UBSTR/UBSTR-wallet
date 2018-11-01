@@ -8,7 +8,6 @@ import cy.agorise.bitsybitshareswallet.models.UserAccount
 
 @Dao
 interface UserAccountDao {
-
     @Insert
     fun insert(userAccount: UserAccount)
 

@@ -8,7 +8,6 @@ import cy.agorise.bitsybitshareswallet.models.Authority
 
 @Dao
 interface AuthorityDao {
-
     @Insert
     fun insert(authority: Authority)
 

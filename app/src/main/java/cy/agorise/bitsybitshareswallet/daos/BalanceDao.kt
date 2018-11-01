@@ -8,7 +8,6 @@ import cy.agorise.bitsybitshareswallet.models.Balance
 
 @Dao
 interface BalanceDao {
-
     @Insert
     fun insert(balance: Balance)
 
