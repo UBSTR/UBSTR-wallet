@@ -11,7 +11,11 @@ import cy.agorise.bitsybitshareswallet.models.*
     Balance::class,
     UserAccount::class,
     Authority::class,
-    UserAccountAuthority::class
+    UserAccountAuthority::class,
+    BrainKey::class,
+    EquivalentValue::class,
+    Operation::class,
+    Transfer::class
     ], version = 1, exportSchema = false)
 abstract class BitsyDatabase : RoomDatabase() {
 
@@ -20,6 +24,7 @@ abstract class BitsyDatabase : RoomDatabase() {
     abstract fun userAccountDao(): UserAccountDao
     abstract fun authorityDao(): AuthorityDao
     abstract fun userAccountAuthorityDao(): UserAccountAuthorityDao
+    abstract fun brainKeyDao(): BrainKeyDao
 
     companion object {
 
