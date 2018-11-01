@@ -9,9 +9,9 @@ import cy.agorise.bitsybitshareswallet.models.Balance
 @Dao
 interface BalanceDao {
 
-    @Query("SELECT * FROM balances")
-    fun getAllBalances(): LiveData<List<Balance>>
-
     @Insert
     fun insert(balance: Balance)
+
+    @Query("SELECT * FROM balances")
+    fun getAllBalances(): LiveData<List<Balance>>
 }

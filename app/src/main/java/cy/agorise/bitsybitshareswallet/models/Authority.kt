@@ -2,18 +2,9 @@ package cy.agorise.bitsybitshareswallet.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "authorities", foreignKeys =
-    [ForeignKey(
-        entity = UserAccount::class,
-        parentColumns = ["id"],
-        childColumns = ["user_id"],
-        onUpdate = ForeignKey.CASCADE,
-        onDelete = ForeignKey.CASCADE
-    )]
-)
+@Entity(tableName = "authorities")
 data class Authority (
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id") val id: Long,

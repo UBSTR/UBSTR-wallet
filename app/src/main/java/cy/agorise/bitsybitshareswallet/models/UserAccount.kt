@@ -9,5 +9,6 @@ data class UserAccount (
     @PrimaryKey
     @ColumnInfo(name = "id") val id: String,
     @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "is_ltm") val isLtm: Boolean // Todo verify data type
+    @ColumnInfo(name = "is_ltm") val isLtm: Boolean, // Todo verify data type
+    @ColumnInfo(name = "weight_threshold") val weightThreshold: Int // TODO verify data type
 )

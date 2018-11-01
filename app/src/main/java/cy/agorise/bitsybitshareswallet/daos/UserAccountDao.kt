@@ -9,9 +9,9 @@ import cy.agorise.bitsybitshareswallet.models.UserAccount
 @Dao
 interface UserAccountDao {
 
-    @Query("SELECT * FROM user_accounts")
-    fun getAllUserAccounts(): LiveData<List<UserAccount>>
-
     @Insert
     fun insert(userAccount: UserAccount)
+
+    @Query("SELECT * FROM user_accounts")
+    fun getAllUserAccounts(): LiveData<List<UserAccount>>
 }

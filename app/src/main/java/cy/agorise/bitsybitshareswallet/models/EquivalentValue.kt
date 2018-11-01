@@ -9,15 +9,11 @@ import androidx.room.PrimaryKey
     [ForeignKey(
         entity = Transfer::class,
         parentColumns = ["operation_id"],
-        childColumns = ["transfer_id"],
-        onUpdate = ForeignKey.CASCADE,
-        onDelete = ForeignKey.CASCADE
+        childColumns = ["transfer_id"]
     ), ForeignKey(
         entity = Asset::class,
         parentColumns = ["id"],
-        childColumns = ["asset_id"],
-        onUpdate = ForeignKey.CASCADE,
-        onDelete = ForeignKey.CASCADE
+        childColumns = ["asset_id"]
     )]
 )
 data class EquivalentValue (

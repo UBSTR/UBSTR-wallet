@@ -9,9 +9,9 @@ import cy.agorise.bitsybitshareswallet.models.Asset
 @Dao
 interface AssetDao {
 
-    @Query("SELECT * FROM assets")
-    fun getAllAssets(): LiveData<List<Asset>>
-
     @Insert
     fun insert(asset: Asset)
+
+    @Query("SELECT * FROM assets")
+    fun getAllAssets(): LiveData<List<Asset>>
 }

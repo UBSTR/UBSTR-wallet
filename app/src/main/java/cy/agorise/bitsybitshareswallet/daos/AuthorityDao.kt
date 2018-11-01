@@ -9,9 +9,9 @@ import cy.agorise.bitsybitshareswallet.models.Authority
 @Dao
 interface AuthorityDao {
 
-    @Query("SELECT * FROM authorities")
-    fun getAllAuthorities(): LiveData<List<Authority>>
-
     @Insert
     fun insert(authority: Authority)
+
+    @Query("SELECT * FROM authorities")
+    fun getAllAuthorities(): LiveData<List<Authority>>
 }

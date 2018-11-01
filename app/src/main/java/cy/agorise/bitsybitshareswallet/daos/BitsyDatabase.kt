@@ -4,15 +4,22 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import cy.agorise.bitsybitshareswallet.models.Asset
+import cy.agorise.bitsybitshareswallet.models.*
 
-@Database(entities = [Asset::class], version = 1, exportSchema = false)
+@Database(entities = [
+    Asset::class,
+    Balance::class,
+    UserAccount::class,
+    Authority::class,
+    UserAccountAuthority::class
+    ], version = 1, exportSchema = false)
 abstract class BitsyDatabase : RoomDatabase() {
 
     abstract fun assetDao(): AssetDao
     abstract fun balanceDao(): BalanceDao
     abstract fun userAccountDao(): UserAccountDao
     abstract fun authorityDao(): AuthorityDao
+    abstract fun userAccountAuthorityDao(): UserAccountAuthorityDao
 
     companion object {
 
