@@ -8,9 +8,6 @@ import androidx.room.PrimaryKey
 data class Authority (
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id") val id: Long,
-    @ColumnInfo(name = "encrypted_brainkey") val encryptedBrainkey: String,
-    @ColumnInfo(name = "encrypted_sequence_number") val encryptedSequenceNumber: String, // TODO verify data type
-    @ColumnInfo(name = "encrypted_wif") val encryptedWif: String,
-    @ColumnInfo(name = "user_id") val userId: String,
-    @ColumnInfo(name = "authority_type") val authorityType: Int
+    @ColumnInfo(name = "encrypted_private_key") val encryptedBrainkey: String,
+    @ColumnInfo(name = "user_id") val userId: String
 )
