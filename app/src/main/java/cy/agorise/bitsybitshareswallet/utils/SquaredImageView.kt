@@ -11,10 +11,10 @@ import androidx.appcompat.widget.AppCompatImageView
  */
 
 class SquaredImageView : AppCompatImageView {
+
     constructor(context: Context) : super(context)
 
     constructor(context: Context, @Nullable attrs: AttributeSet) : super(context, attrs)
-
     constructor(context: Context, @Nullable attrs: AttributeSet, defStyleAttr: Int) : super(
         context,
         attrs,
