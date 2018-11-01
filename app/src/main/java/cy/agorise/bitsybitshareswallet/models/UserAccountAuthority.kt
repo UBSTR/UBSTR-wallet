@@ -21,5 +21,5 @@ import androidx.room.ForeignKey
 data class UserAccountAuthority (
     @ColumnInfo(name = "user_account_id") val userAccountId: String,
     @ColumnInfo(name = "authority_id") val authorityId: Long,
-    @ColumnInfo(name = "weight") val weight: Int // TODO verify data type
+    @ColumnInfo(name = "weight") val weight: Int
 )
