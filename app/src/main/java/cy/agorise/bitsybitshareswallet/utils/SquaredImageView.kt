@@ -1,6 +1,7 @@
 package cy.agorise.crystalwallet.util
 
 import android.content.Context
+import android.support.annotation.Nullable
 import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
 
@@ -21,7 +22,7 @@ class SquaredImageView : AppCompatImageView {
     ) {
     }
 
-    protected fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    protected override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
         val size = Math.min(getMeasuredWidth(), getMeasuredHeight())
