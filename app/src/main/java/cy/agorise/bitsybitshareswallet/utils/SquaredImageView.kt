@@ -1,8 +1,9 @@
-package cy.agorise.crystalwallet.util
+package cy.agorise.bitsybitshareswallet.utils
 
 import android.content.Context
-import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
+import androidx.annotation.Nullable
+import androidx.appcompat.widget.AppCompatImageView
 
 /**
  * Created by xd on 1/24/18.
@@ -10,21 +11,20 @@ import android.util.AttributeSet
  */
 
 class SquaredImageView : AppCompatImageView {
-    constructor(context: Context) : super(context) {}
+    constructor(context: Context) : super(context)
 
-    constructor(context: Context, @Nullable attrs: AttributeSet) : super(context, attrs) {}
+    constructor(context: Context, @Nullable attrs: AttributeSet) : super(context, attrs)
 
     constructor(context: Context, @Nullable attrs: AttributeSet, defStyleAttr: Int) : super(
         context,
         attrs,
         defStyleAttr
-    ) {
-    }
+    )
 
-    protected fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-        val size = Math.min(getMeasuredWidth(), getMeasuredHeight())
+        val size = Math.min(measuredWidth, measuredHeight)
         setMeasuredDimension(size, size)
     }
 }
