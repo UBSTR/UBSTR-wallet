@@ -9,7 +9,7 @@ import cy.agorise.bitsybitshareswallet.models.BrainKey
 @Dao
 interface BrainKeyDao {
     @Insert
-    fun insert(asset: BrainKeyDao)
+    fun insert(brainKey: BrainKey)
 
     @Query("SELECT * FROM brain_keys")
     fun getAllBrainKeys(): LiveData<List<BrainKey>>
