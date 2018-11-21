@@ -21,7 +21,7 @@ class SettingsActivity : AppCompatActivity() {
         if (PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean(Constants.KEY_NIGHT_MODE_ACTIVATED, false)
         ) {
-            setTheme(R.style.AppTheme_Dark)
+            setTheme(R.style.Theme_Bitsy_Dark)
         }
 
         setContentView(R.layout.activity_settings)

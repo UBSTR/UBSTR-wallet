@@ -9,12 +9,12 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/bts_logo"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/Theme.Bitsy"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/Theme.Bitsy.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -29,16 +29,6 @@
         </activity>
         <activity android:name=".activities.ReceiveTransactionActivity">
         </activity>
-
-        <!--<activity
-                android:name="de.bitshares_munich.smartcoinswallet.ReceiveActivity"
-                android:screenOrientation="portrait"
-                android:theme="@style/AppTheme" />-->
-
-        <activity
-                android:name=".activities.RequestActivity"
-                android:screenOrientation="portrait"
-                android:theme="@style/AppTheme" />
     </application>
 
 </manifest>
