@@ -25,6 +25,20 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <!-- Custom widget styles -->
+    <style name="SplashTheme" parent="Theme.Bitsy.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+    </style>
+
+    <style name="Widget.PalmPay.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:stateListAnimator">@animator/button_state_list_anim</item>
+    </style>
+
+    <style name="Widget.PalmPay.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">?android:attr/colorPrimaryDark</item>
+    </style>
+
     <!-- Text styles -->
     <style name="TextAppearance.Body1" parent="TextAppearance.MaterialComponents.Body1" />
     <style name="TextAppearance.Body2" parent="TextAppearance.MaterialComponents.Body2" />

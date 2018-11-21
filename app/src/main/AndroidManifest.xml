@@ -12,9 +12,8 @@
             android:theme="@style/Theme.Bitsy"
             tools:ignore="GoogleAppIndexingWarning">
         <activity
-                android:name=".activities.MainActivity"
-                android:label="@string/app_name"
-                android:theme="@style/Theme.Bitsy">
+                android:name=".activities.SplashActivity"
+                android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -29,6 +28,8 @@
         </activity>
         <activity android:name=".activities.ReceiveTransactionActivity">
         </activity>
+        <activity android:name=".activities.MainActivity"/>
+        <activity android:name=".activities.LicenseActivity"/>
     </application>
 
 </manifest>
