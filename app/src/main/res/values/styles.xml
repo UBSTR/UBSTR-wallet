@@ -36,7 +36,7 @@
     </style>
 
     <style name="Widget.PalmPay.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">?android:attr/colorPrimaryDark</item>
+        <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 
     <!-- Text styles -->
