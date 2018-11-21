@@ -34,19 +34,4 @@ class BalancesFragment : Fragment() {
         viewModel = ViewModelProviders.of(this).get(BalancesViewModel::class.java)
         // TODO: Use the ViewModel
     }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        btnReceive.setOnClickListener {
-            val intent = Intent(view.context, ReceiveTransactionActivity::class.java)
-            startActivity(intent)
-        }
-
-        btnSend.setOnClickListener {
-            val intent = Intent(view.context, SendTransactionActivity::class.java)
-            startActivity(intent)
-        }
-    }
-
 }

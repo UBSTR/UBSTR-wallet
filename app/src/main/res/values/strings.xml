@@ -2,38 +2,14 @@
     <string name="app_name">BiTSy</string>
 
     <!-- Main Activity -->
-    <string name="title_transactions">Transactions</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_receive">Receive</string>
+    <string name="title_balances">Balances</string>
     <string name="title_merchants">Merchants</string>
-    <string name="block_number_bottom_bar">Block: %1$s</string>
+    <string name="title_send">Send</string>
 
     <!-- Settings -->
     <string name="title_settings">Settings</string>
     <string name="night_mode">Night mode</string>
-
-    <string name="cancel">CANCEL</string>
-
-    <string name="to">to</string>
-    <string name="from">from</string>
-
-    <string name="account_id">accountId</string>
-
-    <string name="pref_language">language</string>
-
-    <string name="next">NEXT</string>
-
-    <string name="from_capital">From</string>
-    <string name="to_capital">To</string>
-
-    <string name="amount">Amount</string>
-
-    <string name="loyalty_points">Loyalty Points</string>
-    <string name="backup_asset">Backup Asset</string>
-    <string name="memo_capital">Memo</string>
-    <string name="checkbox_donate">Donate 2 BTS to the Support Developers at</string>
-    <string name="send_capital">Send</string>
-    <string name="v_1_0_beta" translatable="false">v 1.0 beta</string>
-    <string name="block_number" translatable="false">block# -------</string>
-    <string name="no_amount_requested">No amount requested</string>
-    <string name="request_amount_screen_name">Amount</string>
 
 </resources>

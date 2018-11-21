@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+            android:id="@+id/navigation_receive"
+            android:icon="@drawable/ic_receive"
+            android:title="@string/title_receive"/>
+
+    <item
+            android:id="@+id/navigation_balances"
+            android:icon="@drawable/ic_balances"
+            android:title="@string/title_balances"/>
+
+    <item
+            android:id="@+id/navigation_merchants"
+            android:icon="@drawable/ic_merchants"
+            android:title="@string/title_merchants"/>
+
+    <item
+            android:id="@+id/navigation_send"
+            android:icon="@drawable/ic_send"
+            android:title="@string/title_send"/>
+
+</menu>
