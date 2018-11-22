@@ -8,8 +8,6 @@ import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import kotlinx.android.synthetic.main.activity_license.*
 
-const val CURRENT_LICENSE_VERSION = 1
-
 class LicenseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,7 +19,7 @@ class LicenseActivity : AppCompatActivity() {
             .getInt(Constants.KEY_LAST_AGREED_LICENSE_VERSION, 0)
 
         // If the last agreed license version is the actual one then proceed to the following Activities
-        if (agreedLicenseVersion == CURRENT_LICENSE_VERSION) {
+        if (agreedLicenseVersion == Constants.CURRENT_LICENSE_VERSION) {
             agree()
         } else {
             wbLA.loadData(getString(R.string.licence_html), "text/html", "UTF-8")
@@ -38,7 +36,7 @@ class LicenseActivity : AppCompatActivity() {
      */
     private fun agree() {
         PreferenceManager.getDefaultSharedPreferences(this).edit()
-            .putInt(Constants.KEY_LAST_AGREED_LICENSE_VERSION, CURRENT_LICENSE_VERSION).apply()
+            .putInt(Constants.KEY_LAST_AGREED_LICENSE_VERSION, Constants.CURRENT_LICENSE_VERSION).apply()
 
         val intent : Intent?
 
