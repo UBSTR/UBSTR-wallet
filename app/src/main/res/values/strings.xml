@@ -9,8 +9,11 @@
 
     <!-- Import Brainkey Activity -->
     <string name="text_field__6_digit_pin">6+ digits PIN</string>
+    <string name="error__pin_too_short">PIN too short</string>
     <string name="text_field__confirm_pin">Confirm PIN</string>
+    <string name="error__pin_mismatch">PIN mismatch</string>
     <string name="text__brain_key">BrainKey</string>
+    <string name="error__enter_correct_brainkey">Please enter correct brainkey, it should have between 12 and 16 words.</string>
     <string name="button__import">Import</string>
     <string name="button__create">Create</string>
 

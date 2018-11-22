@@ -10,6 +10,7 @@
     tools:context=".activities.ImportBrainkeyActivity">
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilPin"
         style="@style/Widget.Bitsy.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,6 +30,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilPinConfirmation"
         style="@style/Widget.Bitsy.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -48,6 +50,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilBrainKey"
         style="@style/Widget.Bitsy.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -63,7 +66,8 @@
             android:inputType="textMultiLine"
             android:gravity="top"
             android:lines="4"
-            android:maxLines="4"/>
+            android:scrollHorizontally="false"
+            android:imeOptions="actionDone"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton

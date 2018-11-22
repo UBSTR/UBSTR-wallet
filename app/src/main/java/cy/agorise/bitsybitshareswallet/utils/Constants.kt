@@ -9,6 +9,9 @@ object Constants {
     /** Version of the currently used license */
     const val CURRENT_LICENSE_VERSION = 1
 
+    /** The minimum required length for a PIN number */
+    const val MIN_PIN_LENGTH = 6
+
     /** Key used to store if the initial setup is already done or not */
     const val KEY_INITIAL_SETUP_DONE = "key_initial_setup_done"
 
