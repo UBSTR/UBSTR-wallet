@@ -7,4 +7,9 @@
 
     <dimen name="layout_margin">35sp</dimen>
 
+    <!-- Spacing between widgets vertically -->
+    <dimen name="spacing_same_topic">16dp</dimen>
+    <dimen name="spacing_different_topic">24dp</dimen>
+    <dimen name="spacing_different_section">40dp</dimen>
+
 </resources>
