@@ -9,6 +9,9 @@ object Constants {
     /** Version of the currently used license */
     const val CURRENT_LICENSE_VERSION = 1
 
+    /** Key used to store the id value of the currently active account in the shared preferences */
+    const val KEY_CURRENT_ACCOUNT_ID = "key_current_account_id"
+
     /** The minimum required length for a PIN number */
     const val MIN_PIN_LENGTH = 6
 

@@ -59,7 +59,7 @@
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:hint="@string/text__brain_key">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <cy.agorise.bitsybitshareswallet.views.MyTextInputEditText
             android:id="@+id/tietBrainKey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

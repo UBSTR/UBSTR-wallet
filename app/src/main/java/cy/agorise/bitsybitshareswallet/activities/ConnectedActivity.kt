@@ -4,15 +4,21 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
-import android.preference.PreferenceManager
+import android.os.PersistableBundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import cy.agorise.bitsybitshareswallet.utils.Constants
+import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.android.NetworkService
-import cy.agorise.graphenej.api.calls.GetFullAccounts
-import java.util.ArrayList
+import cy.agorise.graphenej.api.android.RxBus
+import cy.agorise.graphenej.models.FullAccountDetails
+import cy.agorise.graphenej.models.HistoryOperationDetail
+import cy.agorise.graphenej.models.JsonRpcResponse
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 
 /**
  * Class in charge of managing the connection to graphenej's NetworkService
@@ -23,6 +29,11 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
     private val mHandler = Handler()
 
+    // Disposable returned at the bus subscription
+    private var mDisposable: Disposable? = null
+
+    private var storedOpCount: Long = -1
+
     /* Network service connection */
     protected var mNetworkService: NetworkService? = null
 
@@ -30,6 +41,48 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
      * Flag used to keep track of the NetworkService binding state
      */
     private var mShouldUnbindNetwork: Boolean = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mDisposable = RxBus.getBusInstance()
+            .asFlowable()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { message ->
+                if (message is JsonRpcResponse<*>) {
+                    // Generic processing taken care by subclasses
+                    handleJsonRpcResponse(message)
+                    // Payment detection focused responses
+                    if (message.error == null) {
+//                        if (message.result is List<*> && (message.result as List<*>).size > 0) {
+//                            if ((message.result as List<*>)[0] is FullAccountDetails) {
+//                                if (message.id == recurrentAccountUpdateId) {
+//                                    handleAccountDetails((message.result as List<*>)[0] as FullAccountDetails)
+//                                } else if (message.id == postProcessingAccountUpdateId) {
+//                                    handleAccountUpdate((message.result as List<*>)[0] as FullAccountDetails)
+//                                }
+//                            }
+//                        } else if (message.result is HistoryOperationDetail && message.id == accountOpRequestId) {
+//                            handleNewOperations(message.result as HistoryOperationDetail)
+//                        }
+                    } else {
+                        // In case of error
+                        Log.e(TAG, "Got error message from full node. Msg: " + message.error.message)
+                        Toast.makeText(
+                            this@ConnectedActivity,
+                            String.format("Error from full node. Msg: %s", message.error.message),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+//                } else if (message is ConnectionStatusUpdate) {
+//                    handleConnectionStatusUpdate(message)
+//                    if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
+//                        recurrentAccountUpdateId = -1
+//                        accountOpRequestId = -1
+//                        isProcessingTx = false
+//                    }
+                }
+            }
+    }
 
     override fun onResume() {
         super.onResume()
@@ -81,4 +134,16 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
     override fun onServiceDisconnected(name: ComponentName?) {
     }
+
+    /**
+     * Method to be implemented by all subclasses in order to be notified of JSON-RPC responses.
+     * @param response
+     */
+    internal abstract fun handleJsonRpcResponse(response: JsonRpcResponse<*>)
+
+    /**
+     * Method to be implemented by all subclasses in order to be notified of connection status updates
+     * @param connectionStatusUpdate
+     */
+    internal abstract fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate)
 }

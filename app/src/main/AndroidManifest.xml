@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="cy.agorise.bitsybitshareswallet">
+      xmlns:tools="http://schemas.android.com/tools"
+      package="cy.agorise.bitsybitshareswallet">
 
     <application
-            android:name=".utils.BitsyApplication"
-            android:allowBackup="true"
-            android:icon="@drawable/bts_logo"
-            android:label="@string/app_name"
-            android:roundIcon="@drawable/bts_logo"
-            android:supportsRtl="true"
-            android:theme="@style/Theme.Bitsy"
-            tools:ignore="GoogleAppIndexingWarning">
+        android:name=".utils.BitsyApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/bts_logo"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/bts_logo"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Bitsy"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity
-                android:name=".activities.SplashActivity"
-                android:theme="@style/SplashTheme">
+            android:name=".activities.SplashActivity"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -22,13 +22,10 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".activities.SettingsActivity"
-                android:label="@string/title_settings">
-        </activity>
-        <activity android:name=".activities.SendTransactionActivity">
-        </activity>
-        <activity android:name=".activities.ReceiveTransactionActivity">
-        </activity>
+            android:name=".activities.SettingsActivity"
+            android:label="@string/title_settings"/>
+        <activity android:name=".activities.SendTransactionActivity"/>
+        <activity android:name=".activities.ReceiveTransactionActivity"/>
         <activity android:name=".activities.MainActivity"/>
         <activity android:name=".activities.LicenseActivity"/>
         <activity android:name=".activities.ImportBrainkeyActivity"/>

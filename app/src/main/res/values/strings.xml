@@ -16,6 +16,11 @@
     <string name="error__enter_correct_brainkey">Please enter correct brainkey, it should have between 12 and 16 words.</string>
     <string name="button__import">Import</string>
     <string name="button__create">Create</string>
+    <!-- TODO improve below error explanation -->
+    <string name="error__invalid_brainkey">Invalid account, please check your brainkey for typing errors</string>
+    <string name="error__try_again">Please try again after 5 minutes</string>
+    <string name="dialog__account_candidates_title">Please select an account</string>
+    <string name="dialog__account_candidates_content">The keys derived from this brainkey seem to be used to control more than one account, please select which account you wish to import</string>
 
     <!-- Main Activity -->
     <string name="title_activity_main">MainActivity</string>
