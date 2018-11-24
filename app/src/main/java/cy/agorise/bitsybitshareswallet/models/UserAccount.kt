@@ -9,6 +9,5 @@ data class UserAccount (
     @PrimaryKey
     @ColumnInfo(name = "id") val id: String,
     @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "is_ltm") val isLtm: Boolean,
-    @ColumnInfo(name = "weight_threshold") val weightThreshold: Int
+    @ColumnInfo(name = "is_ltm") val isLtm: Boolean
 )

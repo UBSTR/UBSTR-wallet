@@ -7,7 +7,6 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
-import android.os.PersistableBundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -84,6 +83,11 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
             }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        if (!mDisposable!!.isDisposed) mDisposable!!.dispose()
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -97,6 +101,16 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
 //        storedOpCount = PreferenceManager.getDefaultSharedPreferences(this)
 //            .getLong(Constants.KEY_ACCOUNT_OPERATION_COUNT, -1)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Unbinding from network service
+        if (mShouldUnbindNetwork) {
+            unbindService(this)
+            mShouldUnbindNetwork = false
+        }
+//        mHandler.removeCallbacks(mCheckMissingPaymentsTask)
     }
 
     /**

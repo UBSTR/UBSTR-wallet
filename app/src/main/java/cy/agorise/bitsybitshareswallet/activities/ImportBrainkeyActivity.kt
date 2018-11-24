@@ -1,19 +1,21 @@
 package cy.agorise.bitsybitshareswallet.activities
 
-import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.list.listItems
+import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import cy.agorise.bitsybitshareswallet.R
+import cy.agorise.bitsybitshareswallet.daos.BitsyDatabase
+import cy.agorise.bitsybitshareswallet.models.Authority
+import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
+import cy.agorise.bitsybitshareswallet.repositories.UserAccountRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
-import cy.agorise.graphenej.Address
-import cy.agorise.graphenej.BrainKey
-import cy.agorise.graphenej.UserAccount
+import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
+import cy.agorise.graphenej.*
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.calls.GetAccounts
 import cy.agorise.graphenej.api.calls.GetKeyReferences
@@ -22,6 +24,9 @@ import cy.agorise.graphenej.models.JsonRpcResponse
 import kotlinx.android.synthetic.main.activity_import_brainkey.*
 import org.bitcoinj.core.ECKey
 import java.util.ArrayList
+
+// TODO Add method to load the 20? most important assets
+// TODO add progress bar or something while the user waits for the import response from the node
 
 class ImportBrainkeyActivity : ConnectedActivity() {
     private val TAG = "ImportBrainkeyActivity"
@@ -179,17 +184,19 @@ class ImportBrainkeyActivity : ConnectedActivity() {
                 MaterialDialog(this)
                     .title(R.string.dialog__account_candidates_title)
                     .message(R.string.dialog__account_candidates_content)
-                    .listItems(items = candidates) { dialog, index, _ ->
+                    .listItemsSingleChoice (items = candidates, initialSelection = -1) { _, index, _ ->
                         if (index >= 0) {
                             // If one account was selected, we keep a reference to it and
                             // store the account properties
-                            // TODO make sure this is reached
                             mUserAccount = mUserAccountCandidates!![index]
                             onAccountSelected(accountPropertiesList[index])
-                            dialog.dismiss()
                         }
                     }
-                    .negativeButton(android.R.string.cancel) { mKeyReferencesAttempts = 0 }
+                    .positiveButton(android.R.string.ok)
+                    .negativeButton(android.R.string.cancel) {
+                        mKeyReferencesAttempts = 0
+                    }
+                    .cancelable(false)
                     .show()
             } else if (accountPropertiesList.size == 1) {
                 onAccountSelected(accountPropertiesList[0])
@@ -216,25 +223,76 @@ class ImportBrainkeyActivity : ConnectedActivity() {
     private fun onAccountSelected(accountProperties: AccountProperties) {
         mUserAccount!!.name = accountProperties.name
 
-        Toast.makeText(this, "Account: "+accountProperties.name, Toast.LENGTH_SHORT).show()
+        val encryptedPIN = CryptoUtils.encrypt(this, tietPin.text!!.toString())
 
-        val password = tietPin.text!!.toString()
+        // Stores the user selected PIN encrypted
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .edit()
+            .putString(Constants.KEY_ENCRYPTED_PIN, encryptedPIN)
+            .apply()
 
         // Stores the accounts this key refers to
-//        database.putOwnedUserAccounts(applicationContext, mUserAccount, password)
+        val id = accountProperties.id
+        val name = accountProperties.name
+        val isLTM = accountProperties.membership_expiration_date == Constants.LIFETIME_EXPIRATION_DATE
+
+        val userAccount = cy.agorise.bitsybitshareswallet.models.UserAccount(id, name, isLTM)
+
+        val userAccountRepository = UserAccountRepository(application)
+        userAccountRepository.insert(userAccount)
 
         // Stores the id of the currently active user account
-//        PreferenceManager.getDefaultSharedPreferences(applicationContext)
-//            .edit()
-//            .putString(Constants.KEY_CURRENT_ACCOUNT_ID, mUserAccount!!.objectId)
-//            .apply()
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .edit()
+            .putString(Constants.KEY_CURRENT_ACCOUNT_ID, mUserAccount!!.objectId)
+            .apply()
 
-        // Trying to store all possible authorities (owner, active and memo)
-//        for (i in 0..2) {
-//            mBrainKey.setSequenceNumber(i)
-//            saveAccountAuthorities(mBrainKey, accountProperties)
-//        }
+        // Trying to store all possible authorities (owner, active and memo) into the database
+        val ownerAuthority = accountProperties.owner
+        val activeAuthority = accountProperties.active
+        val options = accountProperties.options
 
-        // TODO move to MainActivity
+        for (i in 0..2) {
+            mBrainKey!!.sequenceNumber = i
+            val publicKey = PublicKey(ECKey.fromPublicOnly(mBrainKey!!.privateKey.pubKey))
+
+            if (ownerAuthority.keyAuths.keys.contains(publicKey)) {
+                addAuthorityToDatabase(accountProperties.id, AuthorityType.OWNER.ordinal, mBrainKey!!)
+            }
+            if (activeAuthority.keyAuths.keys.contains(publicKey)) {
+                addAuthorityToDatabase(accountProperties.id, AuthorityType.ACTIVE.ordinal, mBrainKey!!)
+            }
+            if (options.memoKey == publicKey) {
+                addAuthorityToDatabase(accountProperties.id, AuthorityType.MEMO.ordinal, mBrainKey!!)
+            }
+        }
+
+        // Stores a flag into the SharedPreferences to tell the app there is an active account and there is no need
+        // to show this activity again, until the account is removed.
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .edit()
+            .putBoolean(Constants.KEY_INITIAL_SETUP_DONE, true)
+            .apply()
+
+        // Send the user to the MainActivity
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    /**
+     * Adds the given BrainKey encrypted as AuthorityType of userId.
+     */
+    private fun addAuthorityToDatabase(userId: String, authorityType: Int, brainKey: BrainKey) {
+        val brainKeyWords = brainKey.brainKey
+        val sequenceNumber = brainKey.sequenceNumber
+
+        val encryptedBrainKey = CryptoUtils.encrypt(this, brainKeyWords)
+        val encryptedSequenceNumber = CryptoUtils.encrypt(this, sequenceNumber.toString())
+
+        val authority = Authority(0, userId, authorityType, encryptedBrainKey, encryptedSequenceNumber)
+
+        val authorityRepository = AuthorityRepository(application)
+        authorityRepository.insert(authority)
     }
 }

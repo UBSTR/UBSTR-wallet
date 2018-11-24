@@ -15,6 +15,15 @@ object Constants {
     /** The minimum required length for a PIN number */
     const val MIN_PIN_LENGTH = 6
 
+    /** The user selected encrypted PIN */
+    const val KEY_ENCRYPTED_PIN = "key_encrypted_pin"
+
+    /**
+     * LTM accounts come with an expiration date expressed as this string.
+     * This is used to recognize such accounts from regular ones.
+     */
+    const val LIFETIME_EXPIRATION_DATE = "1969-12-31T23:59:59"
+
     /** Key used to store if the initial setup is already done or not */
     const val KEY_INITIAL_SETUP_DONE = "key_initial_setup_done"
 
