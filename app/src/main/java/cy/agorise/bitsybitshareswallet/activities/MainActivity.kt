@@ -1,6 +1,9 @@
 package cy.agorise.bitsybitshareswallet.activities
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -51,5 +54,22 @@ class MainActivity : AppCompatActivity() {
         val ft = supportFragmentManager.beginTransaction()
         ft.replace(R.id.fragment_frame, MerchantsFragment())
         ft.commit()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        // Inflates the menu and places it in the toolbar
+        menuInflater.inflate(R.menu.menu_main, menu)
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return if (item!!.itemId == R.id.menu_settings) {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+            true
+        } else {
+            super.onOptionsItemSelected(item)
+        }
     }
 }
