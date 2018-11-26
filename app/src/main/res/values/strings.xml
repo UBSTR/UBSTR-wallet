@@ -7,6 +7,14 @@
     <string name="button__agree">Agree</string>
     <string name="button__disagree">Disagree</string>
 
+    <!-- Database Load Activity-->
+    <string name="title__loading_assets">Loading Assets…</string>
+    <string name="text__performing_requests">Performing a series of requests in order to get the complete list of all existing assets</string>
+    <string name="text__loading_assets">Loaded %1$d assets into the database</string>
+    <string name="title__assets_loaded">Assets Loaded</string>
+    <string name="text__assets_loaded">Next, please setup your account…</string>
+    <string name="button__next">Next</string>
+
     <!-- Import Brainkey Activity -->
     <string name="text_field__6_digit_pin">6+ digits PIN</string>
     <string name="error__pin_too_short">PIN too short</string>

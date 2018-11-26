@@ -72,13 +72,13 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                             Toast.LENGTH_LONG
                         ).show()
                     }
-//                } else if (message is ConnectionStatusUpdate) {
-//                    handleConnectionStatusUpdate(message)
-//                    if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
+                } else if (message is ConnectionStatusUpdate) {
+                    handleConnectionStatusUpdate(message)
+                    if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
 //                        recurrentAccountUpdateId = -1
 //                        accountOpRequestId = -1
 //                        isProcessingTx = false
-//                    }
+                    }
                 }
             }
     }

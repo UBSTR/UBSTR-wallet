@@ -32,7 +32,8 @@ class LicenseActivity : AppCompatActivity() {
 
     /**
      * This function stores the version of the current accepted license version into the Shared Preferences and
-     * sends the user to either import/create account if there is no active account or to the MainActivity otherwise
+     * sends the user to load the assets database if they have not been loaded, import/create account if there is no
+     * active account or to the MainActivity otherwise.
      */
     private fun agree() {
         PreferenceManager.getDefaultSharedPreferences(this).edit()
@@ -40,13 +41,19 @@ class LicenseActivity : AppCompatActivity() {
 
         val intent : Intent?
 
+        val isDatabaseLoaded = PreferenceManager.getDefaultSharedPreferences(this)
+            .getBoolean(Constants.KEY_DATABASE_LOADED, false)
+
         val initialSetupDone = PreferenceManager.getDefaultSharedPreferences(this)
             .getBoolean(Constants.KEY_INITIAL_SETUP_DONE, false)
 
-        intent = if (initialSetupDone)
-            Intent(this, MainActivity::class.java)
-        else
+        intent = if (!isDatabaseLoaded)
+            Intent(this, DatabaseLoadActivity::class.java)
+        else if (!initialSetupDone)
             Intent(this, ImportBrainkeyActivity::class.java)
+        else
+            Intent(this, MainActivity::class.java)
+
 
         startActivity(intent)
         finish()

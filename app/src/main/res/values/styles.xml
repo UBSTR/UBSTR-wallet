@@ -42,6 +42,7 @@
     </style>
 
     <!-- Text styles -->
+    <style name="TextAppearance.Bitsy.Headline5" parent="TextAppearance.MaterialComponents.Headline5" />
     <style name="TextAppearance.Bitsy.Headline6" parent="TextAppearance.MaterialComponents.Headline6" />
     <style name="TextAppearance.Bitsy.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1" />
     <style name="TextAppearance.Bitsy.Body1" parent="TextAppearance.MaterialComponents.Body1" />

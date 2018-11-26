@@ -21,14 +21,15 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".activities.LicenseActivity"/>
+        <activity android:name=".activities.DatabaseLoadActivity"/>
+        <activity android:name=".activities.ImportBrainkeyActivity"/>
+        <activity android:name=".activities.MainActivity"/>
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/title_settings"/>
         <activity android:name=".activities.SendTransactionActivity"/>
         <activity android:name=".activities.ReceiveTransactionActivity"/>
-        <activity android:name=".activities.MainActivity"/>
-        <activity android:name=".activities.LicenseActivity"/>
-        <activity android:name=".activities.ImportBrainkeyActivity"/>
     </application>
 
 </manifest>
