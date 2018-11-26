@@ -1,7 +1,8 @@
 package cy.agorise.bitsybitshareswallet.viewmodels
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 
-class BalancesViewModel : ViewModel() {
-    // TODO: Implement the ViewModel
+
+class BalancesViewModel(application: Application) : AndroidViewModel(application) {
 }

@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/night_mode"
-        android:textAppearance="@style/TextAppearance.Body1"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"
         android:textColor="?android:textColorPrimary"/>
 
 </LinearLayout>

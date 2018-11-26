@@ -42,6 +42,8 @@
     </style>
 
     <!-- Text styles -->
-    <style name="TextAppearance.Body1" parent="TextAppearance.MaterialComponents.Body1" />
-    <style name="TextAppearance.Body2" parent="TextAppearance.MaterialComponents.Body2" />
+    <style name="TextAppearance.Bitsy.Headline6" parent="TextAppearance.MaterialComponents.Headline6" />
+    <style name="TextAppearance.Bitsy.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1" />
+    <style name="TextAppearance.Bitsy.Body1" parent="TextAppearance.MaterialComponents.Body1" />
+    <style name="TextAppearance.Bitsy.Body2" parent="TextAppearance.MaterialComponents.Body2" />
 </resources>

@@ -12,10 +12,6 @@ import cy.agorise.bitsybitshareswallet.viewmodels.MerchantsViewModel
 
 class MerchantsFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = MerchantsFragment()
-    }
-
     private lateinit var viewModel: MerchantsViewModel
 
     override fun onCreateView(
@@ -25,8 +21,9 @@ class MerchantsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_merchants, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         viewModel = ViewModelProviders.of(this).get(MerchantsViewModel::class.java)
         // TODO: Use the ViewModel
     }
