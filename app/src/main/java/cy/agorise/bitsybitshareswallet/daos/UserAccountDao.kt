@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import cy.agorise.bitsybitshareswallet.models.UserAccount
+import cy.agorise.bitsybitshareswallet.entities.UserAccount
 
 @Dao
 interface UserAccountDao {

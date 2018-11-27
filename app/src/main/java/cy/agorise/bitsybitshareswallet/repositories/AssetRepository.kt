@@ -4,7 +4,7 @@ import android.app.Application
 import android.os.AsyncTask
 import cy.agorise.bitsybitshareswallet.daos.AssetDao
 import cy.agorise.bitsybitshareswallet.daos.BitsyDatabase
-import cy.agorise.bitsybitshareswallet.models.Asset
+import cy.agorise.bitsybitshareswallet.entities.Asset
 
 class AssetRepository internal constructor(application: Application) {
 

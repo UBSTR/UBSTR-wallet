@@ -1,21 +1,16 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
 import androidx.lifecycle.ViewModelProviders
-import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.Nullable
 import androidx.lifecycle.Observer
 
 import cy.agorise.bitsybitshareswallet.R
-import cy.agorise.bitsybitshareswallet.activities.ReceiveTransactionActivity
-import cy.agorise.bitsybitshareswallet.activities.SendTransactionActivity
-import cy.agorise.bitsybitshareswallet.models.UserAccount
-import cy.agorise.bitsybitshareswallet.repositories.UserAccountRepository
+import cy.agorise.bitsybitshareswallet.entities.UserAccount
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.BalancesViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel

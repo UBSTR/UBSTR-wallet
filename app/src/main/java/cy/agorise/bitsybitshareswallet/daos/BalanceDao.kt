@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import cy.agorise.bitsybitshareswallet.models.Balance
+import cy.agorise.bitsybitshareswallet.entities.Balance
 
 @Dao
 interface BalanceDao {

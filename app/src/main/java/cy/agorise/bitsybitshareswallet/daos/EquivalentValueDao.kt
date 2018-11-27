@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import cy.agorise.bitsybitshareswallet.models.EquivalentValue
+import cy.agorise.bitsybitshareswallet.entities.EquivalentValue
 
 @Dao
 interface EquivalentValueDao {

@@ -1,20 +1,15 @@
-package cy.agorise.bitsybitshareswallet.models
+package cy.agorise.bitsybitshareswallet.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "transfers",foreignKeys =
-    [ForeignKey(
-        entity = Operation::class,
-        parentColumns = ["id"],
-        childColumns = ["operation_id"]
-    )]
-)
+@Entity(tableName = "transfers")
 data class Transfer (
     @PrimaryKey
-    @ColumnInfo(name = "operation_id") val operationId: String,
+    @ColumnInfo(name = "id") val id: String,
+    @ColumnInfo(name = "block_number") val blockNumber: Long,
+    @ColumnInfo(name = "timestamp") val timestamp: Long,
     @ColumnInfo(name = "fee_amount") val feeAmount: Long,
     @ColumnInfo(name = "fee_asset_id") val feeAssetId: String, // TODO should be foreign key to Asset
     @ColumnInfo(name = "source") val source: String, // TODO should be foreign key to UserAccount

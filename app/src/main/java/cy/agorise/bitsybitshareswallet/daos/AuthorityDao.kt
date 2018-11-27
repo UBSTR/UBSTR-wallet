@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import cy.agorise.bitsybitshareswallet.models.Authority
+import cy.agorise.bitsybitshareswallet.entities.Authority
 
 @Dao
 interface AuthorityDao {

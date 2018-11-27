@@ -1,5 +1,7 @@
 package cy.agorise.bitsybitshareswallet.utils
 
+import cy.agorise.graphenej.Asset
+
 
 object Constants {
 
@@ -35,6 +37,12 @@ object Constants {
      * This is used to recognize such accounts from regular ones.
      */
     const val LIFETIME_EXPIRATION_DATE = "1969-12-31T23:59:59"
+
+    /**
+     * Smartcoin options for output
+     */
+    val BTS     = Asset("1.3.0")
+    val bitUSD  = Asset("1.3.121")
 
     /** Key used to store the night mode setting into the shared preferences */
     const val KEY_NIGHT_MODE_ACTIVATED = "key_night_mode_activated"

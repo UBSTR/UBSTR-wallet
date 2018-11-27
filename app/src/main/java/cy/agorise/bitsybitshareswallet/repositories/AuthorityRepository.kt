@@ -4,7 +4,7 @@ import android.app.Application
 import android.os.AsyncTask
 import cy.agorise.bitsybitshareswallet.daos.AuthorityDao
 import cy.agorise.bitsybitshareswallet.daos.BitsyDatabase
-import cy.agorise.bitsybitshareswallet.models.Authority
+import cy.agorise.bitsybitshareswallet.entities.Authority
 
 class AuthorityRepository internal constructor(application: Application) {
 

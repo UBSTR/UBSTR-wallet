@@ -5,7 +5,7 @@ import android.os.AsyncTask
 import androidx.lifecycle.LiveData
 import cy.agorise.bitsybitshareswallet.daos.BitsyDatabase
 import cy.agorise.bitsybitshareswallet.daos.UserAccountDao
-import cy.agorise.bitsybitshareswallet.models.UserAccount
+import cy.agorise.bitsybitshareswallet.entities.UserAccount
 
 class UserAccountRepository internal constructor(application: Application) {
 

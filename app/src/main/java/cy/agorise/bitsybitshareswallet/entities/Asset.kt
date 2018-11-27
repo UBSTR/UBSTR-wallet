@@ -1,4 +1,4 @@
-package cy.agorise.bitsybitshareswallet.models
+package cy.agorise.bitsybitshareswallet.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
