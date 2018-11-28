@@ -284,12 +284,14 @@ class ImportBrainkeyActivity : ConnectedActivity() {
      */
     private fun addAuthorityToDatabase(userId: String, authorityType: Int, brainKey: BrainKey) {
         val brainKeyWords = brainKey.brainKey
+        val wif = brainKey.walletImportFormat
         val sequenceNumber = brainKey.sequenceNumber
 
         val encryptedBrainKey = CryptoUtils.encrypt(this, brainKeyWords)
         val encryptedSequenceNumber = CryptoUtils.encrypt(this, sequenceNumber.toString())
+        val encryptedWIF = CryptoUtils.encrypt(this, wif)
 
-        val authority = Authority(0, userId, authorityType, encryptedBrainKey, encryptedSequenceNumber)
+        val authority = Authority(0, userId, authorityType, encryptedWIF, encryptedBrainKey, encryptedSequenceNumber)
 
         val authorityRepository = AuthorityRepository(application)
         authorityRepository.insert(authority)

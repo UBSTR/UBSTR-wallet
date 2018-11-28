@@ -191,6 +191,11 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
                             // all its stored request ids will now be reset
                             responseMap.clear()
                         }
+                        // According to Nelson this is better than doing it in onServiceConnected, but here it does not get called
+//                        else if (message.updateCode == ConnectionStatusUpdate.CONNECTED) {
+//                            // Start the transfers update
+//                            startTransfersUpdateProcedure()
+//                        }
                     }
                 })
         } else {
