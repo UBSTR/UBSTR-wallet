@@ -293,7 +293,7 @@ class ImportBrainkeyActivity : ConnectedActivity() {
 
         val authority = Authority(0, userId, authorityType, encryptedWIF, encryptedBrainKey, encryptedSequenceNumber)
 
-        val authorityRepository = AuthorityRepository(application)
+        val authorityRepository = AuthorityRepository(this)
         authorityRepository.insert(authority)
     }
 }

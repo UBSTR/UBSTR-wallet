@@ -12,8 +12,10 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import cy.agorise.bitsybitshareswallet.entities.Transfer
 import cy.agorise.bitsybitshareswallet.models.HistoricalOperationEntry
+import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.repositories.TransferRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
+import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
 import cy.agorise.graphenej.*
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.android.NetworkService
@@ -31,6 +33,7 @@ import io.reactivex.schedulers.Schedulers
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
 import java.util.*
+import javax.crypto.AEADBadTagException
 
 /**
  * This class is responsible for loading the local database with all past transfer operations of the
@@ -48,6 +51,9 @@ import java.util.*
  */
 class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Lifecycle) : LifecycleObserver {
     private val TAG = this.javaClass.name
+
+    /** Constant that specifies if we are on debug mode */
+    private val DEBUG = false
 
     /* Constant used to fix the number of historical transfers to fetch from the network in one batch */
     private val HISTORICAL_TRANSFER_BATCH_SIZE = 100
@@ -82,6 +88,9 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
 
     /** Repository to access and update Transfers */
     private var transferRepository: TransferRepository? = null
+
+    /** Repository to access and update Transfers */
+    private var authorityRepository: AuthorityRepository? = null
 
     /* Network service connection */
     private var mNetworkService: NetworkService? = null
@@ -123,8 +132,6 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
      */
     private var mShouldUnbindNetwork: Boolean = false
 
-    private val DEBUG = false
-
     private var lastId: Long = 0
 
     private var lastEquivalentValueBlockNum: Long = 0
@@ -161,12 +168,23 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
     init {
         this.mLifeCycle.addObserver(this)
         transferRepository = TransferRepository(mContext!!)
+        authorityRepository = AuthorityRepository(mContext!!)
 
         val pref = PreferenceManager.getDefaultSharedPreferences(mContext)
         val userId = pref.getString(Constants.KEY_CURRENT_ACCOUNT_ID, "")
         if (userId != "") {
             mCurrentAccount = UserAccount(userId)
-//            wifkey = database.getWif(mContext, mCurrentAccount, AuthorityType.MEMO) TODO RESTORE
+            val disposable = authorityRepository!!.getWIF(userId!!, AuthorityType.MEMO.ordinal)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { encryptedWIF ->
+                    try {
+                        wifKey = CryptoUtils.decrypt(mContext!!, encryptedWIF)
+                    } catch (e: AEADBadTagException) {
+                        Log.e(TAG, "AEADBadTagException. Class: " + e.javaClass + ", Msg: " + e.message)
+                    }
+
+                }
             mDisposable = RxBus.getBusInstance()
                 .asFlowable()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -364,11 +382,8 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
                 op.to.objectId,
                 op.assetAmount.amount.toLong(),
                 op.assetAmount.asset.objectId,
-                memo.plaintextMessage,
-                memo.source.toString(),
-                memo.destination.toString()
+                memo.plaintextMessage
             )
-            // TODO build transfer object, save Wif in ImportBrainkeyActivity
 
             transfers.add(transfer)
         }
@@ -624,6 +639,7 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     internal fun onDestroy() {
+        Log.d(TAG, "Destroying TransfersLoader")
         if (mDisposable != null && !mDisposable!!.isDisposed) mDisposable!!.dispose()
         if (mShouldUnbindNetwork) {
             mContext!!.unbindService(mNetworkServiceConnection)

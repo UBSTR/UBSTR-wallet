@@ -21,7 +21,7 @@ interface TransferDao {
     fun getCount(): Single<Int>
 
     @Query("SELECT * FROM transfers")
-    fun getAllTransfers(): LiveData<List<Transfer>>
+    fun getAll(): LiveData<List<Transfer>>
 
     @Query("DELETE FROM transfers")
     fun deleteAll()

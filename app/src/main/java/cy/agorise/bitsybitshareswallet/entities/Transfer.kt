@@ -16,7 +16,5 @@ data class Transfer (
     @ColumnInfo(name = "destination") val destination: String, // TODO should be foreign key to UserAccount
     @ColumnInfo(name = "transfer_amount") val transferAmount: Long,
     @ColumnInfo(name = "transfer_asset_id") val transferAssetId: String, // TODO should be foreign key to Asset
-    @ColumnInfo(name = "memo") val memo: String,
-    @ColumnInfo(name = "memo_from_key") val memoFromKey: String,
-    @ColumnInfo(name = "memo_to_key") val memoToKey: String
+    @ColumnInfo(name = "memo") val memo: String
 )
