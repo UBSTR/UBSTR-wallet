@@ -53,7 +53,7 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
     private val TAG = this.javaClass.name
 
     /** Constant that specifies if we are on debug mode */
-    private val DEBUG = false
+    private val DEBUG = true
 
     /* Constant used to fix the number of historical transfers to fetch from the network in one batch */
     private val HISTORICAL_TRANSFER_BATCH_SIZE = 100

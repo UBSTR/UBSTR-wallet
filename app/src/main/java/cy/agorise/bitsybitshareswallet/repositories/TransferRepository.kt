@@ -25,7 +25,7 @@ class TransferRepository internal constructor(context: Context) {
     }
 
     fun deleteAll() {
-        mTransferDao.deleteAll()
+        deleteAllAsyncTask(mTransferDao).execute()
     }
 
     private class insertAllAsyncTask internal constructor(private val mAsyncTaskDao: TransferDao) :
@@ -33,6 +33,15 @@ class TransferRepository internal constructor(context: Context) {
 
         override fun doInBackground(vararg transfers: List<Transfer>): Void? {
             mAsyncTaskDao.insertAll(transfers[0])
+            return null
+        }
+    }
+
+    private class deleteAllAsyncTask internal constructor(private val mAsyncTaskDao: TransferDao) :
+        AsyncTask<Void, Void, Void>() {
+
+        override fun doInBackground(vararg params: Void?): Void? {
+            mAsyncTaskDao.deleteAll()
             return null
         }
     }
