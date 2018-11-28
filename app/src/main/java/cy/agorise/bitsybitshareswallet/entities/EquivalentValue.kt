@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "equivalent_values",foreignKeys =
     [ForeignKey(
         entity = Transfer::class,
-        parentColumns = ["operation_id"],
+        parentColumns = ["id"],
         childColumns = ["transfer_id"]
     ), ForeignKey(
         entity = Asset::class,

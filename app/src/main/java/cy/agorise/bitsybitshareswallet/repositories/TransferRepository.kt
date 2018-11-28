@@ -5,6 +5,7 @@ import android.os.AsyncTask
 import cy.agorise.bitsybitshareswallet.daos.BitsyDatabase
 import cy.agorise.bitsybitshareswallet.daos.TransferDao
 import cy.agorise.bitsybitshareswallet.entities.Transfer
+import io.reactivex.Single
 
 class TransferRepository internal constructor(context: Context) {
 
@@ -19,7 +20,7 @@ class TransferRepository internal constructor(context: Context) {
         insertAllAsyncTask(mTransferDao).execute(transfers)
     }
 
-    fun getCount(): Int {
+    fun getCount(): Single<Int> {
         return mTransferDao.getCount()
     }
 

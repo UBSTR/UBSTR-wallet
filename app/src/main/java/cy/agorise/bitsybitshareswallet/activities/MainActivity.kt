@@ -6,13 +6,16 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import androidx.appcompat.app.AppCompatActivity
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.fragments.BalancesFragment
 import cy.agorise.bitsybitshareswallet.fragments.MerchantsFragment
+import cy.agorise.bitsybitshareswallet.processors.TransfersLoader
+import cy.agorise.graphenej.api.ApiAccess
+import cy.agorise.graphenej.api.ConnectionStatusUpdate
+import cy.agorise.graphenej.models.JsonRpcResponse
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : ConnectedActivity() {
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -70,6 +73,37 @@ class MainActivity : AppCompatActivity() {
             true
         } else {
             super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun handleJsonRpcResponse(response: JsonRpcResponse<*>) {
+
+    }
+
+    /**
+     * Private method called whenever there's an update to the connection status
+     * @param connectionStatusUpdate  Connection status update.
+     */
+    override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) {
+        when (connectionStatusUpdate.updateCode) {
+            ConnectionStatusUpdate.CONNECTED -> {
+                // Instantiating this loader is enough to kick-start the transfers loading procedure
+                TransfersLoader(this, lifecycle)
+            }
+            ConnectionStatusUpdate.DISCONNECTED -> {
+                // Do nothing for now
+            }
+            ConnectionStatusUpdate.AUTHENTICATED -> {}//updateBalances() }
+            ConnectionStatusUpdate.API_UPDATE -> {
+                // In certain cases the information about the accounts is not complete, this may not be the best
+                // solution but at least it works. Feel free to improve it or move it to a better place
+                //MissingAccountsLoader(this, lifecycle)
+
+                if (connectionStatusUpdate.api == ApiAccess.API_DATABASE) {
+                    // Updating transfer and exchange costs in all possible input assets
+                    //updateCosts()
+                }
+            }
         }
     }
 }

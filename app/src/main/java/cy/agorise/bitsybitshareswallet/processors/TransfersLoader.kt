@@ -27,6 +27,7 @@ import cy.agorise.graphenej.operations.TransferOperation
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
+import io.reactivex.schedulers.Schedulers
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
 import java.util.*
@@ -218,14 +219,18 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
             // If we are in debug mode, we first erase all entries in the 'transfer' table
             transferRepository!!.deleteAll()
         }
-        val transferCount = transferRepository!!.getCount()
-        if (transferCount > 0) {
-            // If we already have some transfers in the database, we might want to skip the request
-            // straight to the last batch
-            historicalTransferCount = Math.floor((transferCount / HISTORICAL_TRANSFER_BATCH_SIZE).toDouble()).toInt()
-        }
-        // Retrieving account transactions
-        loadNextOperationsBatch()
+        val disposable = transferRepository!!.getCount()
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { transferCount ->
+                 if (transferCount > 0) {
+                    // If we already have some transfers in the database, we might want to skip the request
+                    // straight to the last batch
+                    historicalTransferCount = Math.floor((transferCount / HISTORICAL_TRANSFER_BATCH_SIZE).toDouble()).toInt()
+                }
+                // Retrieving account transactions
+                loadNextOperationsBatch()
+            }
     }
 
     /**
@@ -241,7 +246,7 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
 
         val insertedCount = transferRepository!!.insertAll(processOperationList(operationHistoryList))
 //        Log.d(TAG, String.format("Inserted count: %d, list size: %d", insertedCount, operationHistoryList.size))
-        if (operationHistoryList.isEmpty()) {
+        if (/* insertedCount == 0 && */ operationHistoryList.isEmpty()) {
             // We finally reached the end of the transactions, so now we must check for missing
             // transfer times
 //            mState = State.LOADING_MISSING_TIMES
