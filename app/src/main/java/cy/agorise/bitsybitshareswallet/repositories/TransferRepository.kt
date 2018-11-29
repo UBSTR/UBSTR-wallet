@@ -2,6 +2,7 @@ package cy.agorise.bitsybitshareswallet.repositories
 
 import android.content.Context
 import android.os.AsyncTask
+import androidx.lifecycle.LiveData
 import cy.agorise.bitsybitshareswallet.daos.BitsyDatabase
 import cy.agorise.bitsybitshareswallet.daos.TransferDao
 import cy.agorise.bitsybitshareswallet.entities.Transfer
@@ -18,6 +19,10 @@ class TransferRepository internal constructor(context: Context) {
 
     fun insertAll(transfers: List<Transfer>) {
         insertAllAsyncTask(mTransferDao).execute(transfers)
+    }
+
+    fun getAll(): LiveData<List<Transfer>> {
+        return mTransferDao.getAll()
     }
 
     fun getCount(): Single<Int> {

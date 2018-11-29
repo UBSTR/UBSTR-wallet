@@ -17,7 +17,7 @@ import cy.agorise.graphenej.models.JsonRpcResponse
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : ConnectedActivity() {
-    private val TAG = this.javaClass.name
+    private val TAG = this.javaClass.simpleName
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {

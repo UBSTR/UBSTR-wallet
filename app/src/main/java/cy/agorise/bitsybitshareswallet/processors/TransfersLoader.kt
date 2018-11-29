@@ -51,7 +51,7 @@ import javax.crypto.AEADBadTagException
 class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Lifecycle) : LifecycleObserver,
     ServiceConnection {
 
-    private val TAG = this.javaClass.name
+    private val TAG = this.javaClass.simpleName
 
     /** Constant that specifies if we are on debug mode */
     private val DEBUG = false
