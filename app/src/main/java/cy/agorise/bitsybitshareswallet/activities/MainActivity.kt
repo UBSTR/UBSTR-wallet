@@ -2,6 +2,7 @@ package cy.agorise.bitsybitshareswallet.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -16,6 +17,7 @@ import cy.agorise.graphenej.models.JsonRpcResponse
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : ConnectedActivity() {
+    private val TAG = this.javaClass.name
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -86,22 +88,18 @@ class MainActivity : ConnectedActivity() {
      */
     override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) {
         when (connectionStatusUpdate.updateCode) {
-            ConnectionStatusUpdate.CONNECTED -> {
-                // Instantiating this loader is enough to kick-start the transfers loading procedure
-                TransfersLoader(this, lifecycle)
-            }
-            ConnectionStatusUpdate.DISCONNECTED -> {
-                // Do nothing for now
-            }
+            ConnectionStatusUpdate.CONNECTED -> { /* Do nothing for now */ }
+            ConnectionStatusUpdate.DISCONNECTED -> { /* Do nothing for now */ }
             ConnectionStatusUpdate.AUTHENTICATED -> {}//updateBalances() }
             ConnectionStatusUpdate.API_UPDATE -> {
                 // In certain cases the information about the accounts is not complete, this may not be the best
                 // solution but at least it works. Feel free to improve it or move it to a better place
                 //MissingAccountsLoader(this, lifecycle)
 
-                if (connectionStatusUpdate.api == ApiAccess.API_DATABASE) {
-                    // Updating transfer and exchange costs in all possible input assets
-                    //updateCosts()
+                if (connectionStatusUpdate.api == ApiAccess.API_NETWORK_BROADCAST) {
+                    Log.d(TAG, "ConnectionStatusUpdate: API_NETWORK_BROADCAST")
+                    // Instantiating this loader is enough to kick-start the transfers loading procedure
+                    TransfersLoader(this, lifecycle)
                 }
             }
         }
