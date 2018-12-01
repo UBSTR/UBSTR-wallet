@@ -13,8 +13,11 @@ import androidx.recyclerview.widget.SortedList
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.entities.Transfer
 
-class TransactionsAdapter(private val context: Context, private val mComparator: Comparator<Transfer>) :
+class TransactionsAdapter(private val context: Context) :
     RecyclerView.Adapter<TransactionsAdapter.ViewHolder>() {
+
+    private val mComparator =
+        Comparator<Transfer> { a, b -> a.id.compareTo(b.id) }
 
     private val mSortedList =
         SortedList<Transfer>(Transfer::class.java, object : SortedList.Callback<Transfer>() {
@@ -48,21 +51,17 @@ class TransactionsAdapter(private val context: Context, private val mComparator:
         })
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val rootView            = itemView.findViewById<ConstraintLayout>(R.id.rootView)
-        val vPaymentDirection   = itemView.findViewById<View>(R.id.vPaymentDirection)
-        val tvFrom              = itemView.findViewById<TextView>(R.id.tvFrom)
-        val ivDirectionArrow    = itemView.findViewById<ImageView>(R.id.ivDirectionArrow)
-        val tvTo                = itemView.findViewById<TextView>(R.id.tvTo)
-        val llMemo              = itemView.findViewById<LinearLayout>(R.id.llMemo)
-        val tvMemo              = itemView.findViewById<TextView>(R.id.tvMemo)
-        val tvDate              = itemView.findViewById<TextView>(R.id.tvDate)
-        val tvTime              = itemView.findViewById<TextView>(R.id.tvTime)
-        val tvCryptoAmount      = itemView.findViewById<TextView>(R.id.tvCryptoAmount)
-        val tvFiatEquivalent    = itemView.findViewById<TextView>(R.id.tvFiatEquivalent)
-    }
-
-    init {
-
+        val rootView: ConstraintLayout  = itemView.findViewById(R.id.rootView)
+        val vPaymentDirection: View     = itemView.findViewById(R.id.vPaymentDirection)
+        val tvFrom: TextView            = itemView.findViewById(R.id.tvFrom)
+        val ivDirectionArrow: ImageView = itemView.findViewById(R.id.ivDirectionArrow)
+        val tvTo: TextView              = itemView.findViewById(R.id.tvTo)
+        val llMemo: LinearLayout        = itemView.findViewById(R.id.llMemo)
+        val tvMemo: TextView            = itemView.findViewById(R.id.tvMemo)
+        val tvDate: TextView            = itemView.findViewById(R.id.tvDate)
+        val tvTime: TextView            = itemView.findViewById(R.id.tvTime)
+        val tvCryptoAmount: TextView    = itemView.findViewById(R.id.tvCryptoAmount)
+        val tvFiatEquivalent: TextView  = itemView.findViewById(R.id.tvFiatEquivalent)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionsAdapter.ViewHolder {

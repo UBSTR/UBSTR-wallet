@@ -8,27 +8,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import cy.agorise.bitsybitshareswallet.R
+import cy.agorise.bitsybitshareswallet.adapters.BalancesAdapter
 import cy.agorise.bitsybitshareswallet.adapters.TransactionsAdapter
+import cy.agorise.bitsybitshareswallet.entities.Balance
 import cy.agorise.bitsybitshareswallet.entities.Transfer
 import cy.agorise.bitsybitshareswallet.entities.UserAccount
 import cy.agorise.bitsybitshareswallet.utils.Constants
-import cy.agorise.bitsybitshareswallet.viewmodels.BalancesViewModel
+import cy.agorise.bitsybitshareswallet.viewmodels.BalanceViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.TransactionViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import kotlinx.android.synthetic.main.fragment_balances.*
-import java.util.Comparator
 
 class BalancesFragment : Fragment() {
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
-    private lateinit var mBalancesViewModel: BalancesViewModel
+    private lateinit var mBalanceViewModel: BalanceViewModel
     private lateinit var mTransactionViewModel: TransactionViewModel
-
-    private val mComparator =
-        Comparator<Transfer> { a, b -> a.id.compareTo(b.id) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,6 +39,7 @@ class BalancesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Configure UserAccountViewModel to show the current account
         mUserAccountViewModel = ViewModelProviders.of(this).get(UserAccountViewModel::class.java)
 
         val userId = PreferenceManager.getDefaultSharedPreferences(context)
@@ -49,13 +49,21 @@ class BalancesFragment : Fragment() {
             tvAccountName.text = user.name
         })
 
+        // Configure BalanceViewModel to show the current balances
+        mBalanceViewModel = ViewModelProviders.of(this).get(BalanceViewModel::class.java)
 
-        mBalancesViewModel = ViewModelProviders.of(this).get(BalancesViewModel::class.java)
-        // TODO: Use the ViewModel
+        val balancesAdapter = BalancesAdapter(context!!)
+        rvBalances.adapter = balancesAdapter
+        rvBalances.layoutManager = GridLayoutManager(context, 2)
 
+        mBalanceViewModel.getAll().observe(this, Observer<List<Balance>> { balances ->
+            balancesAdapter.replaceAll(balances)
+        })
+
+        // Configure TransactionViewModel to show the transaction history
         mTransactionViewModel = ViewModelProviders.of(this).get(TransactionViewModel::class.java)
 
-        val transactionsAdapter = TransactionsAdapter(context!!, mComparator)
+        val transactionsAdapter = TransactionsAdapter(context!!)
         rvTransactions.adapter = transactionsAdapter
         rvTransactions.layoutManager = LinearLayoutManager(context)
 

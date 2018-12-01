@@ -150,7 +150,6 @@ class MainActivity : ConnectedActivity() {
         val balances = ArrayList<Balance>()
         for (assetBalance in assetBalances) {
             val balance = Balance(
-                mCurrentAccount!!.objectId,
                 assetBalance.asset.objectId,
                 assetBalance.amount.toLong(),
                 now
