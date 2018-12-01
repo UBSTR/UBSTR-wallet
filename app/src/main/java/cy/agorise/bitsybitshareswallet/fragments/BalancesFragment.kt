@@ -14,9 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.BalancesAdapter
 import cy.agorise.bitsybitshareswallet.adapters.TransactionsAdapter
-import cy.agorise.bitsybitshareswallet.entities.Balance
-import cy.agorise.bitsybitshareswallet.entities.Transfer
-import cy.agorise.bitsybitshareswallet.entities.UserAccount
+import cy.agorise.bitsybitshareswallet.database.entities.Balance
+import cy.agorise.bitsybitshareswallet.database.entities.Transfer
+import cy.agorise.bitsybitshareswallet.database.entities.UserAccount
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.BalanceViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.TransactionViewModel

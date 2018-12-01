@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import cy.agorise.bitsybitshareswallet.R
-import cy.agorise.bitsybitshareswallet.entities.Balance
+import cy.agorise.bitsybitshareswallet.database.entities.Balance
 
 class BalancesAdapter(private val context: Context) :
     RecyclerView.Adapter<BalancesAdapter.ViewHolder>() {

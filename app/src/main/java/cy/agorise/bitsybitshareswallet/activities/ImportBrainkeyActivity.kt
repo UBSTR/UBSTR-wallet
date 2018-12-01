@@ -9,7 +9,7 @@ import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import cy.agorise.bitsybitshareswallet.R
-import cy.agorise.bitsybitshareswallet.entities.Authority
+import cy.agorise.bitsybitshareswallet.database.entities.Authority
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.repositories.UserAccountRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
@@ -235,7 +235,7 @@ class ImportBrainkeyActivity : ConnectedActivity() {
         val name = accountProperties.name
         val isLTM = accountProperties.membership_expiration_date == Constants.LIFETIME_EXPIRATION_DATE
 
-        val userAccount = cy.agorise.bitsybitshareswallet.entities.UserAccount(id, name, isLTM)
+        val userAccount = cy.agorise.bitsybitshareswallet.database.entities.UserAccount(id, name, isLTM)
 
         val userAccountRepository = UserAccountRepository(application)
         userAccountRepository.insert(userAccount)

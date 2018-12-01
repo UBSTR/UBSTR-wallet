@@ -3,9 +3,9 @@ package cy.agorise.bitsybitshareswallet.repositories
 import android.app.Application
 import android.os.AsyncTask
 import androidx.lifecycle.LiveData
-import cy.agorise.bitsybitshareswallet.daos.BitsyDatabase
-import cy.agorise.bitsybitshareswallet.daos.UserAccountDao
-import cy.agorise.bitsybitshareswallet.entities.UserAccount
+import cy.agorise.bitsybitshareswallet.database.BitsyDatabase
+import cy.agorise.bitsybitshareswallet.database.daos.UserAccountDao
+import cy.agorise.bitsybitshareswallet.database.entities.UserAccount
 
 class UserAccountRepository internal constructor(application: Application) {
 

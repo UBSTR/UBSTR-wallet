@@ -3,9 +3,9 @@ package cy.agorise.bitsybitshareswallet.repositories
 import android.content.Context
 import android.os.AsyncTask
 import androidx.lifecycle.LiveData
-import cy.agorise.bitsybitshareswallet.daos.BitsyDatabase
-import cy.agorise.bitsybitshareswallet.daos.TransferDao
-import cy.agorise.bitsybitshareswallet.entities.Transfer
+import cy.agorise.bitsybitshareswallet.database.BitsyDatabase
+import cy.agorise.bitsybitshareswallet.database.daos.TransferDao
+import cy.agorise.bitsybitshareswallet.database.entities.Transfer
 import io.reactivex.Single
 
 class TransferRepository internal constructor(context: Context) {

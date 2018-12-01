@@ -2,9 +2,9 @@ package cy.agorise.bitsybitshareswallet.repositories
 
 import android.app.Application
 import android.os.AsyncTask
-import cy.agorise.bitsybitshareswallet.daos.AssetDao
-import cy.agorise.bitsybitshareswallet.daos.BitsyDatabase
-import cy.agorise.bitsybitshareswallet.entities.Asset
+import cy.agorise.bitsybitshareswallet.database.daos.AssetDao
+import cy.agorise.bitsybitshareswallet.database.BitsyDatabase
+import cy.agorise.bitsybitshareswallet.database.entities.Asset
 
 class AssetRepository internal constructor(application: Application) {
 

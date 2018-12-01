@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.collection.LongSparseArray
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import cy.agorise.bitsybitshareswallet.R
-import cy.agorise.bitsybitshareswallet.entities.Balance
+import cy.agorise.bitsybitshareswallet.database.entities.Balance
 import cy.agorise.bitsybitshareswallet.fragments.BalancesFragment
 import cy.agorise.bitsybitshareswallet.fragments.MerchantsFragment
 import cy.agorise.bitsybitshareswallet.processors.TransfersLoader

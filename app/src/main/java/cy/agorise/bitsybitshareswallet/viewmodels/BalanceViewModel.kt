@@ -3,7 +3,7 @@ package cy.agorise.bitsybitshareswallet.viewmodels
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import cy.agorise.bitsybitshareswallet.entities.Balance
+import cy.agorise.bitsybitshareswallet.database.entities.Balance
 import cy.agorise.bitsybitshareswallet.repositories.BalanceRepository
 
 

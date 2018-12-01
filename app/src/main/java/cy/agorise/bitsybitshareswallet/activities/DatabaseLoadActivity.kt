@@ -89,11 +89,11 @@ class DatabaseLoadActivity: ConnectedActivity() {
      * @param assetList The list of assets obtained in the last 'list_assets' API call.
      */
     private fun handlePlatformAssetBatch(assetList: List<Asset>) {
-        val assets = mutableListOf<cy.agorise.bitsybitshareswallet.entities.Asset>()
+        val assets = mutableListOf<cy.agorise.bitsybitshareswallet.database.entities.Asset>()
 
         // TODO find if there is a better way to convert to Bitsy Asset instances
         for (_asset in assetList) {
-            val asset = cy.agorise.bitsybitshareswallet.entities.Asset(
+            val asset = cy.agorise.bitsybitshareswallet.database.entities.Asset(
                 _asset.objectId,
                 _asset.symbol,
                 _asset.precision,

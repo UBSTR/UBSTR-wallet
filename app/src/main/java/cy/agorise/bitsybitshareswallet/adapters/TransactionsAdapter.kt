@@ -11,7 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import cy.agorise.bitsybitshareswallet.R
-import cy.agorise.bitsybitshareswallet.entities.Transfer
+import cy.agorise.bitsybitshareswallet.database.entities.Transfer
 
 class TransactionsAdapter(private val context: Context) :
     RecyclerView.Adapter<TransactionsAdapter.ViewHolder>() {

@@ -2,9 +2,9 @@ package cy.agorise.bitsybitshareswallet.repositories
 
 import android.content.Context
 import android.os.AsyncTask
-import cy.agorise.bitsybitshareswallet.daos.AuthorityDao
-import cy.agorise.bitsybitshareswallet.daos.BitsyDatabase
-import cy.agorise.bitsybitshareswallet.entities.Authority
+import cy.agorise.bitsybitshareswallet.database.daos.AuthorityDao
+import cy.agorise.bitsybitshareswallet.database.BitsyDatabase
+import cy.agorise.bitsybitshareswallet.database.entities.Authority
 import io.reactivex.Single
 
 class AuthorityRepository internal constructor(context: Context) {

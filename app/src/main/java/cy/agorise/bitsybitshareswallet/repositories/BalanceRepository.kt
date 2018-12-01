@@ -3,9 +3,9 @@ package cy.agorise.bitsybitshareswallet.repositories
 import android.content.Context
 import android.os.AsyncTask
 import androidx.lifecycle.LiveData
-import cy.agorise.bitsybitshareswallet.daos.BalanceDao
-import cy.agorise.bitsybitshareswallet.daos.BitsyDatabase
-import cy.agorise.bitsybitshareswallet.entities.Balance
+import cy.agorise.bitsybitshareswallet.database.daos.BalanceDao
+import cy.agorise.bitsybitshareswallet.database.BitsyDatabase
+import cy.agorise.bitsybitshareswallet.database.entities.Balance
 
 class BalanceRepository internal constructor(context: Context) {
 

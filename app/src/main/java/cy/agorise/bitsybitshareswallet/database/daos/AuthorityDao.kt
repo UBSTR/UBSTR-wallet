@@ -1,10 +1,10 @@
-package cy.agorise.bitsybitshareswallet.daos
+package cy.agorise.bitsybitshareswallet.database.daos
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import cy.agorise.bitsybitshareswallet.entities.Authority
+import cy.agorise.bitsybitshareswallet.database.entities.Authority
 import io.reactivex.Single
 
 @Dao
