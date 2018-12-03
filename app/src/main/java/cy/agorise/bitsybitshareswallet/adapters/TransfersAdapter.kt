@@ -11,16 +11,16 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import cy.agorise.bitsybitshareswallet.R
-import cy.agorise.bitsybitshareswallet.database.entities.Transfer
+import cy.agorise.bitsybitshareswallet.database.joins.TransferDetail
 
-class TransactionsAdapter(private val context: Context) :
-    RecyclerView.Adapter<TransactionsAdapter.ViewHolder>() {
+class TransfersAdapter(private val context: Context) :
+    RecyclerView.Adapter<TransfersAdapter.ViewHolder>() {
 
     private val mComparator =
-        Comparator<Transfer> { a, b -> a.id.compareTo(b.id) }
+        Comparator<TransferDetail> { a, b -> a.id.compareTo(b.id) }
 
     private val mSortedList =
-        SortedList<Transfer>(Transfer::class.java, object : SortedList.Callback<Transfer>() {
+        SortedList<TransferDetail>(TransferDetail::class.java, object : SortedList.Callback<TransferDetail>() {
             override fun onInserted(position: Int, count: Int) {
                 notifyItemRangeInserted(position, count)
             }
@@ -37,15 +37,15 @@ class TransactionsAdapter(private val context: Context) :
                 notifyItemRangeChanged(position, count)
             }
 
-            override fun compare(a: Transfer, b: Transfer): Int {
+            override fun compare(a: TransferDetail, b: TransferDetail): Int {
                 return mComparator.compare(a, b)
             }
 
-            override fun areContentsTheSame(oldItem: Transfer, newItem: Transfer): Boolean {
+            override fun areContentsTheSame(oldItem: TransferDetail, newItem: TransferDetail): Boolean {
                 return oldItem == newItem
             }
 
-            override fun areItemsTheSame(item1: Transfer, item2: Transfer): Boolean {
+            override fun areItemsTheSame(item1: TransferDetail, item2: TransferDetail): Boolean {
                 return item1.id == item2.id
             }
         })
@@ -64,7 +64,7 @@ class TransactionsAdapter(private val context: Context) :
         val tvFiatEquivalent: TextView  = itemView.findViewById(R.id.tvFiatEquivalent)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionsAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransfersAdapter.ViewHolder {
         val inflater = LayoutInflater.from(context)
 
         val transactionView = inflater.inflate(R.layout.item_transaction, parent, false)
@@ -73,41 +73,41 @@ class TransactionsAdapter(private val context: Context) :
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        val transaction = mSortedList.get(position)
+        val transferDetail = mSortedList.get(position)
 
-        viewHolder.tvFrom.text = transaction.source
-        viewHolder.tvTo.text = transaction.destination
+        viewHolder.tvFrom.text = transferDetail.from
+        viewHolder.tvTo.text = transferDetail.to
     }
 
-    fun add(transaction: Transfer) {
-        mSortedList.add(transaction)
+    fun add(transferDetail: TransferDetail) {
+        mSortedList.add(transferDetail)
     }
 
-    fun remove(transaction: Transfer) {
-        mSortedList.remove(transaction)
+    fun remove(transferDetail: TransferDetail) {
+        mSortedList.remove(transferDetail)
     }
 
-    fun add(transactions: List<Transfer>) {
-        mSortedList.addAll(transactions)
+    fun add(transfersDetails: List<TransferDetail>) {
+        mSortedList.addAll(transfersDetails)
     }
 
-    fun remove(transactions: List<Transfer>) {
+    fun remove(transfersDetails: List<TransferDetail>) {
         mSortedList.beginBatchedUpdates()
-        for (transaction in transactions) {
-            mSortedList.remove(transaction)
+        for (transferDetail in transfersDetails) {
+            mSortedList.remove(transferDetail)
         }
         mSortedList.endBatchedUpdates()
     }
 
-    fun replaceAll(transactions: List<Transfer>) {
+    fun replaceAll(transfersDetails: List<TransferDetail>) {
         mSortedList.beginBatchedUpdates()
         for (i in mSortedList.size() - 1 downTo 0) {
-            val transaction = mSortedList.get(i)
-            if (!transactions.contains(transaction)) {
-                mSortedList.remove(transaction)
+            val transferDetail = mSortedList.get(i)
+            if (!transfersDetails.contains(transferDetail)) {
+                mSortedList.remove(transferDetail)
             }
         }
-        mSortedList.addAll(transactions)
+        mSortedList.addAll(transfersDetails)
         mSortedList.endBatchedUpdates()
     }
 

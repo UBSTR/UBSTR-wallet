@@ -13,13 +13,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.BalancesAdapter
-import cy.agorise.bitsybitshareswallet.adapters.TransactionsAdapter
-import cy.agorise.bitsybitshareswallet.database.entities.Transfer
+import cy.agorise.bitsybitshareswallet.adapters.TransfersAdapter
 import cy.agorise.bitsybitshareswallet.database.entities.UserAccount
 import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
+import cy.agorise.bitsybitshareswallet.database.joins.TransferDetail
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.BalanceDetailViewModel
-import cy.agorise.bitsybitshareswallet.viewmodels.TransactionViewModel
+import cy.agorise.bitsybitshareswallet.viewmodels.TransferDetailViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import kotlinx.android.synthetic.main.fragment_balances.*
 
@@ -27,7 +27,7 @@ class BalancesFragment : Fragment() {
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
     private lateinit var mBalanceDetailViewModel: BalanceDetailViewModel
-    private lateinit var mTransactionViewModel: TransactionViewModel
+    private lateinit var mTransferDetailViewModel: TransferDetailViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,15 +60,15 @@ class BalancesFragment : Fragment() {
             balancesAdapter.replaceAll(balancesDetails)
         })
 
-        // Configure TransactionViewModel to show the transaction history
-        mTransactionViewModel = ViewModelProviders.of(this).get(TransactionViewModel::class.java)
+        // Configure TransferDetailViewModel to show the transaction history
+        mTransferDetailViewModel = ViewModelProviders.of(this).get(TransferDetailViewModel::class.java)
 
-        val transactionsAdapter = TransactionsAdapter(context!!)
-        rvTransactions.adapter = transactionsAdapter
+        val transfersAdapter = TransfersAdapter(context!!)
+        rvTransactions.adapter = transfersAdapter
         rvTransactions.layoutManager = LinearLayoutManager(context)
 
-        mTransactionViewModel.getAll().observe(this, Observer<List<Transfer>> { transfers ->
-            transactionsAdapter.replaceAll(transfers)
+        mTransferDetailViewModel.getAll().observe(this, Observer<List<TransferDetail>> { transfersDetails ->
+            transfersAdapter.replaceAll(transfersDetails)
         })
     }
 }
