@@ -8,16 +8,16 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import cy.agorise.bitsybitshareswallet.R
-import cy.agorise.bitsybitshareswallet.database.entities.Balance
+import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
 
 class BalancesAdapter(private val context: Context) :
     RecyclerView.Adapter<BalancesAdapter.ViewHolder>() {
 
     private val mComparator =
-        Comparator<Balance> { a, b -> a.assetId.compareTo(b.assetId) }
+        Comparator<BalanceDetail> { a, b -> a.symbol.compareTo(b.symbol) }
 
     private val mSortedList =
-        SortedList<Balance>(Balance::class.java, object : SortedList.Callback<Balance>() {
+        SortedList<BalanceDetail>(BalanceDetail::class.java, object : SortedList.Callback<BalanceDetail>() {
             override fun onInserted(position: Int, count: Int) {
                 notifyItemRangeInserted(position, count)
             }
@@ -34,16 +34,16 @@ class BalancesAdapter(private val context: Context) :
                 notifyItemRangeChanged(position, count)
             }
 
-            override fun compare(a: Balance, b: Balance): Int {
+            override fun compare(a: BalanceDetail, b: BalanceDetail): Int {
                 return mComparator.compare(a, b)
             }
 
-            override fun areContentsTheSame(oldItem: Balance, newItem: Balance): Boolean {
+            override fun areContentsTheSame(oldItem: BalanceDetail, newItem: BalanceDetail): Boolean {
                 return oldItem == newItem
             }
 
-            override fun areItemsTheSame(item1: Balance, item2: Balance): Boolean {
-                return item1.assetId == item2.assetId
+            override fun areItemsTheSame(item1: BalanceDetail, item2: BalanceDetail): Boolean {
+                return item1.id == item2.id
             }
         })
 
@@ -62,23 +62,25 @@ class BalancesAdapter(private val context: Context) :
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val balance = mSortedList.get(position)
 
-        val amount = "${balance.assetAmount} ${balance.assetId}"
-        viewHolder.tvBalance.text = amount
+        val amount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
+
+        viewHolder.tvBalance.text =
+                String.format("%." + Math.min(balance.precision, 8) + "f %s", amount, balance.symbol)
     }
 
-    fun add(balance: Balance) {
+    fun add(balance: BalanceDetail) {
         mSortedList.add(balance)
     }
 
-    fun remove(balance: Balance) {
+    fun remove(balance: BalanceDetail) {
         mSortedList.remove(balance)
     }
 
-    fun add(balances: List<Balance>) {
+    fun add(balances: List<BalanceDetail>) {
         mSortedList.addAll(balances)
     }
 
-    fun remove(balances: List<Balance>) {
+    fun remove(balances: List<BalanceDetail>) {
         mSortedList.beginBatchedUpdates()
         for (balance in balances) {
             mSortedList.remove(balance)
@@ -86,7 +88,7 @@ class BalancesAdapter(private val context: Context) :
         mSortedList.endBatchedUpdates()
     }
 
-    fun replaceAll(balances: List<Balance>) {
+    fun replaceAll(balances: List<BalanceDetail>) {
         mSortedList.beginBatchedUpdates()
         for (i in mSortedList.size() - 1 downTo 0) {
             val balance = mSortedList.get(i)

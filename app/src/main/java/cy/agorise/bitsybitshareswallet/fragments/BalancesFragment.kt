@@ -14,11 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.BalancesAdapter
 import cy.agorise.bitsybitshareswallet.adapters.TransactionsAdapter
-import cy.agorise.bitsybitshareswallet.database.entities.Balance
 import cy.agorise.bitsybitshareswallet.database.entities.Transfer
 import cy.agorise.bitsybitshareswallet.database.entities.UserAccount
+import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
 import cy.agorise.bitsybitshareswallet.utils.Constants
-import cy.agorise.bitsybitshareswallet.viewmodels.BalanceViewModel
+import cy.agorise.bitsybitshareswallet.viewmodels.BalanceDetailViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.TransactionViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import kotlinx.android.synthetic.main.fragment_balances.*
@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.fragment_balances.*
 class BalancesFragment : Fragment() {
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
-    private lateinit var mBalanceViewModel: BalanceViewModel
+    private lateinit var mBalanceDetailViewModel: BalanceDetailViewModel
     private lateinit var mTransactionViewModel: TransactionViewModel
 
     override fun onCreateView(
@@ -49,15 +49,15 @@ class BalancesFragment : Fragment() {
             tvAccountName.text = user.name
         })
 
-        // Configure BalanceViewModel to show the current balances
-        mBalanceViewModel = ViewModelProviders.of(this).get(BalanceViewModel::class.java)
+        // Configure BalanceDetailViewModel to show the current balances
+        mBalanceDetailViewModel = ViewModelProviders.of(this).get(BalanceDetailViewModel::class.java)
 
         val balancesAdapter = BalancesAdapter(context!!)
         rvBalances.adapter = balancesAdapter
         rvBalances.layoutManager = GridLayoutManager(context, 2)
 
-        mBalanceViewModel.getAll().observe(this, Observer<List<Balance>> { balances ->
-            balancesAdapter.replaceAll(balances)
+        mBalanceDetailViewModel.getAll().observe(this, Observer<List<BalanceDetail>> { balancesDetails ->
+            balancesAdapter.replaceAll(balancesDetails)
         })
 
         // Configure TransactionViewModel to show the transaction history

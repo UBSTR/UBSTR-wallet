@@ -6,6 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import cy.agorise.bitsybitshareswallet.database.daos.*
 import cy.agorise.bitsybitshareswallet.database.entities.*
+import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
+import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetailDao
 
 @Database(entities = [
         Asset::class,
@@ -24,6 +26,7 @@ abstract class BitsyDatabase : RoomDatabase() {
     abstract fun equivalentValueDao(): EquivalentValueDao
     abstract fun transferDao(): TransferDao
     abstract fun userAccountDao(): UserAccountDao
+    abstract fun balanceDetailDao(): BalanceDetailDao
 
     companion object {
 
