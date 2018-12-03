@@ -8,11 +8,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.collection.LongSparseArray
+import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.database.entities.Balance
 import cy.agorise.bitsybitshareswallet.fragments.BalancesFragment
 import cy.agorise.bitsybitshareswallet.fragments.MerchantsFragment
+import cy.agorise.bitsybitshareswallet.fragments.ReceiveTransactionFragment
+import cy.agorise.bitsybitshareswallet.fragments.SendTransactionFragment
 import cy.agorise.bitsybitshareswallet.processors.TransfersLoader
 import cy.agorise.bitsybitshareswallet.repositories.BalanceRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
@@ -39,19 +42,19 @@ class MainActivity : ConnectedActivity() {
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_receive -> {
-                Toast.makeText(this, "Receive Fragment", Toast.LENGTH_SHORT).show()
+                loadFragment(ReceiveTransactionFragment())
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_balances -> {
-                loadBalancesFragment()
+                loadFragment(BalancesFragment())
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_merchants -> {
-                loadMerchantsFragment()
+                loadFragment(MerchantsFragment())
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_send -> {
-                Toast.makeText(this, "Send Fragment", Toast.LENGTH_SHORT).show()
+                loadFragment(SendTransactionFragment())
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -73,15 +76,9 @@ class MainActivity : ConnectedActivity() {
         mBalanceRepository = BalanceRepository(this)
     }
 
-    private fun loadBalancesFragment() {
+    private fun loadFragment(fragment: Fragment) {
         val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.fragment_frame, BalancesFragment())
-        ft.commit()
-    }
-
-    private fun loadMerchantsFragment() {
-        val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.fragment_frame, MerchantsFragment())
+        ft.replace(R.id.fragment_frame, fragment)
         ft.commit()
     }
 

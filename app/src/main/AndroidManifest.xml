@@ -28,8 +28,6 @@
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/title_settings"/>
-        <activity android:name=".activities.SendTransactionActivity"/>
-        <activity android:name=".activities.ReceiveTransactionActivity"/>
     </application>
 
 </manifest>
