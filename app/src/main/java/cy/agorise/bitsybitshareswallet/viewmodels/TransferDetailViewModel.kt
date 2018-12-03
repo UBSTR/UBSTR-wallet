@@ -9,7 +9,7 @@ import cy.agorise.bitsybitshareswallet.repositories.TransferDetailRepository
 class TransferDetailViewModel(application: Application) : AndroidViewModel(application) {
     private var mRepository = TransferDetailRepository(application)
 
-    internal fun getAll(): LiveData<List<TransferDetail>> {
-        return mRepository.getAll()
+    internal fun getAll(userId: String): LiveData<List<TransferDetail>> {
+        return mRepository.getAll(userId)
     }
 }

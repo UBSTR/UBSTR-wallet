@@ -1,6 +1,7 @@
 package cy.agorise.bitsybitshareswallet.adapters
 
 import android.content.Context
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,9 +13,13 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.database.joins.TransferDetail
+import cy.agorise.bitsybitshareswallet.utils.Constants
 
 class TransfersAdapter(private val context: Context) :
     RecyclerView.Adapter<TransfersAdapter.ViewHolder>() {
+
+    val userId = PreferenceManager.getDefaultSharedPreferences(context)
+        .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "")!!
 
     private val mComparator =
         Comparator<TransferDetail> { a, b -> a.id.compareTo(b.id) }
@@ -75,8 +80,16 @@ class TransfersAdapter(private val context: Context) :
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val transferDetail = mSortedList.get(position)
 
+        viewHolder.vPaymentDirection.setBackgroundColor(context.resources.getColor(
+            if(transferDetail.direction) R.color.colorReceive else R.color.colorSend
+        ))
+
         viewHolder.tvFrom.text = transferDetail.from
         viewHolder.tvTo.text = transferDetail.to
+
+        viewHolder.ivDirectionArrow.setImageDrawable(context.getDrawable(
+            if(transferDetail.direction) R.drawable.ic_arrow_receive else R.drawable.ic_arrow_send
+        ))
     }
 
     fun add(transferDetail: TransferDetail) {

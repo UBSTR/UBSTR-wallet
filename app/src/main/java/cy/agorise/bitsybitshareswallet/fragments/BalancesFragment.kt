@@ -67,7 +67,7 @@ class BalancesFragment : Fragment() {
         rvTransactions.adapter = transfersAdapter
         rvTransactions.layoutManager = LinearLayoutManager(context)
 
-        mTransferDetailViewModel.getAll().observe(this, Observer<List<TransferDetail>> { transfersDetails ->
+        mTransferDetailViewModel.getAll(userId).observe(this, Observer<List<TransferDetail>> { transfersDetails ->
             transfersAdapter.replaceAll(transfersDetails)
         })
     }
