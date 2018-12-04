@@ -18,5 +18,4 @@ class BalanceDetailRepository internal constructor(context: Context) {
     fun getAll(): LiveData<List<BalanceDetail>> {
         return mBalanceDetailDao.getAll()
     }
-
 }
