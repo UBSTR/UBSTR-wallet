@@ -42,6 +42,7 @@
                 android:id="@+id/tietTo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:digits="abcdefghijklmnopqrstuvwxyz-0123456789"
                 android:maxLines="1"/>
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -135,7 +136,7 @@
             app:layout_constraintEnd_toStartOf="@id/cameraVerticalGuideline"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabCloseCamera"
+            android:id="@+id/fabOpenCamera"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fabCustomSize="32dp"
@@ -145,7 +146,7 @@
             app:srcCompat="@drawable/ic_camera" />
 
         <me.dm7.barcodescanner.zxing.ZXingScannerView
-            android:id="@+id/ivCamera"
+            android:id="@+id/cameraPreview"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintDimensionRatio="w,3:4"

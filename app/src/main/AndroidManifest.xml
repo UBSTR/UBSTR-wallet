@@ -3,6 +3,8 @@
       xmlns:tools="http://schemas.android.com/tools"
       package="cy.agorise.bitsybitshareswallet">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:name=".utils.BitsyApplication"
         android:allowBackup="true"
