@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -40,6 +41,8 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler {
 
     private var mAssetsAdapter: AssetsAdapter? = null
 
+    private var selectedAssetSymbol = ""
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_send_transaction, container, false)
@@ -59,7 +62,25 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler {
             mBalancesDetails = balancesDetails
             mAssetsAdapter = AssetsAdapter(context!!, android.R.layout.simple_spinner_item, mBalancesDetails!!)
             spAsset.adapter = mAssetsAdapter
+
+            // Try to select the selectedAssetSymbol
+            for (i in 0 until mAssetsAdapter!!.count) {
+                if (mAssetsAdapter!!.getItem(i)!!.symbol == selectedAssetSymbol) {
+                    spAsset.setSelection(i)
+                    break
+                }
+            }
         })
+
+        spAsset.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) { }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedAssetSymbol = mAssetsAdapter!!.getItem(position)!!.symbol
+            }
+        }
+
+        fabSendTransaction.setOnClickListener { validateFields() }
     }
 
     private fun verifyCameraPermission() {
@@ -138,6 +159,10 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler {
         }catch (e: Exception) {
             Log.d(TAG, "Invoice error: " + e.message)
         }
+    }
+
+    private fun validateFields() {
+
     }
 
     override fun onResume() {
