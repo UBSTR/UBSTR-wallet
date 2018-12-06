@@ -43,7 +43,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:digits="abcdefghijklmnopqrstuvwxyz-0123456789"
-                android:maxLines="1"/>
+                android:maxLines="1"
+                android:lines="1"
+                android:imeOptions="actionNext"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -89,6 +91,17 @@
             app:layout_constraintTop_toBottomOf="@+id/spAsset"
             app:layout_constraintEnd_toEndOf="@+id/spAsset"
             app:layout_constraintStart_toStartOf="@+id/spAsset" />
+
+        <TextView
+            android:id="@+id/tvAvailableAssetAmount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.Bitsy.Caption"
+            tools:text="12.01253 BTS"
+            android:textAlignment="center"
+            app:layout_constraintTop_toBottomOf="@id/vSpinner"
+            app:layout_constraintStart_toStartOf="@id/vSpinner"
+            app:layout_constraintEnd_toEndOf="@id/vSpinner"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilMemo"

@@ -55,6 +55,8 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
     private val RESPONSE_GET_ACCOUNT_BY_NAME = 1
 
     private var isCameraPreviewVisible = false
+    private var isToAccountCorrect = false
+    private var isAmountCorrect = false
 
     private var mBalancesDetails: List<BalanceDetail>? = null
 
@@ -119,7 +121,13 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             override fun onNothingSelected(parent: AdapterView<*>?) { }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                selectedAssetSymbol = mAssetsAdapter!!.getItem(position)!!.symbol
+                val balance = mAssetsAdapter!!.getItem(position)!!
+                selectedAssetSymbol = balance.symbol
+
+                val amount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
+
+                tvAvailableAssetAmount.text =
+                        String.format("%." + Math.min(balance.precision, 8) + "f %s", amount, balance.symbol)
             }
         }
 
@@ -128,13 +136,21 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
         // Use RxJava Debounce to avoid making calls to the NetworkService on every text change event
         mDisposables.add(RxTextView.textChanges(tietTo)
+            .debounce(500, TimeUnit.MILLISECONDS)
             .map { it.toString().trim() }
             .filter { it.length > 1 }
-            .debounce(500, TimeUnit.MILLISECONDS)
             .subscribe {
                 val id = mNetworkService!!.sendMessage(GetAccountByName(it!!), GetAccountByName.REQUIRED_API)
                 responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME
             }
+        )
+
+        mDisposables.add(RxTextView.textChanges(tietAmount)
+            .debounce(500, TimeUnit.MILLISECONDS)
+            .filter { it.isNotEmpty() }
+            .map { it.toString().trim().toDouble() }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { validateAmount(it!!) }
         )
 
         mDisposables.add(RxBus.getBusInstance()
@@ -164,12 +180,14 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
         if (result is AccountProperties) {
             mSelectedUserAccount = UserAccount(result.id, result.name)
             tilTo.isErrorEnabled = false
-            fabSendTransaction.show()
+            isToAccountCorrect = true
         } else {
             mSelectedUserAccount = null
             tilTo.error = "Invalid account"
-            fabSendTransaction.hide()
+            isToAccountCorrect = false
         }
+
+        enableDisableSendFAB()
     }
 
     private fun verifyCameraPermission() {
@@ -250,13 +268,30 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
         }
     }
 
+    private fun validateAmount(amount: Double) {
+        val balance = mAssetsAdapter!!.getItem(spAsset.selectedItemPosition)!!
+        val currentAmount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
+
+        if (currentAmount < amount) {
+            tilAmount.error = "Not enough funds"
+            isAmountCorrect = false
+        } else {
+            tilAmount.isErrorEnabled = false
+            isAmountCorrect = true
+        }
+
+        enableDisableSendFAB()
+    }
+
+    private fun enableDisableSendFAB() {
+        if (isToAccountCorrect && isAmountCorrect)
+            fabSendTransaction.show()
+        else
+            fabSendTransaction.hide()
+    }
+
     private fun validateFields() {
-        tilAmount.isErrorEnabled = false
-
-//        val selectedAsset = mAssetsAdapter!!.getItem(spAsset.selectedItemPosition)
-//        val selectedAmount = tietAmount.getTex
-
-        // Create TransferOperation
+                // Create TransferOperation
         val builder = TransferOperationBuilder()
         builder.setSource(mUserAccount)
     }
