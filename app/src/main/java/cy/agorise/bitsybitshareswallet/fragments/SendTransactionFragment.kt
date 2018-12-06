@@ -1,8 +1,14 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
 import android.Manifest
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.IBinder
+import android.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,23 +21,38 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
+import com.jakewharton.rxbinding2.widget.RxTextView
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.AssetsAdapter
 import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
+import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.BalanceDetailViewModel
 import cy.agorise.graphenej.Invoice
+import cy.agorise.graphenej.UserAccount
+import cy.agorise.graphenej.api.ConnectionStatusUpdate
+import cy.agorise.graphenej.api.android.NetworkService
+import cy.agorise.graphenej.api.android.RxBus
+import cy.agorise.graphenej.api.calls.GetAccountByName
+import cy.agorise.graphenej.models.AccountProperties
+import cy.agorise.graphenej.models.JsonRpcResponse
+import cy.agorise.graphenej.operations.TransferOperationBuilder
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_send_transaction.*
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
-class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler {
+class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, ServiceConnection {
     private val TAG = this.javaClass.simpleName
 
     // Camera Permission
     private val REQUEST_CAMERA_PERMISSION = 1
+
+    private val RESPONSE_GET_ACCOUNT_BY_NAME = 1
 
     private var isCameraPreviewVisible = false
 
@@ -43,6 +64,22 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler {
 
     private var selectedAssetSymbol = ""
 
+    /** Current user account */
+    private var mUserAccount: UserAccount? = null
+
+    /** User account to which send the funds */
+    private var mSelectedUserAccount: UserAccount? = null
+
+    private var mDisposables = CompositeDisposable()
+
+    /* Network service connection */
+    private var mNetworkService: NetworkService? = null
+
+    /** Flag used to keep track of the NetworkService binding state */
+    private var mShouldUnbindNetwork: Boolean = false
+
+    // Map used to keep track of request and response id pairs
+    private val responseMap = HashMap<Long, Int>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_send_transaction, container, false)
@@ -50,6 +87,12 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val userId = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "")
+
+        if (userId != "")
+            mUserAccount = UserAccount(userId)
 
         verifyCameraPermission()
 
@@ -81,6 +124,52 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler {
         }
 
         fabSendTransaction.setOnClickListener { validateFields() }
+        fabSendTransaction.hide()
+
+        // Use RxJava Debounce to avoid making calls to the NetworkService on every text change event
+        mDisposables.add(RxTextView.textChanges(tietTo)
+            .map { it.toString().trim() }
+            .filter { it.length > 1 }
+            .debounce(500, TimeUnit.MILLISECONDS)
+            .subscribe {
+                val id = mNetworkService!!.sendMessage(GetAccountByName(it!!), GetAccountByName.REQUIRED_API)
+                responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME
+            }
+        )
+
+        mDisposables.add(RxBus.getBusInstance()
+                .asFlowable()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { message ->
+                    if (message is JsonRpcResponse<*>) {
+                        if (responseMap.containsKey(message.id)) {
+                            val responseType = responseMap[message.id]
+                            when (responseType) {
+                                RESPONSE_GET_ACCOUNT_BY_NAME -> handleAccountName(message.result)
+                            }
+                            responseMap.remove(message.id)
+                        }
+                    } else if (message is ConnectionStatusUpdate) {
+                        if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
+                            // If we got a disconnection notification, we should clear our response map, since
+                            // all its stored request ids will now be reset
+                            responseMap.clear()
+                        }
+                    }
+                }
+        )
+    }
+
+    private fun handleAccountName(result: Any?) {
+        if (result is AccountProperties) {
+            mSelectedUserAccount = UserAccount(result.id, result.name)
+            tilTo.isErrorEnabled = false
+            fabSendTransaction.show()
+        } else {
+            mSelectedUserAccount = null
+            tilTo.error = "Invalid account"
+            fabSendTransaction.hide()
+        }
     }
 
     private fun verifyCameraPermission() {
@@ -162,18 +251,46 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler {
     }
 
     private fun validateFields() {
+        tilAmount.isErrorEnabled = false
 
+//        val selectedAsset = mAssetsAdapter!!.getItem(spAsset.selectedItemPosition)
+//        val selectedAmount = tietAmount.getTex
+
+        // Create TransferOperation
+        val builder = TransferOperationBuilder()
+        builder.setSource(mUserAccount)
     }
 
     override fun onResume() {
         super.onResume()
         if (isCameraPreviewVisible)
             startCameraPreview()
+
+        val intent = Intent(context, NetworkService::class.java)
+        if (context!!.bindService(intent, this, Context.BIND_AUTO_CREATE)) {
+            mShouldUnbindNetwork = true
+        } else {
+            Log.e(TAG, "Binding to the network service failed.")
+        }
     }
 
     override fun onPause() {
         super.onPause()
         if (!isCameraPreviewVisible)
             stopCameraPreview()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (!mDisposables.isDisposed) mDisposables.dispose()
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) { }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        // We've bound to LocalService, cast the IBinder and get LocalService instance
+        val binder = service as NetworkService.LocalBinder
+        mNetworkService = binder.service
     }
 }

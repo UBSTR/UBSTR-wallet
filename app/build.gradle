@@ -47,6 +47,7 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-rxjava2:$room_version" // RxJava support for Room
 
+    implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
 
     implementation 'org.bitcoinj:bitcoinj-core:0.14.3'
     implementation 'com.moldedbits.r2d2:r2d2:1.0.1'
