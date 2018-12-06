@@ -36,6 +36,8 @@ import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
 import cy.agorise.graphenej.api.calls.GetAccountByName
 import cy.agorise.graphenej.api.calls.GetDynamicGlobalProperties
+import cy.agorise.graphenej.api.calls.GetRequiredFees
+import cy.agorise.graphenej.crypto.SecureRandomGenerator
 import cy.agorise.graphenej.models.AccountProperties
 import cy.agorise.graphenej.models.DynamicGlobalProperties
 import cy.agorise.graphenej.models.JsonRpcResponse
@@ -62,7 +64,8 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
     private val REQUEST_CAMERA_PERMISSION = 1
 
     private val RESPONSE_GET_ACCOUNT_BY_NAME = 1
-    private val RESPOSE_GET_DYNAMIC_GLOBAL_PARAMETERS = 2
+    private val RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS = 2
+    private val RESPONSE_GET_REQUIRED_FEES = 3
 
     private var isCameraPreviewVisible = false
     private var isToAccountCorrect = false
@@ -100,6 +103,9 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
     /** Repository to access and update Authorities */
     private var authorityRepository: AuthorityRepository? = null
+
+    /* This is one of the of the recipient account's public key, it will be used for memo encoding */
+    private var destinationPublicKey: PublicKey? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_send_transaction, container, false)
@@ -199,8 +205,9 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             if (responseMap.containsKey(message.id)) {
                 val responseType = responseMap[message.id]
                 when (responseType) {
-                    RESPONSE_GET_ACCOUNT_BY_NAME -> handleAccountName(message.result)
-                    RESPOSE_GET_DYNAMIC_GLOBAL_PARAMETERS -> handleDynamicGlobalProperties(message.result)
+                    RESPONSE_GET_ACCOUNT_BY_NAME            -> handleAccountName(message.result)
+                    RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS  -> handleDynamicGlobalProperties(message.result)
+                    RESPONSE_GET_REQUIRED_FEES              -> handleRequiredFees(message.result)
                 }
                 responseMap.remove(message.id)
             }
@@ -216,10 +223,12 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
     private fun handleAccountName(result: Any?) {
         if (result is AccountProperties) {
             mSelectedUserAccount = UserAccount(result.id, result.name)
+            destinationPublicKey = result.active.keyAuths.keys.iterator().next()
             tilTo.isErrorEnabled = false
             isToAccountCorrect = true
         } else {
             mSelectedUserAccount = null
+            destinationPublicKey = null
             tilTo.error = "Invalid account"
             isToAccountCorrect = false
         }
@@ -229,8 +238,24 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
     private fun handleDynamicGlobalProperties(result: Any?) {
         if (result is DynamicGlobalProperties) {
-            Log.d(TAG, "DynamicGlobalProperties: " + result.toString())
+            val expirationTime = (result.time.time / 1000) + Transaction.DEFAULT_EXPIRATION_TIME
+            val headBlockId = result.head_block_id
+            val headBlockNumber = result.head_block_number
 
+            transaction!!.blockData = BlockData(headBlockNumber, headBlockId, expirationTime)
+
+            val asset = Asset(mAssetsAdapter!!.getItem(spAsset.selectedItemPosition)!!.id)
+
+            val id = mNetworkService!!.sendMessage(GetRequiredFees(transaction!!, asset), GetRequiredFees.REQUIRED_API)
+            responseMap[id] = RESPONSE_GET_REQUIRED_FEES
+        } else {
+            // TODO unableToSendTransactionError()
+        }
+    }
+
+    private fun handleRequiredFees(result: Any?) {
+        if (result is GetRequiredFees) {
+            Log.d(TAG, "GetRequiredFees: " + result.toString())
         } else {
             // TODO unableToSendTransactionError()
         }
@@ -349,15 +374,27 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
                 .setDestination(mSelectedUserAccount)
                 .setTransferAmount(transferAmount)
 
+            val privateKey = ECKey.fromPrivate(DumpedPrivateKey.fromBase58(null, wifKey).key.privKeyBytes)
+
+            // Add memo if exists
+            val memoMsg = tietMemo.text.toString()
+            if (memoMsg.isNotEmpty()) {
+                val nonce = SecureRandomGenerator.getSecureRandom().nextLong().toBigInteger()
+                val encryptedMemo = Memo.encryptMessage(privateKey, destinationPublicKey!!, nonce, memoMsg)
+                val from = Address(ECKey.fromPublicOnly(privateKey.pubKey))
+                val to = Address(destinationPublicKey!!.key)
+                val memo = Memo(from, to, nonce, encryptedMemo)
+                operationBuilder.setMemo(memo)
+            }
+
             val operations = ArrayList<BaseOperation>()
             operations.add(operationBuilder.build())
 
-            val privateKey = ECKey.fromPrivate(DumpedPrivateKey.fromBase58(null, wifKey).key.privKeyBytes)
             transaction = Transaction(privateKey, null, operations)
 
             val id = mNetworkService!!.sendMessage(GetDynamicGlobalProperties(),
                 GetDynamicGlobalProperties.REQUIRED_API)
-            responseMap[id] =  RESPOSE_GET_DYNAMIC_GLOBAL_PARAMETERS
+            responseMap[id] =  RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS
         } else
             Log.d(TAG, "Network Service is not connected")
     }
