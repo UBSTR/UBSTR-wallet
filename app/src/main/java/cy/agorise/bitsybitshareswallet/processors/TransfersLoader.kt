@@ -72,7 +72,7 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
     /** Repository to access and update Transfers */
     private var transferRepository: TransferRepository? = null
 
-    /** Repository to access and update Transfers */
+    /** Repository to access and update Authorities */
     private var authorityRepository: AuthorityRepository? = null
 
     /* Network service connection */

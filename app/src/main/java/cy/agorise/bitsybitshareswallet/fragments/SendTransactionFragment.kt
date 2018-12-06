@@ -19,32 +19,41 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.google.common.primitives.UnsignedLong
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
 import com.jakewharton.rxbinding2.widget.RxTextView
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.AssetsAdapter
 import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
+import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
+import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
 import cy.agorise.bitsybitshareswallet.viewmodels.BalanceDetailViewModel
-import cy.agorise.graphenej.Invoice
-import cy.agorise.graphenej.UserAccount
+import cy.agorise.graphenej.*
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
 import cy.agorise.graphenej.api.calls.GetAccountByName
+import cy.agorise.graphenej.api.calls.GetDynamicGlobalProperties
 import cy.agorise.graphenej.models.AccountProperties
+import cy.agorise.graphenej.models.DynamicGlobalProperties
 import cy.agorise.graphenej.models.JsonRpcResponse
 import cy.agorise.graphenej.operations.TransferOperationBuilder
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_send_transaction.*
 import me.dm7.barcodescanner.zxing.ZXingScannerView
+import org.bitcoinj.core.DumpedPrivateKey
+import org.bitcoinj.core.ECKey
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.util.ArrayList
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import javax.crypto.AEADBadTagException
 
 class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, ServiceConnection {
     private val TAG = this.javaClass.simpleName
@@ -53,6 +62,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
     private val REQUEST_CAMERA_PERMISSION = 1
 
     private val RESPONSE_GET_ACCOUNT_BY_NAME = 1
+    private val RESPOSE_GET_DYNAMIC_GLOBAL_PARAMETERS = 2
 
     private var isCameraPreviewVisible = false
     private var isToAccountCorrect = false
@@ -82,6 +92,14 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
     // Map used to keep track of request and response id pairs
     private val responseMap = HashMap<Long, Int>()
+
+    private var transaction: Transaction? = null
+
+    /** Variable holding the current user's private key in the WIF format */
+    private var wifKey: String? = null
+
+    /** Repository to access and update Authorities */
+    private var authorityRepository: AuthorityRepository? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_send_transaction, container, false)
@@ -131,8 +149,22 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             }
         }
 
-        fabSendTransaction.setOnClickListener { validateFields() }
+        fabSendTransaction.setOnClickListener { startSendTransferOperation() }
         fabSendTransaction.hide()
+
+        authorityRepository = AuthorityRepository(context!!)
+
+        mDisposables.add(authorityRepository!!.getWIF(userId!!, AuthorityType.ACTIVE.ordinal)
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { encryptedWIF ->
+                try {
+                    wifKey = CryptoUtils.decrypt(context!!, encryptedWIF)
+                } catch (e: AEADBadTagException) {
+                    Log.e(TAG, "AEADBadTagException. Class: " + e.javaClass + ", Msg: " + e.message)
+                }
+
+            })
 
         // Use RxJava Debounce to avoid making calls to the NetworkService on every text change event
         mDisposables.add(RxTextView.textChanges(tietTo)
@@ -145,6 +177,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             }
         )
 
+        // Use RxJava Debounce to update the Amount error only after the user stops writing for > 500 ms
         mDisposables.add(RxTextView.textChanges(tietAmount)
             .debounce(500, TimeUnit.MILLISECONDS)
             .filter { it.isNotEmpty() }
@@ -153,27 +186,31 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             .subscribe { validateAmount(it!!) }
         )
 
+        // Connect to the RxBus, which receives events from the NetworkService
         mDisposables.add(RxBus.getBusInstance()
                 .asFlowable()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { message ->
-                    if (message is JsonRpcResponse<*>) {
-                        if (responseMap.containsKey(message.id)) {
-                            val responseType = responseMap[message.id]
-                            when (responseType) {
-                                RESPONSE_GET_ACCOUNT_BY_NAME -> handleAccountName(message.result)
-                            }
-                            responseMap.remove(message.id)
-                        }
-                    } else if (message is ConnectionStatusUpdate) {
-                        if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
-                            // If we got a disconnection notification, we should clear our response map, since
-                            // all its stored request ids will now be reset
-                            responseMap.clear()
-                        }
-                    }
-                }
+                .subscribe { handleIncomingMessage(it) }
         )
+    }
+
+    private fun handleIncomingMessage(message: Any?) {
+        if (message is JsonRpcResponse<*>) {
+            if (responseMap.containsKey(message.id)) {
+                val responseType = responseMap[message.id]
+                when (responseType) {
+                    RESPONSE_GET_ACCOUNT_BY_NAME -> handleAccountName(message.result)
+                    RESPOSE_GET_DYNAMIC_GLOBAL_PARAMETERS -> handleDynamicGlobalProperties(message.result)
+                }
+                responseMap.remove(message.id)
+            }
+        } else if (message is ConnectionStatusUpdate) {
+            if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
+                // If we got a disconnection notification, we should clear our response map, since
+                // all its stored request ids will now be reset
+                responseMap.clear()
+            }
+        }
     }
 
     private fun handleAccountName(result: Any?) {
@@ -188,6 +225,15 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
         }
 
         enableDisableSendFAB()
+    }
+
+    private fun handleDynamicGlobalProperties(result: Any?) {
+        if (result is DynamicGlobalProperties) {
+            Log.d(TAG, "DynamicGlobalProperties: " + result.toString())
+
+        } else {
+            // TODO unableToSendTransactionError()
+        }
     }
 
     private fun verifyCameraPermission() {
@@ -290,10 +336,30 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             fabSendTransaction.hide()
     }
 
-    private fun validateFields() {
-                // Create TransferOperation
-        val builder = TransferOperationBuilder()
-        builder.setSource(mUserAccount)
+    private fun startSendTransferOperation() {
+        // Create TransferOperation
+        if (mNetworkService!!.isConnected) {
+            val balance = mAssetsAdapter!!.getItem(spAsset.selectedItemPosition)!!
+            val amount = (tietAmount.text.toString().toDouble() * Math.pow(10.0, balance.precision.toDouble())).toLong()
+
+            val transferAmount = AssetAmount(UnsignedLong.valueOf(amount), Asset(balance.id))
+
+            val operationBuilder = TransferOperationBuilder()
+                .setSource(mUserAccount)
+                .setDestination(mSelectedUserAccount)
+                .setTransferAmount(transferAmount)
+
+            val operations = ArrayList<BaseOperation>()
+            operations.add(operationBuilder.build())
+
+            val privateKey = ECKey.fromPrivate(DumpedPrivateKey.fromBase58(null, wifKey).key.privKeyBytes)
+            transaction = Transaction(privateKey, null, operations)
+
+            val id = mNetworkService!!.sendMessage(GetDynamicGlobalProperties(),
+                GetDynamicGlobalProperties.REQUIRED_API)
+            responseMap[id] =  RESPOSE_GET_DYNAMIC_GLOBAL_PARAMETERS
+        } else
+            Log.d(TAG, "Network Service is not connected")
     }
 
     override fun onResume() {
