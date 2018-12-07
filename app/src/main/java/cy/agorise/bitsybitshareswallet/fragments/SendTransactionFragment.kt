@@ -254,8 +254,9 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
     }
 
     private fun handleRequiredFees(result: Any?) {
-        if (result is GetRequiredFees) {
-            Log.d(TAG, "GetRequiredFees: " + result.toString())
+        if (result is List<*> && result[0] is AssetAmount) {
+            Log.d(TAG, "GetRequiredFees: " + transaction.toString())
+            transaction!!.setFees(result as List<AssetAmount>) // TODO find how to remove this warning
         } else {
             // TODO unableToSendTransactionError()
         }

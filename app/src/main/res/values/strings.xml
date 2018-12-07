@@ -41,8 +41,15 @@
     <!-- Balances -->
     <string name="title_transactions">Transactions</string>
 
+    <!-- Send Transaction Fragment -->
+    <string name="text__to">To</string>
+
     <!-- Settings -->
     <string name="title_settings">Settings</string>
     <string name="night_mode">Night mode</string>
+    <string name="text__amount">Amount</string>
+    <string name="text__memo">Memo</string>
+    <string name="text__scan_qr">Scan QR</string>
+
 
 </resources>

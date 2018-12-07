@@ -32,10 +32,9 @@
             style="@style/Widget.Bitsy.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:hint="To"
+            android:hint="@string/text__to"
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -54,7 +53,7 @@
             style="@style/Widget.Bitsy.TextInputLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="Amount"
+            android:hint="@string/text__amount"
             android:layout_marginTop="@dimen/spacing_same_topic"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="12dp"
@@ -111,7 +110,7 @@
             android:layout_marginTop="@dimen/spacing_same_topic"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:hint="Memo"
+            android:hint="@string/text__memo"
             app:layout_constraintTop_toBottomOf="@id/tilAmount">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -129,7 +128,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_same_topic"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:text="Scan QR"
+            android:text="@string/text__scan_qr"
             android:textAppearance="@style/TextAppearance.Bitsy.Body1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tilMemo" />
