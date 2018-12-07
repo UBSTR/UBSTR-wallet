@@ -12,4 +12,8 @@ data class Asset(
     @ColumnInfo(name = "precision") val precision: Int,
     @ColumnInfo(name = "description") val description: String,
     @ColumnInfo(name = "bit_asset_id") val bitAssetId: String
-)
+) {
+    override fun toString(): String {
+        return symbol
+    }
+}

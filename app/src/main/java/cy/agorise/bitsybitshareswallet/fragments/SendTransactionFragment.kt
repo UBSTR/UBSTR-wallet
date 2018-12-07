@@ -24,7 +24,7 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
 import com.jakewharton.rxbinding2.widget.RxTextView
 import cy.agorise.bitsybitshareswallet.R
-import cy.agorise.bitsybitshareswallet.adapters.AssetsAdapter
+import cy.agorise.bitsybitshareswallet.adapters.BalancesDetailsAdapter
 import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
@@ -75,7 +75,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
     private lateinit var mBalanceDetailViewModel: BalanceDetailViewModel
 
-    private var mAssetsAdapter: AssetsAdapter? = null
+    private var mBalancesDetailsAdapter: BalancesDetailsAdapter? = null
 
     private var selectedAssetSymbol = ""
 
@@ -129,12 +129,12 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
         mBalanceDetailViewModel.getAll().observe(this, Observer<List<BalanceDetail>> { balancesDetails ->
             mBalancesDetails = balancesDetails
-            mAssetsAdapter = AssetsAdapter(context!!, android.R.layout.simple_spinner_item, mBalancesDetails!!)
-            spAsset.adapter = mAssetsAdapter
+            mBalancesDetailsAdapter = BalancesDetailsAdapter(context!!, android.R.layout.simple_spinner_item, mBalancesDetails!!)
+            spAsset.adapter = mBalancesDetailsAdapter
 
             // Try to select the selectedAssetSymbol
-            for (i in 0 until mAssetsAdapter!!.count) {
-                if (mAssetsAdapter!!.getItem(i)!!.symbol == selectedAssetSymbol) {
+            for (i in 0 until mBalancesDetailsAdapter!!.count) {
+                if (mBalancesDetailsAdapter!!.getItem(i)!!.symbol == selectedAssetSymbol) {
                     spAsset.setSelection(i)
                     break
                 }
@@ -145,7 +145,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             override fun onNothingSelected(parent: AdapterView<*>?) { }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val balance = mAssetsAdapter!!.getItem(position)!!
+                val balance = mBalancesDetailsAdapter!!.getItem(position)!!
                 selectedAssetSymbol = balance.symbol
 
                 val amount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
@@ -160,40 +160,45 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
         authorityRepository = AuthorityRepository(context!!)
 
-        mDisposables.add(authorityRepository!!.getWIF(userId!!, AuthorityType.ACTIVE.ordinal)
-            .subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { encryptedWIF ->
-                try {
-                    wifKey = CryptoUtils.decrypt(context!!, encryptedWIF)
-                } catch (e: AEADBadTagException) {
-                    Log.e(TAG, "AEADBadTagException. Class: " + e.javaClass + ", Msg: " + e.message)
-                }
+        mDisposables.add(
+            authorityRepository!!.getWIF(userId!!, AuthorityType.ACTIVE.ordinal)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { encryptedWIF ->
+                    try {
+                        wifKey = CryptoUtils.decrypt(context!!, encryptedWIF)
+                    } catch (e: AEADBadTagException) {
+                        Log.e(TAG, "AEADBadTagException. Class: " + e.javaClass + ", Msg: " + e.message)
+                    }
 
-            })
+                }
+        )
 
         // Use RxJava Debounce to avoid making calls to the NetworkService on every text change event
-        mDisposables.add(RxTextView.textChanges(tietTo)
-            .debounce(500, TimeUnit.MILLISECONDS)
-            .map { it.toString().trim() }
-            .filter { it.length > 1 }
-            .subscribe {
-                val id = mNetworkService!!.sendMessage(GetAccountByName(it!!), GetAccountByName.REQUIRED_API)
-                responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME
-            }
+        mDisposables.add(
+            RxTextView.textChanges(tietTo)
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .map { it.toString().trim() }
+                .filter { it.length > 1 }
+                .subscribe {
+                    val id = mNetworkService!!.sendMessage(GetAccountByName(it!!), GetAccountByName.REQUIRED_API)
+                    responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME
+                }
         )
 
         // Use RxJava Debounce to update the Amount error only after the user stops writing for > 500 ms
-        mDisposables.add(RxTextView.textChanges(tietAmount)
-            .debounce(500, TimeUnit.MILLISECONDS)
-            .filter { it.isNotEmpty() }
-            .map { it.toString().trim().toDouble() }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { validateAmount(it!!) }
+        mDisposables.add(
+            RxTextView.textChanges(tietAmount)
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .filter { it.isNotEmpty() }
+                .map { it.toString().trim().toDouble() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { validateAmount(it!!) }
         )
 
         // Connect to the RxBus, which receives events from the NetworkService
-        mDisposables.add(RxBus.getBusInstance()
+        mDisposables.add(
+            RxBus.getBusInstance()
                 .asFlowable()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { handleIncomingMessage(it) }
@@ -244,7 +249,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
             transaction!!.blockData = BlockData(headBlockNumber, headBlockId, expirationTime)
 
-            val asset = Asset(mAssetsAdapter!!.getItem(spAsset.selectedItemPosition)!!.id)
+            val asset = Asset(mBalancesDetailsAdapter!!.getItem(spAsset.selectedItemPosition)!!.id)
 
             val id = mNetworkService!!.sendMessage(GetRequiredFees(transaction!!, asset), GetRequiredFees.REQUIRED_API)
             responseMap[id] = RESPONSE_GET_REQUIRED_FEES
@@ -317,8 +322,8 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
             tietTo.setText(invoice.to)
 
-            for (i in 0 until mAssetsAdapter!!.count) {
-                if (mAssetsAdapter!!.getItem(i)!!.symbol == invoice.currency.toUpperCase()) {
+            for (i in 0 until mBalancesDetailsAdapter!!.count) {
+                if (mBalancesDetailsAdapter!!.getItem(i)!!.symbol == invoice.currency.toUpperCase()) {
                     spAsset.setSelection(i)
                     break
                 }
@@ -341,7 +346,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
     }
 
     private fun validateAmount(amount: Double) {
-        val balance = mAssetsAdapter!!.getItem(spAsset.selectedItemPosition)!!
+        val balance = mBalancesDetailsAdapter!!.getItem(spAsset.selectedItemPosition)!!
         val currentAmount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
 
         if (currentAmount < amount) {
@@ -365,7 +370,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
     private fun startSendTransferOperation() {
         // Create TransferOperation
         if (mNetworkService!!.isConnected) {
-            val balance = mAssetsAdapter!!.getItem(spAsset.selectedItemPosition)!!
+            val balance = mBalancesDetailsAdapter!!.getItem(spAsset.selectedItemPosition)!!
             val amount = (tietAmount.text.toString().toDouble() * Math.pow(10.0, balance.precision.toDouble())).toLong()
 
             val transferAmount = AssetAmount(UnsignedLong.valueOf(amount), Asset(balance.id))

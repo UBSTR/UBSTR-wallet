@@ -16,5 +16,5 @@ interface AssetDao {
     fun insertAll(assets: List<Asset>)
 
     @Query("SELECT * FROM assets")
-    fun getAllAssets(): LiveData<List<Asset>>
+    fun getAll(): LiveData<List<Asset>>
 }

@@ -10,7 +10,7 @@ import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
 
 
 
-class AssetsAdapter(context: Context, resource: Int, data: List<BalanceDetail>) :
+class BalancesDetailsAdapter(context: Context, resource: Int, data: List<BalanceDetail>) :
     ArrayAdapter<BalanceDetail>(context, resource, data) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
