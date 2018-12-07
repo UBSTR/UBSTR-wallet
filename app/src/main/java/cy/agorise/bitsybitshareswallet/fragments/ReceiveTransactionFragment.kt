@@ -24,8 +24,13 @@ import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.AssetViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import cy.agorise.graphenej.*
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_receive_transaction.*
+import java.lang.Exception
+import java.math.RoundingMode
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -75,33 +80,53 @@ class ReceiveTransactionFragment : Fragment() {
             updateQR()
         }
 
+        // Use RxJava Debounce to create QR code only after the user stopped typing an amount
+        mDisposables.add(
+            RxTextView.textChanges(tietAmount)
+                .debounce(1000, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { updateQR() }
+        )
+
         // Use RxJava Debounce to avoid making calls to the NetworkService on every text change event
-//        mDisposables.add(
-//            RxTextView.textChanges(tietAmount)
-//                .debounce(500, TimeUnit.MILLISECONDS)
-//                .map { it.toString().trim() }
-//                .filter { it.length > 1 }
-//                .subscribe {
-//
-//                }
-//        )
+        mDisposables.add(
+            RxTextView.textChanges(actvAsset)
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .filter { it.toString().length < 3 }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    mAsset = null
+                    updateQR()
+                }
+        )
     }
 
     private fun updateQR() {
-        val amount: Long = 10
+        if (mAsset == null) {
+            ivQR.setImageDrawable(null)
+            return
+        }
 
-        val total = Util.fromBase(AssetAmount(UnsignedLong.valueOf(amount), mAsset!!))
-        val items = arrayOf(LineItem("transfer", 1, total))
+        // Try to obtain the amount from the Amount Text Field or make it zero otherwise
+        val amount: Long = try {
+            val tmpAmount = tietAmount.text.toString().toDouble()
+            (tmpAmount * Math.pow(10.0, mAsset!!.precision.toDouble())).toLong()
+        }catch (e: Exception) {
+            0
+        }
+
+        val total = AssetAmount(UnsignedLong.valueOf(amount), mAsset!!)
+        val totalInDouble = Util.fromBase(total)
+        val items = arrayOf(LineItem("transfer", 1, totalInDouble))
         val invoice = Invoice(mUserAccount!!.name, "", "#bitsy", mAsset!!.symbol, items, "", "")
         Log.d(TAG, "invoice: " + invoice.toJsonString())
         try {
             val bitmap = encodeAsBitmap(Invoice.toQrCode(invoice), "#139657") // PalmPay green
             ivQR.setImageBitmap(bitmap)
-//            updateAmountAddressUI(total, mUserAccount!!.getName())
+            updateAmountAddressUI(total, mUserAccount!!.name)
         } catch (e: WriterException) {
             Log.e(TAG, "WriterException. Msg: " + e.message)
         }
-
     }
 
     /**
@@ -149,26 +174,24 @@ class ReceiveTransactionFragment : Fragment() {
         return bitmap
     }
 
-//    /**
-//     * Updates the UI to show amount and address to send the payment
-//     *
-//     * @param amount Amount in crypto to be paid
-//     * @param address Address to pay amount
-//     */
-//    private fun updateAmountAddressUI(amount: Double, account: String) {
-//        // Trick to format correctly really small floating point numbers
-//        val df = DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
-//        df.maximumFractionDigits = 340
-//
-//        val cryptoAmount = Helper.getCryptoAmountLocaleFormatted(
-//            locale, amount,
-//            inputCoinType.toLowerCase(), this
-//        )
-//
-//        val txtAmount = getString(R.string.please_pay_s_s, cryptoAmount, inputCoinType.toUpperCase())
-//        val txtAddress = getString(R.string.to_s, account)
-//
-//        tvTotalCryptoAmount.setText(txtAmount)
-//        tvReceivingAddress.setText(txtAddress)
-//    }
+    /**
+     * Updates the UI to show amount and account to send the payment
+     *
+     * @param total Total Amount in crypto to be paid
+     * @param account Account to pay total
+     */
+    private fun updateAmountAddressUI(total: AssetAmount, account: String) {
+        val df = DecimalFormat("####."+("#".repeat(total.asset.precision)))
+        df.roundingMode = RoundingMode.CEILING
+        df.decimalFormatSymbols = DecimalFormatSymbols(Locale.getDefault())
+
+        val amount = total.amount.toDouble() / Math.pow(10.toDouble(), total.asset.precision.toDouble())
+        val strAmount = df.format(amount)
+
+        val txtAmount = getString(R.string.template__please_pay, strAmount, total.asset.symbol)
+        val txtAccount = getString(R.string.template__to, account)
+
+        tvPleasePay.text = txtAmount
+        tvTo.text = txtAccount
+    }
 }

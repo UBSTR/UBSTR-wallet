@@ -335,6 +335,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             for (nextItem in invoice.lineItems) {
                 amount += nextItem.quantity * nextItem.price
             }
+            // TODO Improve pattern to account for different asset precisions
             val df = DecimalFormat("####.#####")
             df.roundingMode = RoundingMode.CEILING
             df.decimalFormatSymbols = DecimalFormatSymbols(Locale.getDefault())

@@ -79,7 +79,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:maxLines="1"
-        android:text="Please Pay: 12.25316 BTS"
+        tools:text="Please Pay: 12.25316 BTS"
         android:textAppearance="@style/TextAppearance.Bitsy.Body1"
         android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@id/tvTo"/>
@@ -89,7 +89,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:maxLines="1"
-        android:text="To: seventest-3"
+        tools:text="To: seventest-3"
         android:textAppearance="@style/TextAppearance.Bitsy.Body1"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"/>

@@ -47,6 +47,8 @@
     <string name="text__memo">Memo</string>
     <string name="text__scan_qr">Scan QR</string>
     <string name="text__asset">Asset</string>
+    <string name="template__please_pay">Please pay: %1$s %2$s</string>
+    <string name="template__to">To: %1$s</string>
 
     <!-- Settings -->
     <string name="title_settings">Settings</string>
