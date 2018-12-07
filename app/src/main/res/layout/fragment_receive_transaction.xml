@@ -38,12 +38,17 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"/>
+
     <Spinner
         android:id="@+id/spAsset"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:layout_marginStart="12dp"
+        android:visibility="gone"
         app:layout_constraintTop_toTopOf="@+id/tilAmount"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/centeredVerticalGuideline"/>
