@@ -4,11 +4,11 @@ data class TransferDetail(
     val id: String,
     val from: String,
     val to: String,
-    val direction: Boolean // True -> Received, False -> Sent
+    val direction: Boolean, // True -> Received, False -> Sent
 //    val date: Long,
-//    val cryptoAmount: Long,
-//    val cryptoPrecision: Int,
-//    val cryptoSymbol: String,
+    val cryptoAmount: Long,
+    val cryptoPrecision: Int,
+    val cryptoSymbol: String
 //    val fiatAmount: Long,
 //    val fiatCurrency: String
 )

@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.BalancesAdapter
-import cy.agorise.bitsybitshareswallet.adapters.TransfersAdapter
+import cy.agorise.bitsybitshareswallet.adapters.TransfersDetailsAdapter
 import cy.agorise.bitsybitshareswallet.database.entities.UserAccount
 import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
 import cy.agorise.bitsybitshareswallet.database.joins.TransferDetail
@@ -63,12 +63,12 @@ class BalancesFragment : Fragment() {
         // Configure TransferDetailViewModel to show the transaction history
         mTransferDetailViewModel = ViewModelProviders.of(this).get(TransferDetailViewModel::class.java)
 
-        val transfersAdapter = TransfersAdapter(context!!)
-        rvTransactions.adapter = transfersAdapter
+        val transfersDetailsAdapter = TransfersDetailsAdapter(context!!)
+        rvTransactions.adapter = transfersDetailsAdapter
         rvTransactions.layoutManager = LinearLayoutManager(context)
 
         mTransferDetailViewModel.getAll(userId).observe(this, Observer<List<TransferDetail>> { transfersDetails ->
-            transfersAdapter.replaceAll(transfersDetails)
+            transfersDetailsAdapter.replaceAll(transfersDetails)
         })
     }
 }

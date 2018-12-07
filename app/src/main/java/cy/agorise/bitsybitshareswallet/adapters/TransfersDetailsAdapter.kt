@@ -14,15 +14,19 @@ import androidx.recyclerview.widget.SortedList
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.database.joins.TransferDetail
 import cy.agorise.bitsybitshareswallet.utils.Constants
+import java.math.RoundingMode
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.*
 
-class TransfersAdapter(private val context: Context) :
-    RecyclerView.Adapter<TransfersAdapter.ViewHolder>() {
+class TransfersDetailsAdapter(private val context: Context) :
+    RecyclerView.Adapter<TransfersDetailsAdapter.ViewHolder>() {
 
     val userId = PreferenceManager.getDefaultSharedPreferences(context)
         .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "")!!
 
     private val mComparator =
-        Comparator<TransferDetail> { a, b -> a.id.compareTo(b.id) }
+        Comparator<TransferDetail> { a, b -> b.id.compareTo(a.id) }
 
     private val mSortedList =
         SortedList<TransferDetail>(TransferDetail::class.java, object : SortedList.Callback<TransferDetail>() {
@@ -69,7 +73,7 @@ class TransfersAdapter(private val context: Context) :
         val tvFiatEquivalent: TextView  = itemView.findViewById(R.id.tvFiatEquivalent)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransfersAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransfersDetailsAdapter.ViewHolder {
         val inflater = LayoutInflater.from(context)
 
         val transactionView = inflater.inflate(R.layout.item_transaction, parent, false)
@@ -86,6 +90,22 @@ class TransfersAdapter(private val context: Context) :
 
         viewHolder.tvFrom.text = transferDetail.from
         viewHolder.tvTo.text = transferDetail.to
+
+        viewHolder.tvDate.text = "02 Oct"
+        viewHolder.tvTime.text = "15:01:18 CET"
+
+        // Show the crypto amount correctly formatted
+        // TODO lift the DecimalFormat declaration to other place to make things more efficient
+        val df = DecimalFormat("####."+("#".repeat(transferDetail.cryptoPrecision)))
+        df.roundingMode = RoundingMode.CEILING
+        df.decimalFormatSymbols = DecimalFormatSymbols(Locale.getDefault())
+
+        val amount = transferDetail.cryptoAmount.toDouble() /
+                Math.pow(10.toDouble(), transferDetail.cryptoPrecision.toDouble())
+        val cryptoAmount = "${df.format(amount)} ${transferDetail.cryptoSymbol}"
+        viewHolder.tvCryptoAmount.text = cryptoAmount
+        
+        viewHolder.tvFiatEquivalent.text = "$4119.75"
 
         viewHolder.ivDirectionArrow.setImageDrawable(context.getDrawable(
             if(transferDetail.direction) R.drawable.ic_arrow_receive else R.drawable.ic_arrow_send
