@@ -22,7 +22,7 @@ import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import cy.agorise.graphenej.*
 import kotlinx.android.synthetic.main.fragment_receive_transaction.*
-import java.util.HashMap
+import java.util.*
 
 class ReceiveTransactionFragment : Fragment() {
     private val TAG = this.javaClass.simpleName
@@ -62,7 +62,7 @@ class ReceiveTransactionFragment : Fragment() {
         try {
             val bitmap = encodeAsBitmap(Invoice.toQrCode(invoice), "#139657") // PalmPay green
             ivQR.setImageBitmap(bitmap)
-            //updateAmountAddressUI(total, mUserAccount!!.getName())
+//            updateAmountAddressUI(total, mUserAccount!!.getName())
         } catch (e: WriterException) {
             Log.e(TAG, "WriterException. Msg: " + e.message)
         }
@@ -113,4 +113,27 @@ class ReceiveTransactionFragment : Fragment() {
         bitmap.setPixels(pixels, 0, w, 0, 0, w, h)
         return bitmap
     }
+
+//    /**
+//     * Updates the UI to show amount and address to send the payment
+//     *
+//     * @param amount Amount in crypto to be paid
+//     * @param address Address to pay amount
+//     */
+//    private fun updateAmountAddressUI(amount: Double, account: String) {
+//        // Trick to format correctly really small floating point numbers
+//        val df = DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
+//        df.maximumFractionDigits = 340
+//
+//        val cryptoAmount = Helper.getCryptoAmountLocaleFormatted(
+//            locale, amount,
+//            inputCoinType.toLowerCase(), this
+//        )
+//
+//        val txtAmount = getString(R.string.please_pay_s_s, cryptoAmount, inputCoinType.toUpperCase())
+//        val txtAddress = getString(R.string.to_s, account)
+//
+//        tvTotalCryptoAmount.setText(txtAmount)
+//        tvReceivingAddress.setText(txtAddress)
+//    }
 }

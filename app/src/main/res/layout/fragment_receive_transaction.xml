@@ -38,30 +38,28 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Bitsy.TextInputLayout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"/>
-
-    <Spinner
-        android:id="@+id/spAsset"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_height="0dp"
         android:layout_marginStart="12dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@+id/tilAmount"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/centeredVerticalGuideline"/>
+        android:hint="@string/text__asset"
+        app:layout_constraintTop_toTopOf="@id/tilAmount"
+        app:layout_constraintBottom_toBottomOf="@id/tilAmount"
+        app:layout_constraintStart_toEndOf="@id/centeredVerticalGuideline"
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <View
-        android:id="@+id/vSpinner"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="12dp"
-        android:background="@color/darkGray"
-        app:layout_constraintTop_toBottomOf="@+id/spAsset"
-        app:layout_constraintEnd_toEndOf="@+id/spAsset"
-        app:layout_constraintStart_toStartOf="@+id/spAsset" />
+        <cy.agorise.bitsybitshareswallet.views.MyTextInputAutoCompleteTextView
+            android:id="@+id/actvAsset"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="12dp"
+            android:paddingEnd="8dp"
+            android:maxLines="1"
+            android:lines="1"
+            android:imeOptions="actionDone"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <ImageView
         android:id="@+id/ivQR"
