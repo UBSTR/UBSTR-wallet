@@ -194,4 +194,10 @@ class ReceiveTransactionFragment : Fragment() {
         tvPleasePay.text = txtAmount
         tvTo.text = txtAccount
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (!mDisposables.isDisposed) mDisposables.dispose()
+    }
 }

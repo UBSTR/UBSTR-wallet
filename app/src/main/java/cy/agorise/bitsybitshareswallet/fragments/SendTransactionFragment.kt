@@ -34,6 +34,7 @@ import cy.agorise.graphenej.*
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
+import cy.agorise.graphenej.api.calls.BroadcastTransaction
 import cy.agorise.graphenej.api.calls.GetAccountByName
 import cy.agorise.graphenej.api.calls.GetDynamicGlobalProperties
 import cy.agorise.graphenej.api.calls.GetRequiredFees
@@ -66,6 +67,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
     private val RESPONSE_GET_ACCOUNT_BY_NAME = 1
     private val RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS = 2
     private val RESPONSE_GET_REQUIRED_FEES = 3
+    private val RESPONSE_BROADCAST_TRANSACTION = 4
 
     private var isCameraPreviewVisible = false
     private var isToAccountCorrect = false
@@ -213,6 +215,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
                     RESPONSE_GET_ACCOUNT_BY_NAME            -> handleAccountName(message.result)
                     RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS  -> handleDynamicGlobalProperties(message.result)
                     RESPONSE_GET_REQUIRED_FEES              -> handleRequiredFees(message.result)
+                    RESPONSE_BROADCAST_TRANSACTION          -> handleBroadcastTransaction(message)
                 }
                 responseMap.remove(message.id)
             }
@@ -262,8 +265,29 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
         if (result is List<*> && result[0] is AssetAmount) {
             Log.d(TAG, "GetRequiredFees: " + transaction.toString())
             transaction!!.setFees(result as List<AssetAmount>) // TODO find how to remove this warning
+
+            val id = mNetworkService!!.sendMessage(BroadcastTransaction(transaction), BroadcastTransaction.REQUIRED_API)
+            responseMap[id] = RESPONSE_BROADCAST_TRANSACTION
         } else {
             // TODO unableToSendTransactionError()
+        }
+    }
+
+    private fun handleBroadcastTransaction(message: JsonRpcResponse<*>) {
+        if (message.result == null && message.error == null) {
+            // TODO extract string resources
+            Toast.makeText(context!!, "Transaction sent!", Toast.LENGTH_SHORT).show()
+
+            // Remove information from the text fields and disable send button
+            tietTo.setText("")
+            tietAmount.setText("")
+            tietMemo.setText("")
+            isToAccountCorrect = false
+            isAmountCorrect = false
+            enableDisableSendFAB()
+        } else {
+            // TODO extract error messages to show a better explanation to the user
+            Toast.makeText(context!!, message.error.message, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -351,6 +375,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
         val currentAmount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
 
         if (currentAmount < amount) {
+            // TODO extract string resource
             tilAmount.error = "Not enough funds"
             isAmountCorrect = false
         } else {
