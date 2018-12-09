@@ -99,7 +99,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         mUserAccountViewModel = ViewModelProviders.of(this).get(UserAccountViewModel::class.java)
 
         mUserAccountViewModel.getMissingUserAccountIds().observe(this, Observer<List<String>>{ userAccountIds ->
-            if (!userAccountIds.isEmpty()) {
+            if (userAccountIds.isNotEmpty()) {
                 for (userAccountId in userAccountIds)
                     missingUserAccounts.add(UserAccount(userAccountId))
 
@@ -122,6 +122,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         }
 
         mUserAccountViewModel.insertAll(userAccounts)
+        missingUserAccounts.clear()
     }
 
     /**
@@ -131,7 +132,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         override fun run() {
             if (mNetworkService!!.isConnected) {
                 mNetworkService!!.sendMessage(GetAccounts(missingUserAccounts), GetAccounts.REQUIRED_API)
-            } else {
+            } else if (missingUserAccounts.isNotEmpty()){
                 mHandler.postDelayed(this, Constants.NETWORK_SERVICE_RETRY_PERIOD)
             }
         }
