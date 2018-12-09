@@ -13,13 +13,17 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import cy.agorise.bitsybitshareswallet.database.entities.Balance
 import cy.agorise.bitsybitshareswallet.processors.TransfersLoader
+import cy.agorise.bitsybitshareswallet.repositories.BalanceRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
+import cy.agorise.graphenej.AssetAmount
 import cy.agorise.graphenej.UserAccount
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
+import cy.agorise.graphenej.api.calls.GetAccountBalances
 import cy.agorise.graphenej.api.calls.GetAccounts
 import cy.agorise.graphenej.api.calls.GetFullAccounts
 import cy.agorise.graphenej.models.AccountProperties
@@ -36,6 +40,8 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private val TAG = this.javaClass.simpleName
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
+
+    private var mBalanceRepository: BalanceRepository? = null
 
     /* Current user account */
     protected var mCurrentAccount: UserAccount? = null
@@ -65,6 +71,20 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         if (userId != "")
             mCurrentAccount = UserAccount(userId)
 
+        mBalanceRepository = BalanceRepository(this)
+
+        // Configure UserAccountViewModel to show the current account
+        mUserAccountViewModel = ViewModelProviders.of(this).get(UserAccountViewModel::class.java)
+
+        mUserAccountViewModel.getMissingUserAccountIds().observe(this, Observer<List<String>>{ userAccountIds ->
+            if (userAccountIds.isNotEmpty()) {
+                for (userAccountId in userAccountIds)
+                    missingUserAccounts.add(UserAccount(userAccountId))
+
+                mHandler.postDelayed(mRequestMissingUserAccountsTask, Constants.NETWORK_SERVICE_RETRY_PERIOD)
+            }
+        })
+
         mDisposable = RxBus.getBusInstance()
             .asFlowable()
             .observeOn(AndroidSchedulers.mainThread())
@@ -79,6 +99,8 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                                 handleAccountDetails((message.result as List<*>)[0] as FullAccountDetails)
                             } else if ((message.result as List<*>)[0] is AccountProperties) {
                                 handleAccountProperties(message.result as List<AccountProperties>)
+                            } else if((message.result as List<*>)[0] is AssetAmount) {
+                                handleBalanceUpdate(message.result as List<AssetAmount>)
                             }
                         }
                     } else {
@@ -92,24 +114,8 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                     }
                 } else if (message is ConnectionStatusUpdate) {
                     handleConnectionStatusUpdate(message)
-                    if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
-//                        recurrentAccountUpdateId = -1
-//                        accountOpRequestId = -1
-                    }
                 }
             }
-
-        // Configure UserAccountViewModel to show the current account
-        mUserAccountViewModel = ViewModelProviders.of(this).get(UserAccountViewModel::class.java)
-
-        mUserAccountViewModel.getMissingUserAccountIds().observe(this, Observer<List<String>>{ userAccountIds ->
-            if (userAccountIds.isNotEmpty()) {
-                for (userAccountId in userAccountIds)
-                    missingUserAccounts.add(UserAccount(userAccountId))
-
-                mHandler.postDelayed(mRequestMissingUserAccountsTask, Constants.NETWORK_SERVICE_RETRY_PERIOD)
-            }
-        })
     }
 
     /**
@@ -125,13 +131,16 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                     "\nAsk the NetworkService to remove the node from the list and connect to another one.")
             mNetworkService!!.removeCurrentNodeAndReconnect()
         } else if (storedOpCount == -1L) {
-            // Initial case
+            // Initial case when the app starts
             storedOpCount = latestOpCount
             PreferenceManager.getDefaultSharedPreferences(this)
                 .edit().putLong(Constants.KEY_ACCOUNT_OPERATION_COUNT, latestOpCount).apply()
+            TransfersLoader(this)
+            updateBalances()
         } else if (latestOpCount > storedOpCount) {
             storedOpCount = latestOpCount
-            TransfersLoader(this, lifecycle)
+            TransfersLoader(this)
+            updateBalances()
         }
     }
 
@@ -150,6 +159,31 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
         mUserAccountViewModel.insertAll(userAccounts)
         missingUserAccounts.clear()
+    }
+
+    private fun handleBalanceUpdate(assetAmountList: List<AssetAmount>) {
+        Log.d(TAG, "handleBalanceUpdate")
+        val now = System.currentTimeMillis() / 1000
+        val balances = ArrayList<Balance>()
+        for (assetAmount in assetAmountList) {
+            val balance = Balance(
+                assetAmount.asset.objectId,
+                assetAmount.amount.toLong(),
+                now
+            )
+
+            balances.add(balance)
+        }
+        mBalanceRepository!!.insertAll(balances)
+    }
+
+    private fun updateBalances() {
+        if (mNetworkService!!.isConnected) {
+            mNetworkService!!.sendMessage(
+                GetAccountBalances(mCurrentAccount, ArrayList()),
+                GetAccountBalances.REQUIRED_API
+            )
+        }
     }
 
     /**
@@ -171,13 +205,14 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private val mCheckMissingPaymentsTask = object : Runnable {
         override fun run() {
             if (mNetworkService != null && mNetworkService!!.isConnected) {
-                // Checking that we actually have a user id registered in the shared preferences
-                val userAccounts = ArrayList<String>()
-                userAccounts.add(mCurrentAccount!!.objectId)
-                mNetworkService!!.sendMessage(
-                    GetFullAccounts(userAccounts, false),
-                    GetFullAccounts.REQUIRED_API
-                )
+                if (mCurrentAccount != null) {
+                    val userAccounts = ArrayList<String>()
+                    userAccounts.add(mCurrentAccount!!.objectId)
+                    mNetworkService!!.sendMessage(
+                        GetFullAccounts(userAccounts, false),
+                        GetFullAccounts.REQUIRED_API
+                    )
+                }
             } else {
                 Log.w(TAG, "NetworkService is null or is not connected. mNetworkService: $mNetworkService")
             }
@@ -214,9 +249,6 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
             Log.e(TAG, "Binding to the network service failed.")
         }
         mHandler.postDelayed(mCheckMissingPaymentsTask, Constants.MISSING_PAYMENT_CHECK_PERIOD)
-
-        storedOpCount = PreferenceManager.getDefaultSharedPreferences(this)
-            .getLong(Constants.KEY_ACCOUNT_OPERATION_COUNT, -1)
     }
 
     override fun onDestroy() {

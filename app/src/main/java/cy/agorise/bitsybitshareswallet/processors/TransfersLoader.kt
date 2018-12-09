@@ -48,8 +48,7 @@ import javax.crypto.AEADBadTagException
  * for every transfer, we must first load all historical transfer operations, and then proceed to
  * handle those missing columns.
  */
-class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Lifecycle) : LifecycleObserver,
-    ServiceConnection {
+class TransfersLoader(private var mContext: Context?): ServiceConnection {
 
     private val TAG = this.javaClass.simpleName
 
@@ -106,7 +105,6 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
     }
 
     init {
-        this.mLifeCycle.addObserver(this)
         transferRepository = TransferRepository(mContext!!)
         authorityRepository = AuthorityRepository(mContext!!)
 
@@ -152,6 +150,8 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
             // If there is no current user, we should not do anything
             mState = State.CANCELLED
         }
+
+        onStart()
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
@@ -167,8 +167,7 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
         startTransfersUpdateProcedure()
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    internal fun onStart() {
+    private fun onStart() {
         if (mState != State.CANCELLED) {
             val intent = Intent(mContext, NetworkService::class.java)
             if (mContext!!.bindService(intent, this, Context.BIND_AUTO_CREATE)) {
@@ -219,7 +218,7 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
         // TODO return number of inserted rows
 //        Log.d(TAG, String.format("Inserted count: %d, list size: %d", insertedCount, operationHistoryList.size))
         if (/* insertedCount == 0 && */ operationHistoryList.isEmpty()) {
-            // TODO Terminate process and obtain MissingTimes and MissingEquivalentValues
+            onDestroy()
         } else {
 
             // If we inserted more than one operation, we cannot yet be sure we've reached the
@@ -320,8 +319,7 @@ class TransfersLoader(private var mContext: Context?, private val mLifeCycle: Li
         return transfers
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    internal fun onDestroy() {
+    private fun onDestroy() {
         Log.d(TAG, "Destroying TransfersLoader")
         if (!mDisposables.isDisposed) mDisposables.dispose()
         if (mShouldUnbindNetwork) {
