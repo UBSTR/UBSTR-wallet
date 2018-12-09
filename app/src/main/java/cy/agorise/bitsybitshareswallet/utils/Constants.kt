@@ -49,6 +49,11 @@ object Constants {
      */
     const val NETWORK_SERVICE_RETRY_PERIOD: Long = 5000
 
+    /**
+     * Key used to store the number of operations that the currently selected account had last time we checked
+     */
+    const val KEY_ACCOUNT_OPERATION_COUNT = "key_account_operation_count"
+
     /** Key used to store the night mode setting into the shared preferences */
     const val KEY_NIGHT_MODE_ACTIVATED = "key_night_mode_activated"
 }

@@ -7,11 +7,13 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
+import android.preference.PreferenceManager
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import cy.agorise.bitsybitshareswallet.processors.TransfersLoader
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import cy.agorise.graphenej.UserAccount
@@ -19,12 +21,13 @@ import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
 import cy.agorise.graphenej.api.calls.GetAccounts
+import cy.agorise.graphenej.api.calls.GetFullAccounts
 import cy.agorise.graphenej.models.AccountProperties
 import cy.agorise.graphenej.models.FullAccountDetails
-import cy.agorise.graphenej.models.HistoryOperationDetail
 import cy.agorise.graphenej.models.JsonRpcResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import java.util.*
 
 /**
  * Class in charge of managing the connection to graphenej's NetworkService
@@ -33,6 +36,9 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private val TAG = this.javaClass.simpleName
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
+
+    /* Current user account */
+    protected var mCurrentAccount: UserAccount? = null
 
     private val mHandler = Handler()
 
@@ -53,6 +59,12 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val userId = PreferenceManager.getDefaultSharedPreferences(this)
+            .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "")
+        if (userId != "")
+            mCurrentAccount = UserAccount(userId)
+
         mDisposable = RxBus.getBusInstance()
             .asFlowable()
             .observeOn(AndroidSchedulers.mainThread())
@@ -63,18 +75,11 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                     // Payment detection focused responses
                     if (message.error == null) {
                         if (message.result is List<*> && (message.result as List<*>).size > 0) {
-                            if ((message.result as List<*>)[0] is AccountProperties) {
+                            if ((message.result as List<*>)[0] is FullAccountDetails) {
+                                handleAccountDetails((message.result as List<*>)[0] as FullAccountDetails)
+                            } else if ((message.result as List<*>)[0] is AccountProperties) {
                                 handleAccountProperties(message.result as List<AccountProperties>)
                             }
-//                            if ((message.result as List<*>)[0] is FullAccountDetails) {
-//                                if (message.id == recurrentAccountUpdateId) {
-//                                    handleAccountDetails((message.result as List<*>)[0] as FullAccountDetails)
-//                                } else if (message.id == postProcessingAccountUpdateId) {
-//                                    handleAccountUpdate((message.result as List<*>)[0] as FullAccountDetails)
-//                                }
-//                            }
-//                        } else if (message.result is HistoryOperationDetail && message.id == accountOpRequestId) {
-//                            handleNewOperations(message.result as HistoryOperationDetail)
                         }
                     } else {
                         // In case of error
@@ -90,7 +95,6 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                     if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
 //                        recurrentAccountUpdateId = -1
 //                        accountOpRequestId = -1
-//                        isProcessingTx = false
                     }
                 }
             }
@@ -106,6 +110,29 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                 mHandler.postDelayed(mRequestMissingUserAccountsTask, Constants.NETWORK_SERVICE_RETRY_PERIOD)
             }
         })
+    }
+
+    /**
+     * Method called whenever a response to the 'get_full_accounts' API call has been detected.
+     * @param accountDetails    De-serialized account details object
+     */
+    private fun handleAccountDetails(accountDetails: FullAccountDetails) {
+        val latestOpCount = accountDetails.statistics.total_ops
+        Log.d(TAG, "handleAccountDetails. prev count: $storedOpCount, current count: $latestOpCount")
+
+        if (latestOpCount == 0L) {
+            Log.d(TAG, "The node returned 0 total_ops for current account and may not have installed the history plugin. " +
+                    "\nAsk the NetworkService to remove the node from the list and connect to another one.")
+            mNetworkService!!.removeCurrentNodeAndReconnect()
+        } else if (storedOpCount == -1L) {
+            // Initial case
+            storedOpCount = latestOpCount
+            PreferenceManager.getDefaultSharedPreferences(this)
+                .edit().putLong(Constants.KEY_ACCOUNT_OPERATION_COUNT, latestOpCount).apply()
+        } else if (latestOpCount > storedOpCount) {
+            storedOpCount = latestOpCount
+            TransfersLoader(this, lifecycle)
+        }
     }
 
     private fun handleAccountProperties(accountPropertiesList: List<AccountProperties>) {
@@ -141,29 +168,22 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     /**
      * Task used to perform a redundant payment check.
      */
-//    private val mCheckMissingPaymentsTask = object : Runnable {
-//        override fun run() {
-//            if (mNetworkService != null && mNetworkService.isConnected()) {
-//                val userId = PreferenceManager
-//                    .getDefaultSharedPreferences(this@ConnectedActivity)
-//                    .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "")
-//                if (userId != "") {
-//                    // Checking that we actually have a user id registered in the shared preferences
-//                    val userAccounts = ArrayList<String>()
-//                    userAccounts.add(userId)
-//                    recurrentAccountUpdateId = mNetworkService.sendMessage(
-//                        GetFullAccounts(userAccounts, false),
-//                        GetFullAccounts.REQUIRED_API
-//                    )
-//                } else {
-//                    Log.w(TAG, "User id is empty")
-//                }
-//            } else {
-//                Log.w(TAG, "NetworkService is null or is not connected. mNetworkService: $mNetworkService")
-//            }
-//            mHandler.postDelayed(this, Constants.MISSING_PAYMENT_CHECK_PERIOD)
-//        }
-//    }
+    private val mCheckMissingPaymentsTask = object : Runnable {
+        override fun run() {
+            if (mNetworkService != null && mNetworkService!!.isConnected) {
+                // Checking that we actually have a user id registered in the shared preferences
+                val userAccounts = ArrayList<String>()
+                userAccounts.add(mCurrentAccount!!.objectId)
+                mNetworkService!!.sendMessage(
+                    GetFullAccounts(userAccounts, false),
+                    GetFullAccounts.REQUIRED_API
+                )
+            } else {
+                Log.w(TAG, "NetworkService is null or is not connected. mNetworkService: $mNetworkService")
+            }
+            mHandler.postDelayed(this, Constants.MISSING_PAYMENT_CHECK_PERIOD)
+        }
+    }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         // We've bound to LocalService, cast the IBinder and get LocalService instance
@@ -180,7 +200,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
             unbindService(this)
             mShouldUnbindNetwork = false
         }
-//        mHandler.removeCallbacks(mCheckMissingPaymentsTask)
+        mHandler.removeCallbacks(mCheckMissingPaymentsTask)
         mHandler.removeCallbacks(mRequestMissingUserAccountsTask)
     }
 
@@ -193,10 +213,10 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         } else {
             Log.e(TAG, "Binding to the network service failed.")
         }
-//        mHandler.postDelayed(mCheckMissingPaymentsTask, Constants.MISSING_PAYMENT_CHECK_PERIOD)
+        mHandler.postDelayed(mCheckMissingPaymentsTask, Constants.MISSING_PAYMENT_CHECK_PERIOD)
 
-//        storedOpCount = PreferenceManager.getDefaultSharedPreferences(this)
-//            .getLong(Constants.KEY_ACCOUNT_OPERATION_COUNT, -1)
+        storedOpCount = PreferenceManager.getDefaultSharedPreferences(this)
+            .getLong(Constants.KEY_ACCOUNT_OPERATION_COUNT, -1)
     }
 
     override fun onDestroy() {
