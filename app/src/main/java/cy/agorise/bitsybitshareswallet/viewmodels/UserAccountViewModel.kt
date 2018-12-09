@@ -13,7 +13,15 @@ class UserAccountViewModel(application: Application) : AndroidViewModel(applicat
         return mRepository.getUserAccount(id)
     }
 
+    internal fun getMissingUserAccountIds(): LiveData<List<String>> {
+        return mRepository.getMissingUserAccountIds()
+    }
+
 //    fun insert(userAccount: UserAccount) {
 //        mRepository.insert(userAccount)
 //    }
+
+    fun insertAll(userAccounts: List<UserAccount>) {
+        mRepository.insertAll(userAccounts)
+    }
 }

@@ -10,9 +10,16 @@ import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import cy.agorise.bitsybitshareswallet.utils.Constants
+import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
+import cy.agorise.graphenej.UserAccount
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
+import cy.agorise.graphenej.api.calls.GetAccounts
+import cy.agorise.graphenej.models.AccountProperties
 import cy.agorise.graphenej.models.FullAccountDetails
 import cy.agorise.graphenej.models.HistoryOperationDetail
 import cy.agorise.graphenej.models.JsonRpcResponse
@@ -23,8 +30,9 @@ import io.reactivex.disposables.Disposable
  * Class in charge of managing the connection to graphenej's NetworkService
  */
 abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
+    private val TAG = this.javaClass.simpleName
 
-    private val TAG = "ConnectedActivity"
+    private lateinit var mUserAccountViewModel: UserAccountViewModel
 
     private val mHandler = Handler()
 
@@ -32,6 +40,8 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private var mDisposable: Disposable? = null
 
     private var storedOpCount: Long = -1
+
+    private var missingUserAccounts = ArrayList<UserAccount>()
 
     /* Network service connection */
     protected var mNetworkService: NetworkService? = null
@@ -52,7 +62,10 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                     handleJsonRpcResponse(message)
                     // Payment detection focused responses
                     if (message.error == null) {
-//                        if (message.result is List<*> && (message.result as List<*>).size > 0) {
+                        if (message.result is List<*> && (message.result as List<*>).size > 0) {
+                            if ((message.result as List<*>)[0] is AccountProperties) {
+                                handleAccountProperties(message.result as List<AccountProperties>)
+                            }
 //                            if ((message.result as List<*>)[0] is FullAccountDetails) {
 //                                if (message.id == recurrentAccountUpdateId) {
 //                                    handleAccountDetails((message.result as List<*>)[0] as FullAccountDetails)
@@ -62,7 +75,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 //                            }
 //                        } else if (message.result is HistoryOperationDetail && message.id == accountOpRequestId) {
 //                            handleNewOperations(message.result as HistoryOperationDetail)
-//                        }
+                        }
                     } else {
                         // In case of error
                         Log.e(TAG, "Got error message from full node. Msg: " + message.error.message)
@@ -81,36 +94,47 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                     }
                 }
             }
+
+        // Configure UserAccountViewModel to show the current account
+        mUserAccountViewModel = ViewModelProviders.of(this).get(UserAccountViewModel::class.java)
+
+        mUserAccountViewModel.getMissingUserAccountIds().observe(this, Observer<List<String>>{ userAccountIds ->
+            if (!userAccountIds.isEmpty()) {
+                for (userAccountId in userAccountIds)
+                    missingUserAccounts.add(UserAccount(userAccountId))
+
+                mHandler.postDelayed(mRequestMissingUserAccountsTask, Constants.NETWORK_SERVICE_RETRY_PERIOD)
+            }
+        })
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        if (!mDisposable!!.isDisposed) mDisposable!!.dispose()
-    }
+    private fun handleAccountProperties(accountPropertiesList: List<AccountProperties>) {
+        val userAccounts = ArrayList<cy.agorise.bitsybitshareswallet.database.entities.UserAccount>()
 
-    override fun onResume() {
-        super.onResume()
+        for (accountProperties in accountPropertiesList) {
+            val userAccount = cy.agorise.bitsybitshareswallet.database.entities.UserAccount(
+                accountProperties.id,
+                accountProperties.name,
+                accountProperties.membership_expiration_date == Constants.LIFETIME_EXPIRATION_DATE
+            )
 
-        val intent = Intent(this, NetworkService::class.java)
-        if (bindService(intent, this, Context.BIND_AUTO_CREATE)) {
-            mShouldUnbindNetwork = true
-        } else {
-            Log.e(TAG, "Binding to the network service failed.")
+            userAccounts.add(userAccount)
         }
-//        mHandler.postDelayed(mCheckMissingPaymentsTask, Constants.MISSING_PAYMENT_CHECK_PERIOD)
 
-//        storedOpCount = PreferenceManager.getDefaultSharedPreferences(this)
-//            .getLong(Constants.KEY_ACCOUNT_OPERATION_COUNT, -1)
+        mUserAccountViewModel.insertAll(userAccounts)
     }
 
-    override fun onPause() {
-        super.onPause()
-        // Unbinding from network service
-        if (mShouldUnbindNetwork) {
-            unbindService(this)
-            mShouldUnbindNetwork = false
+    /**
+     * Task used to obtain the missing UserAccounts.
+     */
+    private val mRequestMissingUserAccountsTask = object : Runnable {
+        override fun run() {
+            if (mNetworkService!!.isConnected) {
+                mNetworkService!!.sendMessage(GetAccounts(missingUserAccounts), GetAccounts.REQUIRED_API)
+            } else {
+                mHandler.postDelayed(this, Constants.NETWORK_SERVICE_RETRY_PERIOD)
+            }
         }
-//        mHandler.removeCallbacks(mCheckMissingPaymentsTask)
     }
 
     /**
@@ -146,7 +170,37 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         mNetworkService = binder.service
     }
 
-    override fun onServiceDisconnected(name: ComponentName?) {
+    override fun onServiceDisconnected(name: ComponentName?) { }
+
+    override fun onPause() {
+        super.onPause()
+        // Unbinding from network service
+        if (mShouldUnbindNetwork) {
+            unbindService(this)
+            mShouldUnbindNetwork = false
+        }
+//        mHandler.removeCallbacks(mCheckMissingPaymentsTask)
+        mHandler.removeCallbacks(mRequestMissingUserAccountsTask)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val intent = Intent(this, NetworkService::class.java)
+        if (bindService(intent, this, Context.BIND_AUTO_CREATE)) {
+            mShouldUnbindNetwork = true
+        } else {
+            Log.e(TAG, "Binding to the network service failed.")
+        }
+//        mHandler.postDelayed(mCheckMissingPaymentsTask, Constants.MISSING_PAYMENT_CHECK_PERIOD)
+
+//        storedOpCount = PreferenceManager.getDefaultSharedPreferences(this)
+//            .getLong(Constants.KEY_ACCOUNT_OPERATION_COUNT, -1)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (!mDisposable!!.isDisposed) mDisposable!!.dispose()
     }
 
     /**

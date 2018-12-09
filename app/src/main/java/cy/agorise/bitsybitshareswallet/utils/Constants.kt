@@ -39,10 +39,15 @@ object Constants {
     const val LIFETIME_EXPIRATION_DATE = "1969-12-31T23:59:59"
 
     /**
-     * Smartcoin options for output
+     * Time period between two consecutive requests to the full node performed whenever we have
+     * open payment requests as a matter of redundancy.
      */
-    val BTS     = Asset("1.3.0")
-    val bitUSD  = Asset("1.3.121")
+    const val MISSING_PAYMENT_CHECK_PERIOD: Long = 5000
+
+    /**
+     * Time period to wait to send a request to the NetworkService, and retry in case it is still not connected
+     */
+    const val NETWORK_SERVICE_RETRY_PERIOD: Long = 5000
 
     /** Key used to store the night mode setting into the shared preferences */
     const val KEY_NIGHT_MODE_ACTIVATED = "key_night_mode_activated"

@@ -88,8 +88,8 @@ class TransfersDetailsAdapter(private val context: Context) :
             if(transferDetail.direction) R.color.colorReceive else R.color.colorSend
         ))
 
-        viewHolder.tvFrom.text = transferDetail.from
-        viewHolder.tvTo.text = transferDetail.to
+        viewHolder.tvFrom.text = transferDetail.from ?: ""
+        viewHolder.tvTo.text = transferDetail.to ?: ""
 
         viewHolder.tvDate.text = "02 Oct"
         viewHolder.tvTime.text = "15:01:18 CET"
@@ -104,7 +104,7 @@ class TransfersDetailsAdapter(private val context: Context) :
                 Math.pow(10.toDouble(), transferDetail.cryptoPrecision.toDouble())
         val cryptoAmount = "${df.format(amount)} ${transferDetail.cryptoSymbol}"
         viewHolder.tvCryptoAmount.text = cryptoAmount
-        
+
         viewHolder.tvFiatEquivalent.text = "$4119.75"
 
         viewHolder.ivDirectionArrow.setImageDrawable(context.getDrawable(
