@@ -15,7 +15,8 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
@@ -31,7 +32,7 @@ android {
 
 dependencies {
     def lifecycle_version = "2.0.0"
-    def room_version = "2.1.0-alpha02"
+    def room_version = "2.1.0-alpha03"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':graphenejlib:graphenej')
