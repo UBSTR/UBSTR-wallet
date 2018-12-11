@@ -32,12 +32,12 @@
 
     <style name="Widget.Bitsy.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox" />
 
-    <style name="Widget.PalmPay.Button" parent="Widget.MaterialComponents.Button">
+    <style name="Widget.Bitsy.Button" parent="Widget.MaterialComponents.Button">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:stateListAnimator">@animator/button_state_list_anim</item>
     </style>
 
-    <style name="Widget.PalmPay.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="Widget.Bitsy.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 

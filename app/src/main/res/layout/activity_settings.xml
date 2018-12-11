@@ -11,12 +11,70 @@
     android:paddingBottom="32dp"
     tools:context=".activities.SettingsActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title__general"
+        android:textAppearance="@style/TextAppearance.Bitsy.Subtitle1"
+        android:textStyle="bold"/>
+
+    <Switch
+        android:id="@+id/switchCloseTimer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_different_topic"
+        android:switchPadding="12dp"
+        android:text="@string/msg__close_timer"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+        android:textColor="?android:textColorPrimary"/>
+
     <Switch
         android:id="@+id/switchNightMode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/night_mode"
+        android:layout_marginTop="@dimen/spacing_same_topic"
+        android:text="@string/msg__night_mode"
         android:textAppearance="@style/TextAppearance.Bitsy.Body1"
         android:textColor="?android:textColorPrimary"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_different_section"
+        android:text="@string/title__backup"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_different_topic"
+        android:text="@string/msg__brainkey_description"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnViewBrainKey"
+        style="@style/Widget.Bitsy.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_same_topic"
+        android:text="@string/btn__view_and_copy"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_different_section"
+        android:text="@string/title__bugs_or_ideas"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_same_topic"
+        android:autoLink="all"
+        android:lineSpacingExtra="8dp"
+        android:text="@string/msg__bugs_or_ideas"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
 
 </LinearLayout>

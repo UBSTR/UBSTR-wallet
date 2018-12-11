@@ -71,7 +71,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnImport"
-        style="@style/Widget.PalmPay.Button"
+        style="@style/Widget.Bitsy.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_different_topic"
@@ -89,7 +89,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCreate"
-        style="@style/Widget.PalmPay.Button"
+        style="@style/Widget.Bitsy.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_different_topic"
