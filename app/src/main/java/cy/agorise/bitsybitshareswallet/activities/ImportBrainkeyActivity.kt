@@ -4,10 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
-import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
+import com.jakewharton.rxbinding2.widget.RxTextView
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.database.entities.Authority
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
@@ -20,9 +20,12 @@ import cy.agorise.graphenej.api.calls.GetAccounts
 import cy.agorise.graphenej.api.calls.GetKeyReferences
 import cy.agorise.graphenej.models.AccountProperties
 import cy.agorise.graphenej.models.JsonRpcResponse
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_import_brainkey.*
 import org.bitcoinj.core.ECKey
 import java.util.ArrayList
+import java.util.concurrent.TimeUnit
 
 // TODO Add method to load the 20? most important assets
 // TODO add progress bar or something while the user waits for the import response from the node
@@ -51,41 +54,90 @@ class ImportBrainkeyActivity : ConnectedActivity() {
     private var keyReferencesRequestId: Long = 0
     private var getAccountsRequestId: Long = 0
 
+    private var mDisposables = CompositeDisposable()
+
+    private var isPINValid = false
+    private var isPINConfirmationValid = false
+    private var isBrainKeyValid = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_import_brainkey)
 
-        // Custom event to activate import account from the keyboard
-        tietBrainKey.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                importAccount()
-                true
-            } else
-            false
-        }
+        // Use RxJava Debounce to update the PIN error only after the user stops writing for > 500 ms
+        mDisposables.add(
+            RxTextView.textChanges(tietPin)
+                .skipInitialValue()
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { validatePIN() }
+        )
 
-        btnImport.setOnClickListener { importAccount() }
+        // Use RxJava Debounce to update the PIN Confirmation error only after the user stops writing for > 500 ms
+        mDisposables.add(
+            RxTextView.textChanges(tietPinConfirmation)
+                .skipInitialValue()
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { validatePINConfirmation() }
+        )
+
+        // Use RxJava Debounce to update the BrainKey error only after the user stops writing for > 500 ms
+        mDisposables.add(
+            RxTextView.textChanges(tietBrainKey)
+                .skipInitialValue()
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .map { it.toString().trim() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { validateBrainKey(it) }
+        )
+
+        btnImport.isEnabled = false
+        btnImport.setOnClickListener { verifyBrainKey(false) }
     }
 
-    private fun importAccount() {
-        tilPin.isErrorEnabled = false
-        tilPinConfirmation.isErrorEnabled = false
-        tilBrainKey.isErrorEnabled = false
+    private fun validatePIN() {
+        val pin = tietPin.text.toString()
 
-        if (tietPin.text!!.length < Constants.MIN_PIN_LENGTH)
+        if (pin.length < Constants.MIN_PIN_LENGTH) {
             tilPin.error = getString(R.string.error__pin_too_short)
-        else if (tietPin.text.toString() != tietPinConfirmation.text.toString())
-            tilPinConfirmation.error = getString(R.string.error__pin_mismatch)
-        else if (tietBrainKey.text!!.isEmpty() || !tietBrainKey.text.toString().contains(" "))
-            tilBrainKey.error = getString(R.string.error__enter_correct_brainkey)
-        else {
-            val brainKey = tietBrainKey.text.toString()
-            if (brainKey.split(" ").size in 12..16)
-                verifyBrainKey(false)
-            else
-                tilBrainKey.error = getString(R.string.error__enter_correct_brainkey)
+            isPINValid = false
+        } else {
+            tilPin.isErrorEnabled = false
+            isPINValid = true
         }
 
+        validatePINConfirmation()
+    }
+
+    private fun validatePINConfirmation() {
+        val pinConfirmation = tietPinConfirmation.text.toString()
+
+        if (pinConfirmation != tietPin.text.toString()) {
+            tilPinConfirmation.error = getString(R.string.error__pin_mismatch)
+            isPINConfirmationValid = false
+        } else {
+            tilPinConfirmation.isErrorEnabled = false
+            isPINConfirmationValid = true
+        }
+
+        enableDisableImportButton()
+    }
+
+    private fun validateBrainKey(brainKey: String) {
+        if (brainKey.isEmpty() || !brainKey.contains(" ") || brainKey.split(" ").size !in 12..16) {
+            tilBrainKey.error = getString(R.string.error__enter_correct_brainkey)
+            isBrainKeyValid = false
+        } else {
+            tilBrainKey.isErrorEnabled = false
+            isBrainKeyValid = true
+        }
+
+        enableDisableImportButton()
+    }
+
+    private fun enableDisableImportButton() {
+        btnImport.isEnabled =  (isPINValid && isPINConfirmationValid && isBrainKeyValid)
     }
 
     /**
@@ -295,5 +347,11 @@ class ImportBrainkeyActivity : ConnectedActivity() {
 
         val authorityRepository = AuthorityRepository(this)
         authorityRepository.insert(authority)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (!mDisposables.isDisposed) mDisposables.dispose()
     }
 }
