@@ -155,7 +155,7 @@ class TransfersLoader(private var mContext: Context?): ServiceConnection {
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-
+        mShouldUnbindNetwork = false
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {

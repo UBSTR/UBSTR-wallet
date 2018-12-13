@@ -40,8 +40,7 @@ class SettingsFragment : Fragment() {
                 .putBoolean(Constants.KEY_NIGHT_MODE_ACTIVATED, isChecked).apply()
 
             // Recreates the activity to apply the selected theme
-            // TODO find a way to automatically change the theme
-            // this.recreate()
+            activity?.recreate()
         }
     }
 }

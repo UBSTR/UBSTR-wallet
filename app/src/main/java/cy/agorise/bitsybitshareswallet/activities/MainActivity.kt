@@ -2,6 +2,7 @@ package cy.agorise.bitsybitshareswallet.activities
 
 import android.content.res.Resources
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.MenuItem
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -10,6 +11,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 import cy.agorise.bitsybitshareswallet.R
+import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.models.JsonRpcResponse
 import kotlinx.android.synthetic.main.activity_main.*
@@ -21,6 +23,11 @@ class MainActivity : ConnectedActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Sets the theme to night mode if it has been selected by the user
+        if (PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean(Constants.KEY_NIGHT_MODE_ACTIVATED, false)) {
+            setTheme(R.style.Theme_Bitsy_Dark_NoActionBar)
+        }
         setContentView(R.layout.activity_main)
 
         setSupportActionBar(toolbar)
