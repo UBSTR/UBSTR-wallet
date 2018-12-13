@@ -6,6 +6,7 @@ import android.preference.PreferenceManager
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 
@@ -53,7 +54,8 @@ class BalancesFragment : Fragment() {
 
         val balancesAdapter = BalancesAdapter(context!!)
         rvBalances.adapter = balancesAdapter
-        rvBalances.layoutManager = GridLayoutManager(context, 2)
+        rvBalances.layoutManager = LinearLayoutManager(context!!)
+        rvBalances.addItemDecoration(DividerItemDecoration(context!!, DividerItemDecoration.VERTICAL))
 
         mBalanceDetailViewModel.getAll().observe(this, Observer<List<BalanceDetail>> { balancesDetails ->
             balancesAdapter.replaceAll(balancesDetails)
