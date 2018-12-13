@@ -122,7 +122,8 @@ class TransfersLoader(private var mContext: Context?): ServiceConnection {
                         Log.e(TAG, "AEADBadTagException. Class: " + e.javaClass + ", Msg: " + e.message)
                     }
 
-                })
+                }
+            )
             mDisposables.add(RxBus.getBusInstance()
                 .asFlowable()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -145,7 +146,8 @@ class TransfersLoader(private var mContext: Context?): ServiceConnection {
                             responseMap.clear()
                         }
                     }
-                }))
+                })
+            )
         } else {
             // If there is no current user, we should not do anything
             mState = State.CANCELLED

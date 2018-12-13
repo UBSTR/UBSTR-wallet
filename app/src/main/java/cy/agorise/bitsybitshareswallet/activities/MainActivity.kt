@@ -39,14 +39,19 @@ class MainActivity : ConnectedActivity() {
         val host: NavHostFragment = supportFragmentManager
             .findFragmentById(R.id.navHostFragment) as NavHostFragment? ?: return
 
-        // Set up Action Bar
+        // Set up Action Bar with Navigation's controller
         val navController = host.navController
 
         appBarConfiguration = AppBarConfiguration(navController.graph)
 
+        // Sets up the ActionBar with the navigation controller so that it automatically responds to clicks on toolbar
+        // menu items and shows the up navigation button on all fragments except home (Balances)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
         mHandler = Handler()
+
+        // When this runnable finishes it first verifies if the auto close feature is enabled and if it is then it
+        // closes the app, if not then it just restarts the Handler (timer)
         mRunnable = Runnable {
             if (PreferenceManager.getDefaultSharedPreferences(this)
                     .getBoolean(Constants.KEY_AUTO_CLOSE_ACTIVATED, false))
@@ -57,11 +62,17 @@ class MainActivity : ConnectedActivity() {
         startHandler()
     }
 
+    /**
+     * Restarts the Handler (timer) each time there is user's interaction
+     */
     override fun onUserInteraction() {
         super.onUserInteraction()
         restartHandler()
     }
 
+    /**
+     * Stops and then restarts the Handler
+     */
     private fun restartHandler() {
         stopHandler()
         startHandler()

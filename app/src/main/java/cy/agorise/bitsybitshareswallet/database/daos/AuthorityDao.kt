@@ -12,6 +12,9 @@ interface AuthorityDao {
     @Insert
     fun insert(authority: Authority)
 
+    @Query("SELECT * FROM authorities WHERE user_id=:userId LIMIT 1")
+    fun get(userId: String): Single<Authority>
+
     @Query("SELECT * FROM authorities")
     fun getAll(): LiveData<List<Authority>>
 

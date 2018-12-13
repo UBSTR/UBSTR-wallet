@@ -20,6 +20,10 @@ class AuthorityRepository internal constructor(context: Context) {
         insertAsyncTask(mAuthorityDao).execute(authority)
     }
 
+    fun get(userId: String): Single<Authority> {
+        return mAuthorityDao.get(userId)
+    }
+
     fun getWIF(userId: String, authorityType: Int): Single<String> {
         return mAuthorityDao.getWIF(userId, authorityType)
     }

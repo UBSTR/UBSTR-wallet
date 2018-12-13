@@ -59,7 +59,7 @@ dependencies {
     implementation 'com.moldedbits.r2d2:r2d2:1.0.1'
     implementation 'com.google.zxing:core:3.3.1'
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
-    implementation 'com.afollestad.material-dialogs:core:2.0.0-rc1'
+    implementation 'com.afollestad.material-dialogs:core:2.0.0-rc3'
 
     // Android Debug Database
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'

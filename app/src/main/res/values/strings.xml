@@ -66,6 +66,8 @@
     <string name="msg__brainkey_description">BrainKey. Account recovery words that can be captured or copied, but not
         edited.
     </string>
+    <string name="msg__brainkey_info">Print this out, or write it down. Anyone with access to your recovery key will
+        have access to funds within this wallet.</string>
     <string name="btn__view_and_copy"><![CDATA[View & Copy]]></string>
     <string name="title__bugs_or_ideas">Bugs or Ideas?</string>
     <string name="msg__bugs_or_ideas">Telegram chat: http://t.me/Agorise\nEmail: Agorise@protonmail.ch\nOpen Source:
