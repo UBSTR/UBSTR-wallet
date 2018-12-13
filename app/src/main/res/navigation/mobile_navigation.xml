@@ -9,7 +9,10 @@
     <fragment
         android:id="@+id/balancesFragment"
         android:name="cy.agorise.bitsybitshareswallet.fragments.BalancesFragment"
-        android:label="BalancesFragment"
+        android:label="@string/app_name"
         tools:layout="@layout/fragment_balances">
     </fragment>
+    <fragment android:id="@+id/merchants_dest"
+              android:name="cy.agorise.bitsybitshareswallet.fragments.MerchantsFragment"
+              android:label="fragment_merchants" tools:layout="@layout/fragment_merchants"/>
 </navigation>

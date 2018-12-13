@@ -3,10 +3,8 @@ package cy.agorise.bitsybitshareswallet.fragments
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,6 +31,8 @@ class BalancesFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true)
+
         return inflater.inflate(R.layout.fragment_balances, container, false)
     }
 
@@ -70,5 +70,9 @@ class BalancesFragment : Fragment() {
         mTransferDetailViewModel.getAll(userId).observe(this, Observer<List<TransferDetail>> { transfersDetails ->
             transfersDetailsAdapter.replaceAll(transfersDetails)
         })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_balances, menu)
     }
 }
