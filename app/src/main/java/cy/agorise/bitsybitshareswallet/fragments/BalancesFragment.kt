@@ -6,19 +6,17 @@ import android.preference.PreferenceManager
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.BalancesAdapter
-import cy.agorise.bitsybitshareswallet.adapters.TransfersDetailsAdapter
 import cy.agorise.bitsybitshareswallet.database.entities.UserAccount
 import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
-import cy.agorise.bitsybitshareswallet.database.joins.TransferDetail
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.BalanceDetailViewModel
-import cy.agorise.bitsybitshareswallet.viewmodels.TransferDetailViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import kotlinx.android.synthetic.main.fragment_balances.*
 
@@ -60,6 +58,23 @@ class BalancesFragment : Fragment() {
         mBalanceDetailViewModel.getAll().observe(this, Observer<List<BalanceDetail>> { balancesDetails ->
             balancesAdapter.replaceAll(balancesDetails)
         })
+
+        // Navigate to the Receive Transaction Fragment
+        fabReceiveTransaction.setOnClickListener (
+            Navigation.createNavigateOnClickListener(R.id.receive_action)
+        )
+
+        // Navigate to the Send Transaction Fragment without activating the camera
+        fabSendTransaction.setOnClickListener(
+            Navigation.createNavigateOnClickListener(R.id.send_action)
+        )
+
+        // Navigate to the Send Transaction Fragment using Navigation's SafeArgs to activate the camera
+        fabSendTransactionCamera.setOnClickListener {
+            val action = BalancesFragmentDirections.sendActionCamera()
+            action.setOpenCamera(true)
+            findNavController().navigate(action)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
