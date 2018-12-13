@@ -28,6 +28,7 @@
         <activity android:name=".activities.ImportBrainkeyActivity"/>
         <activity
             android:name=".activities.MainActivity"
+            android:theme="@style/Theme.Bitsy.NoActionBar"
             android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".activities.SettingsActivity"

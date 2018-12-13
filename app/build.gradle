@@ -33,6 +33,7 @@ android {
 dependencies {
     def lifecycle_version = "2.0.0"
     def room_version = "2.1.0-alpha03"
+    def nav_version = "1.0.0-alpha08"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':graphenejlib:graphenej')
@@ -47,6 +48,10 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-rxjava2:$room_version" // RxJava support for Room
+
+    implementation "android.arch.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "android.arch.navigation:navigation-ui-ktx:$nav_version"
+
 
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
 
