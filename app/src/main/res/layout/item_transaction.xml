@@ -8,8 +8,8 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     card_view:cardElevation="4dp"
-    card_view:cardCornerRadius="4dp"
-    android:layout_margin="4dp">
+    card_view:cardCornerRadius="@dimen/card_radius"
+    android:layout_margin="@dimen/card_margin">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/rootView"
