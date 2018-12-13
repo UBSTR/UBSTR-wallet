@@ -44,15 +44,14 @@ object Constants {
      */
     const val MISSING_PAYMENT_CHECK_PERIOD: Long = 5000
 
-    /**
-     * Time period to wait to send a request to the NetworkService, and retry in case it is still not connected
-     */
+    /** Time period to wait to send a request to the NetworkService, and retry in case it is still not connected */
     const val NETWORK_SERVICE_RETRY_PERIOD: Long = 5000
 
-    /**
-     * Key used to store the number of operations that the currently selected account had last time we checked
-     */
+    /**  Key used to store the number of operations that the currently selected account had last time we checked */
     const val KEY_ACCOUNT_OPERATION_COUNT = "key_account_operation_count"
+
+    /** Key used to store the auto close app if no user activity setting into the shared preferences */
+    const val KEY_AUTO_CLOSE_ACTIVATED = "key_auto_close_activated"
 
     /** Key used to store the night mode setting into the shared preferences */
     const val KEY_NIGHT_MODE_ACTIVATED = "key_night_mode_activated"

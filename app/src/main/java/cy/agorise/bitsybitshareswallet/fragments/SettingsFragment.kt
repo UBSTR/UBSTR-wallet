@@ -25,7 +25,21 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initAutoCloseSwitch()
+
         initNightModeSwitch()
+    }
+
+    private fun initAutoCloseSwitch() {
+        val autoCloseOn = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean(Constants.KEY_AUTO_CLOSE_ACTIVATED, false)
+
+        switchAutoClose.isChecked = autoCloseOn
+
+        switchAutoClose.setOnCheckedChangeListener { buttonView, isChecked ->
+            PreferenceManager.getDefaultSharedPreferences(buttonView.context).edit()
+                .putBoolean(Constants.KEY_AUTO_CLOSE_ACTIVATED, isChecked).apply()
+        }
     }
 
     private fun initNightModeSwitch() {

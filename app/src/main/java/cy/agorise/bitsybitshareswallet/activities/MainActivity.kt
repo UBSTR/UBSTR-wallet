@@ -1,7 +1,7 @@
 package cy.agorise.bitsybitshareswallet.activities
 
-import android.content.res.Resources
 import android.os.Bundle
+import android.os.Handler
 import android.preference.PreferenceManager
 import android.view.MenuItem
 import androidx.navigation.findNavController
@@ -20,6 +20,10 @@ class MainActivity : ConnectedActivity() {
     private val TAG = this.javaClass.simpleName
 
     private lateinit var appBarConfiguration : AppBarConfiguration
+
+    // Handler and Runnable used to add a timer for user inaction and close the app if enough time has passed
+    private lateinit var mHandler: Handler
+    private lateinit var mRunnable: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,13 +46,33 @@ class MainActivity : ConnectedActivity() {
 
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            val dest: String = try {
-                resources.getResourceName(destination.id)
-            } catch (e: Resources.NotFoundException) {
-                Integer.toString(destination.id)
-            }
+        mHandler = Handler()
+        mRunnable = Runnable {
+            if (PreferenceManager.getDefaultSharedPreferences(this)
+                    .getBoolean(Constants.KEY_AUTO_CLOSE_ACTIVATED, false))
+                finish()
+            else
+                restartHandler()
         }
+        startHandler()
+    }
+
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        restartHandler()
+    }
+
+    private fun restartHandler() {
+        stopHandler()
+        startHandler()
+    }
+
+    private fun stopHandler() {
+        mHandler.removeCallbacks(mRunnable)
+    }
+
+    private fun startHandler() {
+        mHandler.postDelayed(mRunnable, 3 * 60 * 1000) //for 3 minutes
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
