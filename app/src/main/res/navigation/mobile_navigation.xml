@@ -12,7 +12,16 @@
         android:label="@string/app_name"
         tools:layout="@layout/fragment_balances">
     </fragment>
-    <fragment android:id="@+id/merchants_dest"
-              android:name="cy.agorise.bitsybitshareswallet.fragments.MerchantsFragment"
-              android:label="fragment_merchants" tools:layout="@layout/fragment_merchants"/>
+
+    <fragment
+        android:id="@+id/merchants_dest"
+        android:name="cy.agorise.bitsybitshareswallet.fragments.MerchantsFragment"
+        android:label="@string/title_merchants"
+        tools:layout="@layout/fragment_merchants"/>
+
+    <fragment
+        android:id="@+id/transactions_dest"
+        android:name="cy.agorise.bitsybitshareswallet.fragments.TransactionsFragment"
+        android:label="@string/title_transactions"
+        tools:layout="@layout/fragment_transactions"/>
 </navigation>

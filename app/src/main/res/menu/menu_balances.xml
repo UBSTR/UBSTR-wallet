@@ -3,13 +3,19 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/transactions_dest"
+        android:icon="@drawable/ic_transactions"
+        android:title="@string/title_transactions"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/merchants_dest"
         android:icon="@drawable/ic_merchants"
         android:title="@string/title_merchants"
         app:showAsAction="always"/>
 
     <item
-        android:id="@+id/menu_settings"
+        android:id="@+id/settings_dest"
         android:icon="@drawable/ic_settings"
         android:title="@string/title_settings"
         app:showAsAction="ifRoom"/>

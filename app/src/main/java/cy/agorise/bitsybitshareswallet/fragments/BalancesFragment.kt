@@ -25,7 +25,6 @@ class BalancesFragment : Fragment() {
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
     private lateinit var mBalanceDetailViewModel: BalanceDetailViewModel
-    private lateinit var mTransferDetailViewModel: TransferDetailViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,17 +57,6 @@ class BalancesFragment : Fragment() {
 
         mBalanceDetailViewModel.getAll().observe(this, Observer<List<BalanceDetail>> { balancesDetails ->
             balancesAdapter.replaceAll(balancesDetails)
-        })
-
-        // Configure TransferDetailViewModel to show the transaction history
-        mTransferDetailViewModel = ViewModelProviders.of(this).get(TransferDetailViewModel::class.java)
-
-        val transfersDetailsAdapter = TransfersDetailsAdapter(context!!)
-        rvTransactions.adapter = transfersDetailsAdapter
-        rvTransactions.layoutManager = LinearLayoutManager(context)
-
-        mTransferDetailViewModel.getAll(userId).observe(this, Observer<List<TransferDetail>> { transfersDetails ->
-            transfersDetailsAdapter.replaceAll(transfersDetails)
         })
     }
 
