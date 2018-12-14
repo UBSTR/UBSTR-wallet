@@ -65,6 +65,8 @@ class HomeFragment : Fragment() {
         val pagerAdapter = PagerAdapter(fragmentManager!!)
         viewPager.adapter = pagerAdapter
         tabLayout.setupWithViewPager(viewPager)
+        // Set the pie chart icon for the third tab
+        tabLayout.getTabAt(2)?.setIcon(R.drawable.ic_pie_chart)
     }
 
     /**
@@ -82,11 +84,11 @@ class HomeFragment : Fragment() {
         }
 
         override fun getPageTitle(position: Int): CharSequence? {
-            return getString(listOf(R.string.title_balances, R.string.title_net_worth)[position])
+            return listOf(getString(R.string.title_balances), getString(R.string.title_net_worth), "")[position]
         }
 
         override fun getCount(): Int {
-            return 2
+            return 3
         }
     }
 

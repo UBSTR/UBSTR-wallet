@@ -13,4 +13,5 @@
     <color name="darkGray">#616161</color>
     <color name="colorReceive">#669900</color>
     <color name="colorSend">#DC473A</color>
+    <color name="semiTransparent">#2888</color>
 </resources>
