@@ -13,7 +13,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 
 import cy.agorise.bitsybitshareswallet.R
-import kotlinx.android.synthetic.main.fragment_merchants.*
 
 class MerchantsFragment : Fragment(), OnMapReadyCallback {
 

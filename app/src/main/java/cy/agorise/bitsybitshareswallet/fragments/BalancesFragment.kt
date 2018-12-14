@@ -45,11 +45,11 @@ class BalancesFragment: Fragment() {
         })
     }
 
-//    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-//        super.setUserVisibleHint(isVisibleToUser)
-//        if (isVisibleToUser) {
-//            // TODO find a better way to recreate the fragment, that does it only when the theme has been changed
-//            fragmentManager!!.beginTransaction().detach(this).attach(this).commit()
-//        }
-//    }
+    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+        super.setUserVisibleHint(isVisibleToUser)
+        if (isVisibleToUser) {
+            // TODO find a better way to recreate the fragment, that does it only when the theme has been changed
+            fragmentManager!!.beginTransaction().detach(this).attach(this).commit()
+        }
+    }
 }
