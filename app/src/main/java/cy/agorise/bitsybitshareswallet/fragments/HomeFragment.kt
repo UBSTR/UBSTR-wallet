@@ -16,7 +16,6 @@ import cy.agorise.bitsybitshareswallet.database.entities.UserAccount
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.android.synthetic.main.item_balance.view.*
 
 class HomeFragment : Fragment() {
 
@@ -76,7 +75,6 @@ class HomeFragment : Fragment() {
 
         override fun getItem(position: Int): Fragment {
             // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
             return if (position == 0)
                 BalancesFragment()
             else
