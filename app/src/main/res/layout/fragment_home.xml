@@ -144,33 +144,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="?attr/themedColorBackgroundFloating"
+                android:background="?android:colorControlHighlight"
                 app:tabSelectedTextColor="?android:textColorPrimary"
-                app:tabIndicatorColor="?android:colorControlHighlight"
+                app:tabIndicatorColor="?attr/themedColorBackgroundFloating"
                 app:tabIndicatorHeight="50dp"
+                app:tabPaddingStart="@dimen/activity_horizontal_margin"
                 app:tabMode="scrollable" />
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/viewPager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
-
-            <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginTop="@dimen/spacing_same_topic"-->
-                <!--android:layout_marginStart="@dimen/spacing_same_topic"-->
-                <!--android:text="@string/title_balances"-->
-                <!--android:textAppearance="@style/TextAppearance.Bitsy.Subtitle1"/>-->
-
-            <!--<androidx.recyclerview.widget.RecyclerView-->
-                <!--android:id="@+id/rvBalances"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:paddingStart="@dimen/spacing_same_topic"-->
-                <!--android:paddingEnd="@dimen/spacing_same_topic"-->
-                <!--tools:listitem="@layout/item_balance"-->
-                <!--tools:itemCount="3"/>-->
 
         </LinearLayout>
 

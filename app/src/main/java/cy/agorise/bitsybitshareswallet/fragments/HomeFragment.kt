@@ -21,7 +21,6 @@ import kotlinx.android.synthetic.main.item_balance.view.*
 class HomeFragment : Fragment() {
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
-//    private lateinit var mBalanceDetailViewModel: BalanceDetailViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,18 +44,6 @@ class HomeFragment : Fragment() {
             tvAccountName.text = user.name
         })
 
-//        // Configure BalanceDetailViewModel to show the current balances
-//        mBalanceDetailViewModel = ViewModelProviders.of(this).get(BalanceDetailViewModel::class.java)
-//
-//        val balancesAdapter = BalancesAdapter(context!!)
-//        rvBalances.adapter = balancesAdapter
-//        rvBalances.layoutManager = LinearLayoutManager(context!!)
-//        rvBalances.addItemDecoration(DividerItemDecoration(context!!, DividerItemDecoration.VERTICAL))
-//
-//        mBalanceDetailViewModel.getAll().observe(this, Observer<List<BalanceDetail>> { balancesDetails ->
-//            balancesAdapter.replaceAll(balancesDetails)
-//        })
-
         // Navigate to the Receive Transaction Fragment
         fabReceiveTransaction.setOnClickListener (
             Navigation.createNavigateOnClickListener(R.id.receive_action)
@@ -74,6 +61,7 @@ class HomeFragment : Fragment() {
             findNavController().navigate(action)
         }
 
+        // Configure ViewPager with PagerAdapter and TabLayout to display the Balances/NetWorth section
         val pagerAdapter = PagerAdapter(fragmentManager!!)
         viewPager.adapter = pagerAdapter
         tabLayout.setupWithViewPager(viewPager)
@@ -87,49 +75,18 @@ class HomeFragment : Fragment() {
         override fun getItem(position: Int): Fragment {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1)
+            return if (position == 0)
+                BalancesFragment()
+            else
+                NetWorthFragment()
         }
 
         override fun getPageTitle(position: Int): CharSequence? {
-            return listOf(getString(R.string.title_balances), "Net Worth")[position]
+            return getString(listOf(R.string.title_balances, R.string.title_net_worth)[position])
         }
 
         override fun getCount(): Int {
             return 2
-        }
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    class PlaceholderFragment : Fragment() {
-
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                                  savedInstanceState: Bundle?): View? {
-            val rootView = inflater.inflate(R.layout.item_balance, container, false)
-            val text = "Hello World from section ${arguments?.getInt(ARG_SECTION_NUMBER)}"
-            rootView.tvBalance.text = text
-            return rootView
-        }
-
-        companion object {
-            /**
-             * The fragment argument representing the section number for this
-             * fragment.
-             */
-            private const val ARG_SECTION_NUMBER = "section_number"
-
-            /**
-             * Returns a new instance of this fragment for the given section
-             * number.
-             */
-            fun newInstance(sectionNumber: Int): PlaceholderFragment {
-                val fragment = PlaceholderFragment()
-                val args = Bundle()
-                args.putInt(ARG_SECTION_NUMBER, sectionNumber)
-                fragment.arguments = args
-                return fragment
-            }
         }
     }
 
