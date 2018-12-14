@@ -24,6 +24,7 @@
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 -dontwarn org.bitcoinj.store**
 -dontwarn org.slf4j.**
+-dontwarn okhttp3.internal.platform.*
 
 # Firabase Crashlytics
 -keepattributes *Annotation*

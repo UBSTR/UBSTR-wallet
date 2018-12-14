@@ -9,7 +9,7 @@ import cy.agorise.bitsybitshareswallet.database.entities.UserAccount
 
 @Dao
 interface UserAccountDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(userAccount: UserAccount)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
