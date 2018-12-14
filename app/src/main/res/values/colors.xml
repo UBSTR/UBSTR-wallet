@@ -4,6 +4,9 @@
     <color name="colorPrimaryDark">#006ba4</color>
     <color name="colorAccent">#0099d6</color>
 
+    <!-- Dark theme -->
+    <color name="colorBackgroundFloating">#424242</color>
+
     <color name="black">#000</color>
     <color name="gray">#888</color>
     <color name="lightGray">#e0e0e0</color>

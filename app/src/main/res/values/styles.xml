@@ -6,6 +6,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <!--Custom attributes -->
+        <item name="themedColorBackgroundFloating">@android:color/white</item>
     </style>
     <style name="Theme.Bitsy.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -19,6 +21,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <!--Custom attributes -->
+        <item name="themedColorBackgroundFloating">@color/colorBackgroundFloating</item>
     </style>
     <style name="Theme.Bitsy.Dark.NoActionBar">
         <item name="windowActionBar">false</item>
