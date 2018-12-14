@@ -3,6 +3,8 @@ apply plugin: "androidx.navigation.safeargs"
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'io.fabric'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 28
@@ -63,6 +65,10 @@ dependencies {
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    //Firebase
+    implementation 'com.google.firebase:firebase-core:16.0.6'
+    implementation 'com.google.firebase:firebase-crash:16.2.1'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.7'
     // Others
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
     implementation 'org.bitcoinj:bitcoinj-core:0.14.3'

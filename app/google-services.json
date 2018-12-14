@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "644483315839",
+    "firebase_url": "https://bitsy-wallet.firebaseio.com",
+    "project_id": "bitsy-wallet",
+    "storage_bucket": "bitsy-wallet.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:644483315839:android:4984a6b363726b70",
+        "android_client_info": {
+          "package_name": "cy.agorise.bitsybitshareswallet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "644483315839-q813epbu919ise2peubfeagbi0hcuphc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cy.agorise.bitsybitshareswallet",
+            "certificate_hash": "0807b8ec7b1e00822924a808a6ad84761cd2691a"
+          }
+        },
+        {
+          "client_id": "644483315839-l19le5quoa3a96dernh2m6v3e76rqd8p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5N3o3CRWyiWyFw6zDprWYWIt2d1AI6Ns"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "644483315839-l19le5quoa3a96dernh2m6v3e76rqd8p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
