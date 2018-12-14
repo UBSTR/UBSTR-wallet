@@ -20,5 +20,7 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-## TODO actually fix this
--ignorewarnings
+-dontwarn sun.misc.Unsafe
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+-dontwarn org.bitcoinj.store**
+-dontwarn org.slf4j.**
