@@ -1,22 +1,35 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.gson.GsonBuilder
 
 import cy.agorise.bitsybitshareswallet.R
+import cy.agorise.bitsybitshareswallet.models.Merchant
+import cy.agorise.bitsybitshareswallet.network.AmbassadorService
+import cy.agorise.bitsybitshareswallet.network.FeathersResponse
+import retrofit2.Call
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 
-class MerchantsFragment : Fragment(), OnMapReadyCallback {
+class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<FeathersResponse<Merchant>> {
 
     private lateinit var mMap: GoogleMap
+
+    private var location: LatLng? = null
+    private var merchants: List<Merchant>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,6 +45,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         val mapFragment = childFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        // TODO https://github.com/Agorise/bitsy-wallet/blob/feat_merchants/app/src/main/java/cy/agorise/bitsybitshareswallet/fragments/MapFragment.kt
     }
 
     /**
@@ -46,10 +61,43 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+//        val gson = GsonBuilder()
+//            .setLenient()
+//            .create()
+//        val retrofit = Retrofit.Builder()
+//            .baseUrl("https://intranet.palmpay.io/")
+//            .addConverterFactory(GsonConverterFactory.create(gson))
+//            .build()
+//
+//        val ambassadorService = retrofit.create<AmbassadorService>(AmbassadorService::class.java)
+//        val call = ambassadorService.allMerchants
+//        call.enqueue(this)
+    }
+
+    override fun onResponse(call: Call<FeathersResponse<Merchant>>, response: Response<FeathersResponse<Merchant>>) {
+        if (response.isSuccessful) {
+            val res: FeathersResponse<Merchant>? = response.body()
+            merchants = res!!.data
+            for (mer in merchants!!) {
+                location = LatLng(mer.lat.toDouble(), mer.lon.toDouble())
+                mMap.addMarker(
+                    MarkerOptions().position(location!!).title(mer.name).snippet(mer.address).icon(
+                        BitmapDescriptorFactory.fromResource(R.drawable.ic_merchants)
+                    )
+                )
+            }
+        } else {
+            try {
+                Log.e("error_bitsy", response.errorBody()?.string())
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+
+        }
+    }
+
+    override fun onFailure(call: Call<FeathersResponse<Merchant>>, t: Throwable) {
+
     }
 
 }
