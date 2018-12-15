@@ -9,25 +9,13 @@ class BitsyApplication : Application() {
     private val BITSHARES_NODE_URLS = arrayOf(
         // PP private nodes
         "wss://nl.palmpay.io/ws",
-        "wss://mx.palmpay.io/ws",
 
         // Other public nodes
-        "wss://bitshares.nu/ws", // Stockholm, Sweden
-        "wss://bitshares.openledger.info/ws", // Openledger node
-        "wss://dallas.bitshares.apasia.tech/ws", // Dallas, USA
-        "wss://atlanta.bitshares.apasia.tech/ws", // Atlanta, USA
-        "wss://miami.bitshares.apasia.tech/ws", // Miami, USA
-        "wss://valley.bitshares.apasia.tech/ws", // Silicon Valley, USA
-        "wss://england.bitshares.apasia.tech/ws", // London, UK
-        "wss://netherlands.bitshares.apasia.tech/ws", // Amsterdam, Netherlands
-        "wss://australia.bitshares.apasia.tech/ws", // Sidney, Australia
-        "wss://bit.btsabc.org/ws", // Hong Kong, China
-        "wss://node.btscharts.com/ws", // Beijing, Chinawss://node.btscharts.com/ws
-        "wss://ws.gdex.top", // Shanghai, China
-        "wss://dex.rnglab.org", // Amsterdam, Netherlands
-        "wss://api.bts.blckchnd.com", // Falkenstein, Germany
-        "wss://api-ru.bts.blckchnd.com", // Moscow, Russia
-        "wss://crazybit.online", // Shenzhen, China?
+        "wss://bitshares.nu/ws",                   // Stockholm, Sweden
+        "wss://bitshares.openledger.info/ws",      // Openledger node
+        "wss://dallas.bitshares.apasia.tech/ws",	// Dallas, USA
+        "wss://atlanta.bitshares.apasia.tech/ws",	// Atlanta, USA
+        "wss://dex.rnglab.org",				// Amsterdam, Netherlands
         "wss://citadel.li/node"
     )
 

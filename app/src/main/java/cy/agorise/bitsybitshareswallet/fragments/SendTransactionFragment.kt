@@ -411,16 +411,16 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
             val privateKey = ECKey.fromPrivate(DumpedPrivateKey.fromBase58(null, wifKey).key.privKeyBytes)
 
-            // Add memo if exists
-            val memoMsg = tietMemo.text.toString()
-            if (memoMsg.isNotEmpty()) {
-                val nonce = SecureRandomGenerator.getSecureRandom().nextLong().toBigInteger()
-                val encryptedMemo = Memo.encryptMessage(privateKey, destinationPublicKey!!, nonce, memoMsg)
-                val from = Address(ECKey.fromPublicOnly(privateKey.pubKey))
-                val to = Address(destinationPublicKey!!.key)
-                val memo = Memo(from, to, nonce, encryptedMemo)
-                operationBuilder.setMemo(memo)
-            }
+            // Add memo if exists TODO enable memo
+//            val memoMsg = tietMemo.text.toString()
+//            if (memoMsg.isNotEmpty()) {
+//                val nonce = SecureRandomGenerator.getSecureRandom().nextLong().toBigInteger()
+//                val encryptedMemo = Memo.encryptMessage(privateKey, destinationPublicKey!!, nonce, memoMsg)
+//                val from = Address(ECKey.fromPublicOnly(privateKey.pubKey))
+//                val to = Address(destinationPublicKey!!.key)
+//                val memo = Memo(from, to, nonce, encryptedMemo)
+//                operationBuilder.setMemo(memo)
+//            }
 
             val operations = ArrayList<BaseOperation>()
             operations.add(operationBuilder.build())
