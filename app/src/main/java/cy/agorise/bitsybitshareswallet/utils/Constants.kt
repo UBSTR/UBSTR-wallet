@@ -1,8 +1,5 @@
 package cy.agorise.bitsybitshareswallet.utils
 
-import cy.agorise.graphenej.Asset
-
-
 object Constants {
 
     /** Key used to store the number of the last agreed License version */
@@ -10,12 +7,6 @@ object Constants {
 
     /** Version of the currently used license */
     const val CURRENT_LICENSE_VERSION = 1
-
-    /**
-     * Key used to store a preference value used to keep track of the last time the assets in
-     * database were updated.
-     */
-    const val KEY_LAST_ASSET_LIST_UPDATE = "key_last_assets_update"
 
     /** Key used to store if the initial setup is already done or not */
     const val KEY_INITIAL_SETUP_DONE = "key_initial_setup_done"

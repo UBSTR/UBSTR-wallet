@@ -38,7 +38,6 @@ import cy.agorise.graphenej.api.calls.BroadcastTransaction
 import cy.agorise.graphenej.api.calls.GetAccountByName
 import cy.agorise.graphenej.api.calls.GetDynamicGlobalProperties
 import cy.agorise.graphenej.api.calls.GetRequiredFees
-import cy.agorise.graphenej.crypto.SecureRandomGenerator
 import cy.agorise.graphenej.models.AccountProperties
 import cy.agorise.graphenej.models.DynamicGlobalProperties
 import cy.agorise.graphenej.models.JsonRpcResponse
@@ -374,7 +373,8 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
     }
 
     private fun validateAmount(amount: Double) {
-        val balance = mBalancesDetailsAdapter!!.getItem(spAsset.selectedItemPosition)!!
+        if (mBalancesDetailsAdapter?.isEmpty != false) return
+        val balance = mBalancesDetailsAdapter?.getItem(spAsset.selectedItemPosition) ?: return
         val currentAmount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
 
         if (currentAmount < amount) {
