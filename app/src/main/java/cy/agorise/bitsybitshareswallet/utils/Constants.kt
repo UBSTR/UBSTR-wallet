@@ -11,9 +11,6 @@ object Constants {
     /** Version of the currently used license */
     const val CURRENT_LICENSE_VERSION = 1
 
-    /** Key used to store if the assets database has been loaded or not */
-    const val KEY_DATABASE_LOADED = "key_database_loaded"
-
     /**
      * Key used to store a preference value used to keep track of the last time the assets in
      * database were updated.

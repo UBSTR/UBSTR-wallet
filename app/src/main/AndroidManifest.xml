@@ -43,7 +43,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.LicenseActivity"/>
-        <activity android:name=".activities.DatabaseLoadActivity"/>
         <activity android:name=".activities.ImportBrainkeyActivity"/>
         <activity
             android:name=".activities.MainActivity"
