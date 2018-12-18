@@ -48,7 +48,8 @@ class BalancesAdapter(private val context: Context) :
         })
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvBalance: TextView = itemView.findViewById(R.id.tvBalance)
+        val tvSymbol: TextView = itemView.findViewById(R.id.tvSymbol)
+        val tvAmount: TextView = itemView.findViewById(R.id.tvAmount)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BalancesAdapter.ViewHolder {
@@ -62,10 +63,10 @@ class BalancesAdapter(private val context: Context) :
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val balance = mSortedList.get(position)
 
-        val amount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
+        viewHolder.tvSymbol.text = balance.symbol
 
-        viewHolder.tvBalance.text =
-                String.format("%." + Math.min(balance.precision, 8) + "f %s", amount, balance.symbol)
+        val amount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
+        viewHolder.tvAmount.text = String.format("%." + Math.min(balance.precision, 8) + "f", amount)
     }
 
     fun add(balance: BalanceDetail) {
