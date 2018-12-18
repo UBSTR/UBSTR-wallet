@@ -24,6 +24,10 @@ class BalanceRepository internal constructor(context: Context) {
         return mBalanceDao.getAll()
     }
 
+    fun getMissingAssetIds(): LiveData<List<String>> {
+        return mBalanceDao.getMissingAssetIds()
+    }
+
     private class insertAllAsyncTask internal constructor(private val mAsyncTaskDao: BalanceDao) :
         AsyncTask<List<Balance>, Void, Void>() {
 

@@ -17,4 +17,8 @@ interface BalanceDao {
 
     @Query("SELECT * FROM balances")
     fun getAll(): LiveData<List<Balance>>
+
+    // TODO not sure if this is the best place for this query as it involves two entities
+    @Query("SELECT DISTINCT asset_id FROM balances WHERE asset_id NOT IN (SELECT id FROM assets)")
+    fun getMissingAssetIds(): LiveData<List<String>>
 }

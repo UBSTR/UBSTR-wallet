@@ -17,7 +17,9 @@ import cy.agorise.bitsybitshareswallet.database.entities.Balance
 import cy.agorise.bitsybitshareswallet.processors.TransfersLoader
 import cy.agorise.bitsybitshareswallet.repositories.BalanceRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
+import cy.agorise.bitsybitshareswallet.viewmodels.BalanceViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
+import cy.agorise.graphenej.Asset
 import cy.agorise.graphenej.AssetAmount
 import cy.agorise.graphenej.UserAccount
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
@@ -26,12 +28,14 @@ import cy.agorise.graphenej.api.android.RxBus
 import cy.agorise.graphenej.api.calls.GetAccountBalances
 import cy.agorise.graphenej.api.calls.GetAccounts
 import cy.agorise.graphenej.api.calls.GetFullAccounts
+import cy.agorise.graphenej.api.calls.GetObjects
 import cy.agorise.graphenej.models.AccountProperties
 import cy.agorise.graphenej.models.FullAccountDetails
 import cy.agorise.graphenej.models.JsonRpcResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Class in charge of managing the connection to graphenej's NetworkService
@@ -40,8 +44,9 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private val TAG = this.javaClass.simpleName
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
+    private lateinit var mBalanceViewModel: BalanceViewModel
 
-    private var mBalanceRepository: BalanceRepository? = null
+    private lateinit var mBalanceRepository: BalanceRepository
 
     /* Current user account */
     protected var mCurrentAccount: UserAccount? = null
@@ -54,6 +59,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private var storedOpCount: Long = -1
 
     private var missingUserAccounts = ArrayList<UserAccount>()
+    private var missingAssets = ArrayList<String>()
 
     /* Network service connection */
     protected var mNetworkService: NetworkService? = null
@@ -73,15 +79,28 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
         mBalanceRepository = BalanceRepository(this)
 
-        // Configure UserAccountViewModel to show the current account
+        // Configure UserAccountViewModel to obtain the missing account ids
         mUserAccountViewModel = ViewModelProviders.of(this).get(UserAccountViewModel::class.java)
 
         mUserAccountViewModel.getMissingUserAccountIds().observe(this, Observer<List<String>>{ userAccountIds ->
             if (userAccountIds.isNotEmpty()) {
+                missingUserAccounts.clear()
                 for (userAccountId in userAccountIds)
                     missingUserAccounts.add(UserAccount(userAccountId))
 
                 mHandler.postDelayed(mRequestMissingUserAccountsTask, Constants.NETWORK_SERVICE_RETRY_PERIOD)
+            }
+        })
+
+        // Configure UserAccountViewModel to obtain the missing account ids
+        mBalanceViewModel = ViewModelProviders.of(this).get(BalanceViewModel::class.java)
+
+        mBalanceViewModel.getMissingAssetIds().observe(this, Observer<List<String>>{ assetIds ->
+            if (assetIds.isNotEmpty()) {
+                missingAssets.clear()
+                missingAssets.addAll(assetIds)
+
+                mHandler.postDelayed(mRequestMissingAssetsTask, Constants.NETWORK_SERVICE_RETRY_PERIOD)
             }
         })
 
@@ -99,8 +118,10 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                                 handleAccountDetails((message.result as List<*>)[0] as FullAccountDetails)
                             } else if ((message.result as List<*>)[0] is AccountProperties) {
                                 handleAccountProperties(message.result as List<AccountProperties>)
-                            } else if((message.result as List<*>)[0] is AssetAmount) {
+                            } else if ((message.result as List<*>)[0] is AssetAmount) {
                                 handleBalanceUpdate(message.result as List<AssetAmount>)
+                            } else if ((message.result as List<*>)[0] is Asset) {
+                                handleAssets(message.result as List<Asset>)
                             }
                         }
                     } else {
@@ -174,7 +195,11 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
             balances.add(balance)
         }
-        mBalanceRepository!!.insertAll(balances)
+        mBalanceRepository.insertAll(balances)
+    }
+
+    private fun handleAssets(assets: List<Asset>) {
+        Log.d(TAG, "handleAssets")
     }
 
     private fun updateBalances() {
@@ -187,13 +212,27 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     }
 
     /**
-     * Task used to obtain the missing UserAccounts.
+     * Task used to obtain the missing UserAccounts from Graphenej's NetworkService.
      */
     private val mRequestMissingUserAccountsTask = object : Runnable {
         override fun run() {
             if (mNetworkService!!.isConnected) {
                 mNetworkService!!.sendMessage(GetAccounts(missingUserAccounts), GetAccounts.REQUIRED_API)
             } else if (missingUserAccounts.isNotEmpty()){
+                mHandler.postDelayed(this, Constants.NETWORK_SERVICE_RETRY_PERIOD)
+            }
+        }
+    }
+
+    /**
+     * Task used to obtain the missing Assets from Graphenej's NetworkService.
+     */
+    private val mRequestMissingAssetsTask = object : Runnable {
+        override fun run() {
+            if (mNetworkService!!.isConnected) {
+                // TODO use GetAssets to obtain the missing assets and save them into the db
+                mNetworkService!!.sendMessage(GetObjects(missingAssets), GetAccounts.REQUIRED_API)
+            } else if (missingAssets.isNotEmpty()){
                 mHandler.postDelayed(this, Constants.NETWORK_SERVICE_RETRY_PERIOD)
             }
         }
@@ -237,6 +276,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         }
         mHandler.removeCallbacks(mCheckMissingPaymentsTask)
         mHandler.removeCallbacks(mRequestMissingUserAccountsTask)
+        mHandler.removeCallbacks(mRequestMissingAssetsTask)
     }
 
     override fun onResume() {
