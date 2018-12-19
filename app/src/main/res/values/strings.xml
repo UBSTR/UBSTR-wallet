@@ -76,5 +76,8 @@
     </string>
     <string name="text__coming_soon">Coming soon</string>
     <string name="title_net_worth">Net Worth</string>
+    <string name="title_search">Search</string>
+    <string name="title_filter">Filter</string>
+    <string name="title_export">Export</string>
 
 </resources>

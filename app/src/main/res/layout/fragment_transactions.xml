@@ -8,5 +8,4 @@
     android:padding="@dimen/card_margin"
     android:clipToPadding="false"
     tools:listitem="@layout/item_transaction"
-    tools:itemCount="6"
-    android:layoutAnimation="@anim/layout_animation_from_bottom"/>
+    tools:itemCount="6"/>

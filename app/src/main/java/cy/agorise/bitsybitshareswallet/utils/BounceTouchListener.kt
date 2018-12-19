@@ -23,7 +23,7 @@ class BounceTouchListener private constructor(
     View.OnTouchListener {
 
     private var downCalled = false
-    private val mContent: View
+    private val mContent: View = if (contentResId == -1) mMainView else mMainView.findViewById(contentResId)
     private var mDownY: Float = 0.toFloat()
     private var mSwipingDown: Boolean = false
     private var mSwipingUp: Boolean = false
@@ -33,10 +33,6 @@ class BounceTouchListener private constructor(
     private var mLastTouchY = -99f
     private var mMaxAbsTranslation = -99
 
-
-    init {
-        mContent = if (contentResId == -1) mMainView else mMainView.findViewById(contentResId)
-    }
 
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
         val action = MotionEventCompat.getActionMasked(motionEvent)

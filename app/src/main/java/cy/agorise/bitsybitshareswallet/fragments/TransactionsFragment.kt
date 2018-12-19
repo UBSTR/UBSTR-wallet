@@ -3,9 +3,7 @@ package cy.agorise.bitsybitshareswallet.fragments
 import android.graphics.Point
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
@@ -32,7 +30,7 @@ class TransactionsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-//        setHasOptionsMenu(true)
+        setHasOptionsMenu(true)
 
         return inflater.inflate(R.layout.fragment_transactions, container, false)
     }
@@ -54,6 +52,7 @@ class TransactionsFragment : Fragment() {
             transfersDetailsAdapter.replaceAll(transfersDetails)
         })
 
+        // Create bouncy effect when user tries to over scroll
         rvTransactions.pivotX = getScreenWidth(activity) * 0.5f
 
         pivotY1 = 0f
@@ -94,7 +93,7 @@ class TransactionsFragment : Fragment() {
         return size.y
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-//        inflater.inflate(R.menu.menu_home, menu)
-//    }
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_transactions, menu)
+    }
 }
