@@ -3,7 +3,9 @@ package cy.agorise.bitsybitshareswallet.fragments
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.*
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -26,6 +28,9 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
+
+        val toolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
+        toolbar?.navigationIcon = resources.getDrawable(R.drawable.ic_bitsy_logo_2, null)
 
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
