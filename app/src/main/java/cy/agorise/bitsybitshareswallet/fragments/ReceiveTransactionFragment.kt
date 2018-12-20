@@ -38,6 +38,8 @@ import java.util.concurrent.TimeUnit
 class ReceiveTransactionFragment : Fragment() {
     private val TAG = this.javaClass.simpleName
 
+    private val OTHER_ASSET = "other_asset"
+
     private lateinit var mUserAccountViewModel: UserAccountViewModel
     private lateinit var mAssetViewModel: AssetViewModel
 
@@ -50,7 +52,7 @@ class ReceiveTransactionFragment : Fragment() {
 
     private var mAssetsAdapter: AssetsAdapter? = null
 
-    private var mAssets: List<cy.agorise.bitsybitshareswallet.database.entities.Asset>? = null
+    private var mAssets = ArrayList<cy.agorise.bitsybitshareswallet.database.entities.Asset>()
 
     private var selectedAssetSymbol = ""
 
@@ -72,12 +74,21 @@ class ReceiveTransactionFragment : Fragment() {
                 mUserAccount = UserAccount(user.id, user.name)
         })
 
+        // Configure Assets spinner to show Assets already saved into the db
         mAssetViewModel = ViewModelProviders.of(this).get(AssetViewModel::class.java)
 
         mAssetViewModel.getAll().observe(this,
             Observer<List<cy.agorise.bitsybitshareswallet.database.entities.Asset>> { assets ->
-                mAssets = assets
-                mAssetsAdapter = AssetsAdapter(context!!, android.R.layout.simple_spinner_item, mAssets!!)
+                mAssets.clear()
+                mAssets.addAll(assets)
+
+                // Add an option at the end so the user can search for an asset other than the ones saved in the db
+                val asset = cy.agorise.bitsybitshareswallet.database.entities.Asset(
+                    OTHER_ASSET, "Other...", 0, "", ""
+                )
+                mAssets.add(asset)
+
+                mAssetsAdapter = AssetsAdapter(context!!, android.R.layout.simple_spinner_item, mAssets)
                 spAsset.adapter = mAssetsAdapter
 
                 // Try to select the selectedAssetSymbol
@@ -94,9 +105,16 @@ class ReceiveTransactionFragment : Fragment() {
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val asset = mAssetsAdapter!!.getItem(position)!!
-                selectedAssetSymbol = asset.symbol
 
-                mAsset = Asset(asset.id, asset.symbol, asset.precision)
+                if (asset.id == OTHER_ASSET) {
+                    tilAsset.visibility = View.VISIBLE
+                    mAsset = null
+                } else {
+                    tilAsset.visibility = View.GONE
+                    selectedAssetSymbol = asset.symbol
+
+                    mAsset = Asset(asset.id, asset.symbol, asset.precision)
+                }
                 updateQR()
             }
         }
