@@ -1,8 +1,13 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
+import android.os.IBinder
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,10 +26,16 @@ import com.google.zxing.common.BitMatrix
 import com.jakewharton.rxbinding2.widget.RxTextView
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.AssetsAdapter
+import cy.agorise.bitsybitshareswallet.adapters.AutoSuggestAssetAdapter
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.AssetViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import cy.agorise.graphenej.*
+import cy.agorise.graphenej.api.ConnectionStatusUpdate
+import cy.agorise.graphenej.api.android.NetworkService
+import cy.agorise.graphenej.api.android.RxBus
+import cy.agorise.graphenej.api.calls.ListAssets
+import cy.agorise.graphenej.models.JsonRpcResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_receive_transaction.*
@@ -35,8 +46,13 @@ import java.text.DecimalFormatSymbols
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class ReceiveTransactionFragment : Fragment() {
+class ReceiveTransactionFragment : Fragment(), ServiceConnection {
     private val TAG = this.javaClass.simpleName
+
+    private val RESPONSE_LIST_ASSETS = 1
+
+    /** Number of assets to request from the NetworkService to show as suggestions in the AutoCompleteTextView */
+    private val AUTO_SUGGEST_ASSET_LIMIT = 5
 
     private val OTHER_ASSET = "other_asset"
 
@@ -52,9 +68,20 @@ class ReceiveTransactionFragment : Fragment() {
 
     private var mAssetsAdapter: AssetsAdapter? = null
 
+    private lateinit var mAutoSuggestAssetAdapter: AutoSuggestAssetAdapter
+
     private var mAssets = ArrayList<cy.agorise.bitsybitshareswallet.database.entities.Asset>()
 
     private var selectedAssetSymbol = ""
+
+    // Map used to keep track of request and response id pairs
+    private val responseMap = HashMap<Long, Int>()
+
+    /* Network service connection */
+    private var mNetworkService: NetworkService? = null
+
+    /** Flag used to keep track of the NetworkService binding state */
+    private var mShouldUnbindNetwork: Boolean = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_receive_transaction, container, false)
@@ -119,6 +146,19 @@ class ReceiveTransactionFragment : Fragment() {
             }
         }
 
+//        mAssetViewModel.getAll().observe(this,
+//            Observer<List<cy.agorise.bitsybitshareswallet.database.entities.Asset>> { assets ->
+//                val adapter = ArrayAdapter<cy.agorise.bitsybitshareswallet.database.entities.Asset>(context!!,
+//                    android.R.layout.simple_dropdown_item_1line, assets)
+//                actvAsset.setAdapter(adapter)
+//            })
+//
+//        actvAsset.setOnItemClickListener { parent, _, position, _ ->
+//            val asset = parent.adapter.getItem(position) as cy.agorise.bitsybitshareswallet.database.entities.Asset
+//            mAsset = Asset(asset.id, asset.symbol, asset.precision)
+//            updateQR()
+//        }
+
         // Use RxJava Debounce to create QR code only after the user stopped typing an amount
         mDisposables.add(
             RxTextView.textChanges(tietAmount)
@@ -126,11 +166,69 @@ class ReceiveTransactionFragment : Fragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { updateQR() }
         )
+
+        // Add adapter to the Assets AutoCompleteTextView
+        mAutoSuggestAssetAdapter = AutoSuggestAssetAdapter(context!!, android.R.layout.simple_dropdown_item_1line)
+        actvAsset.setAdapter(mAutoSuggestAssetAdapter)
+
+        // Use RxJava Debounce to avoid making calls to the NetworkService on every text change event and also avoid
+        // the first call when the View is created
+        mDisposables.add(
+            RxTextView.textChanges(actvAsset)
+                .skipInitialValue()
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .map { it.toString().trim().toUpperCase() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    mAsset = null
+                    updateQR()
+
+                    // Get a list of assets that match the already typed string by the user
+                    if (it.length > 1 && mNetworkService != null) {
+                        val id = mNetworkService!!.sendMessage(ListAssets(it, AUTO_SUGGEST_ASSET_LIMIT),
+                            ListAssets.REQUIRED_API)
+                        responseMap[id] = RESPONSE_LIST_ASSETS
+                    }
+                }
+        )
+
+        // Connect to the RxBus, which receives events from the NetworkService
+        mDisposables.add(
+            RxBus.getBusInstance()
+                .asFlowable()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { handleIncomingMessage(it) }
+        )
+    }
+
+    private fun handleIncomingMessage(message: Any?) {
+        if (message is JsonRpcResponse<*>) {
+            if (responseMap.containsKey(message.id)) {
+                val responseType = responseMap[message.id]
+                when (responseType) {
+                    RESPONSE_LIST_ASSETS            -> handleListAssets(message.result as List<Asset>)
+                }
+                responseMap.remove(message.id)
+            }
+        } else if (message is ConnectionStatusUpdate) {
+            if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
+                // If we got a disconnection notification, we should clear our response map, since
+                // all its stored request ids will now be reset
+                responseMap.clear()
+            }
+        }
+    }
+
+    private fun handleListAssets(assetList: List<Asset>) {
+        Log.d(TAG, "handleListAssets")
+        mAutoSuggestAssetAdapter.setData(assetList)
+        mAutoSuggestAssetAdapter.notifyDataSetChanged()
     }
 
     private fun updateQR() {
         if (mAsset == null) {
             ivQR.setImageDrawable(null)
+            // TODO clean the please pay and to text at the bottom too
             return
         }
 
@@ -222,9 +320,38 @@ class ReceiveTransactionFragment : Fragment() {
         tvTo.text = txtAccount
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        val intent = Intent(context, NetworkService::class.java)
+        if (context?.bindService(intent, this, Context.BIND_AUTO_CREATE) == true) {
+            mShouldUnbindNetwork = true
+        } else {
+            Log.e(TAG, "Binding to the network service failed.")
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        // Unbinding from network service
+        if (mShouldUnbindNetwork) {
+            context?.unbindService(this)
+            mShouldUnbindNetwork = false
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
         if (!mDisposables.isDisposed) mDisposables.dispose()
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) { }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        // We've bound to LocalService, cast the IBinder and get LocalService instance
+        val binder = service as NetworkService.LocalBinder
+        mNetworkService = binder.service
     }
 }

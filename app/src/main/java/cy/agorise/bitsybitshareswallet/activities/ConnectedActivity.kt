@@ -31,6 +31,7 @@ import cy.agorise.graphenej.models.FullAccountDetails
 import cy.agorise.graphenej.models.JsonRpcResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import java.util.HashMap
 import kotlin.collections.ArrayList
 
 /**
@@ -38,6 +39,11 @@ import kotlin.collections.ArrayList
  */
 abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private val TAG = this.javaClass.simpleName
+
+    private val RESPONSE_GET_FULL_ACCOUNTS = 1
+    private val RESPONSE_GET_ACCOUNTS = 2
+    private val RESPONSE_GET_ACCOUNT_BALANCES = 3
+    private val RESPONSE_GET_ASSETS = 4
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
     private lateinit var mBalanceViewModel: BalanceViewModel
@@ -59,6 +65,9 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
     /* Network service connection */
     protected var mNetworkService: NetworkService? = null
+
+    // Map used to keep track of request and response id pairs
+    private val responseMap = HashMap<Long, Int>()
 
     /**
      * Flag used to keep track of the NetworkService binding state
@@ -104,36 +113,49 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         mDisposable = RxBus.getBusInstance()
             .asFlowable()
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { message ->
-                if (message is JsonRpcResponse<*>) {
-                    // Generic processing taken care by subclasses
-                    handleJsonRpcResponse(message)
-                    // Payment detection focused responses
-                    if (message.error == null) {
-                        if (message.result is List<*> && (message.result as List<*>).size > 0) {
-                            if ((message.result as List<*>)[0] is FullAccountDetails) {
-                                handleAccountDetails((message.result as List<*>)[0] as FullAccountDetails)
-                            } else if ((message.result as List<*>)[0] is AccountProperties) {
-                                handleAccountProperties(message.result as List<AccountProperties>)
-                            } else if ((message.result as List<*>)[0] is AssetAmount) {
-                                handleBalanceUpdate(message.result as List<AssetAmount>)
-                            } else if ((message.result as List<*>)[0] is Asset) {
-                                handleAssets(message.result as List<Asset>)
-                            }
-                        }
-                    } else {
-                        // In case of error
-                        Log.e(TAG, "Got error message from full node. Msg: " + message.error.message)
-                        Toast.makeText(
-                            this@ConnectedActivity,
-                            String.format("Error from full node. Msg: %s", message.error.message),
-                            Toast.LENGTH_LONG
-                        ).show()
+            .subscribe { handleIncomingMessage(it) }
+    }
+
+    private fun handleIncomingMessage(message: Any?) {
+        if (message is JsonRpcResponse<*>) {
+            // Generic processing taken care by subclasses
+            handleJsonRpcResponse(message)
+
+            if (message.error == null) {
+                if (responseMap.containsKey(message.id)) {
+                    val responseType = responseMap[message.id]
+                    when (responseType) {
+                        RESPONSE_GET_FULL_ACCOUNTS      ->
+                            handleAccountDetails((message.result as List<*>)[0] as FullAccountDetails)
+
+                        RESPONSE_GET_ACCOUNTS           ->
+                            handleAccountProperties(message.result as List<AccountProperties>)
+
+                        RESPONSE_GET_ACCOUNT_BALANCES   ->
+                            handleBalanceUpdate(message.result as List<AssetAmount>)
+
+                        RESPONSE_GET_ASSETS             ->
+                            handleAssets(message.result as List<Asset>)
                     }
-                } else if (message is ConnectionStatusUpdate) {
-                    handleConnectionStatusUpdate(message)
+                    responseMap.remove(message.id)
                 }
+            } else {
+                // In case of error
+                Log.e(TAG, "Got error message from full node. Msg: " + message.error.message)
+                Toast.makeText(
+                    this@ConnectedActivity,
+                    String.format("Error from full node. Msg: %s", message.error.message),
+                    Toast.LENGTH_LONG
+                ).show()
             }
+        } else if (message is ConnectionStatusUpdate) {
+            handleConnectionStatusUpdate(message)
+            if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
+                // If we got a disconnection notification, we should clear our response map, since
+                // all its stored request ids will now be reset
+                responseMap.clear()
+            }
+        }
     }
 
     /**
@@ -225,10 +247,10 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
     private fun updateBalances() {
         if (mNetworkService!!.isConnected) {
-            mNetworkService!!.sendMessage(
-                GetAccountBalances(mCurrentAccount, ArrayList()),
-                GetAccountBalances.REQUIRED_API
-            )
+            val id = mNetworkService!!.sendMessage(GetAccountBalances(mCurrentAccount, ArrayList()),
+                GetAccountBalances.REQUIRED_API)
+
+            responseMap[id] = RESPONSE_GET_ACCOUNT_BALANCES
         }
     }
 
@@ -238,7 +260,9 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private val mRequestMissingUserAccountsTask = object : Runnable {
         override fun run() {
             if (mNetworkService!!.isConnected) {
-                mNetworkService!!.sendMessage(GetAccounts(missingUserAccounts), GetAccounts.REQUIRED_API)
+                val id = mNetworkService!!.sendMessage(GetAccounts(missingUserAccounts), GetAccounts.REQUIRED_API)
+
+                responseMap[id] = RESPONSE_GET_ACCOUNTS
             } else if (missingUserAccounts.isNotEmpty()){
                 mHandler.postDelayed(this, Constants.NETWORK_SERVICE_RETRY_PERIOD)
             }
@@ -251,7 +275,9 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private val mRequestMissingAssetsTask = object : Runnable {
         override fun run() {
             if (mNetworkService!!.isConnected) {
-                mNetworkService!!.sendMessage(GetAssets(missingAssets), GetAssets.REQUIRED_API)
+                val id = mNetworkService!!.sendMessage(GetAssets(missingAssets), GetAssets.REQUIRED_API)
+
+                responseMap[id] = RESPONSE_GET_ASSETS
             } else if (missingAssets.isNotEmpty()){
                 mHandler.postDelayed(this, Constants.NETWORK_SERVICE_RETRY_PERIOD)
             }
@@ -267,10 +293,10 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                 if (mCurrentAccount != null) {
                     val userAccounts = ArrayList<String>()
                     userAccounts.add(mCurrentAccount!!.objectId)
-                    mNetworkService!!.sendMessage(
-                        GetFullAccounts(userAccounts, false),
-                        GetFullAccounts.REQUIRED_API
-                    )
+                    val id = mNetworkService!!.sendMessage(GetFullAccounts(userAccounts, false),
+                        GetFullAccounts.REQUIRED_API)
+
+                    responseMap[id] = RESPONSE_GET_FULL_ACCOUNTS
                 }
             } else {
                 Log.w(TAG, "NetworkService is null or is not connected. mNetworkService: $mNetworkService")

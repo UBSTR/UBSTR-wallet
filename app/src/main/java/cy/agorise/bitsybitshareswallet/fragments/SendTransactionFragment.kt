@@ -440,7 +440,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             startCameraPreview()
 
         val intent = Intent(context, NetworkService::class.java)
-        if (context!!.bindService(intent, this, Context.BIND_AUTO_CREATE)) {
+        if (context?.bindService(intent, this, Context.BIND_AUTO_CREATE) == true) {
             mShouldUnbindNetwork = true
         } else {
             Log.e(TAG, "Binding to the network service failed.")
@@ -449,6 +449,13 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
     override fun onPause() {
         super.onPause()
+
+        // Unbinding from network service
+        if (mShouldUnbindNetwork) {
+            context?.unbindService(this)
+            mShouldUnbindNetwork = false
+        }
+
         if (!isCameraPreviewVisible)
             stopCameraPreview()
     }
