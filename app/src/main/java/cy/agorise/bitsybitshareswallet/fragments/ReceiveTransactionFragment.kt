@@ -8,7 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
+import android.widget.AdapterView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -20,6 +20,7 @@ import com.google.zxing.WriterException
 import com.google.zxing.common.BitMatrix
 import com.jakewharton.rxbinding2.widget.RxTextView
 import cy.agorise.bitsybitshareswallet.R
+import cy.agorise.bitsybitshareswallet.adapters.AssetsAdapter
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.AssetViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
@@ -47,6 +48,12 @@ class ReceiveTransactionFragment : Fragment() {
 
     private var mAsset: Asset? = null
 
+    private var mAssetsAdapter: AssetsAdapter? = null
+
+    private var mAssets: List<cy.agorise.bitsybitshareswallet.database.entities.Asset>? = null
+
+    private var selectedAssetSymbol = ""
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_receive_transaction, container, false)
     }
@@ -69,15 +76,29 @@ class ReceiveTransactionFragment : Fragment() {
 
         mAssetViewModel.getAll().observe(this,
             Observer<List<cy.agorise.bitsybitshareswallet.database.entities.Asset>> { assets ->
-                val adapter = ArrayAdapter<cy.agorise.bitsybitshareswallet.database.entities.Asset>(context!!,
-                    android.R.layout.simple_dropdown_item_1line, assets)
-                actvAsset.setAdapter(adapter)
+                mAssets = assets
+                mAssetsAdapter = AssetsAdapter(context!!, android.R.layout.simple_spinner_item, mAssets!!)
+                spAsset.adapter = mAssetsAdapter
+
+                // Try to select the selectedAssetSymbol
+                for (i in 0 until mAssetsAdapter!!.count) {
+                    if (mAssetsAdapter!!.getItem(i)!!.symbol == selectedAssetSymbol) {
+                        spAsset.setSelection(i)
+                        break
+                    }
+                }
         })
 
-        actvAsset.setOnItemClickListener { parent, _, position, _ ->
-            val asset = parent.adapter.getItem(position) as cy.agorise.bitsybitshareswallet.database.entities.Asset
-            mAsset = Asset(asset.id, asset.symbol, asset.precision)
-            updateQR()
+        spAsset.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) { }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val asset = mAssetsAdapter!!.getItem(position)!!
+                selectedAssetSymbol = asset.symbol
+
+                mAsset = Asset(asset.id, asset.symbol, asset.precision)
+                updateQR()
+            }
         }
 
         // Use RxJava Debounce to create QR code only after the user stopped typing an amount
@@ -86,18 +107,6 @@ class ReceiveTransactionFragment : Fragment() {
                 .debounce(1000, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { updateQR() }
-        )
-
-        // Use RxJava Debounce to avoid making calls to the NetworkService on every text change event
-        mDisposables.add(
-            RxTextView.textChanges(actvAsset)
-                .debounce(500, TimeUnit.MILLISECONDS)
-                .filter { it.toString().length < 3 }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    mAsset = null
-                    updateQR()
-                }
         )
     }
 

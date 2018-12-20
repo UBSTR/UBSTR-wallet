@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModelProviders
 import cy.agorise.bitsybitshareswallet.database.entities.Balance
 import cy.agorise.bitsybitshareswallet.processors.TransfersLoader
 import cy.agorise.bitsybitshareswallet.repositories.AssetRepository
-import cy.agorise.bitsybitshareswallet.repositories.BalanceRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.BalanceViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
@@ -43,7 +42,6 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private lateinit var mUserAccountViewModel: UserAccountViewModel
     private lateinit var mBalanceViewModel: BalanceViewModel
 
-    private lateinit var mBalanceRepository: BalanceRepository
     private lateinit var mAssetRepository: AssetRepository
 
     /* Current user account */
@@ -75,7 +73,6 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         if (userId != "")
             mCurrentAccount = UserAccount(userId)
 
-        mBalanceRepository = BalanceRepository(this)
         mAssetRepository = AssetRepository(this)
 
         // Configure UserAccountViewModel to obtain the missing account ids
@@ -199,7 +196,8 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
             balances.add(balance)
         }
-        mBalanceRepository.insertAll(balances)
+
+        mBalanceViewModel.insertAll(balances)
     }
 
     /**
