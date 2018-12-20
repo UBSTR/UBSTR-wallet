@@ -54,7 +54,7 @@ class MainActivity : ConnectedActivity() {
         // closes the app, if not then it just restarts the Handler (timer)
         mRunnable = Runnable {
             if (PreferenceManager.getDefaultSharedPreferences(this)
-                    .getBoolean(Constants.KEY_AUTO_CLOSE_ACTIVATED, false))
+                    .getBoolean(Constants.KEY_AUTO_CLOSE_ACTIVATED, true))
                 finish()
             else
                 restartHandler()

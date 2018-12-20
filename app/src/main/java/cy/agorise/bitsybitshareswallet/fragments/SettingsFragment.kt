@@ -52,7 +52,7 @@ class SettingsFragment : Fragment() {
      */
     private fun initAutoCloseSwitch() {
         val autoCloseOn = PreferenceManager.getDefaultSharedPreferences(context)
-            .getBoolean(Constants.KEY_AUTO_CLOSE_ACTIVATED, false)
+            .getBoolean(Constants.KEY_AUTO_CLOSE_ACTIVATED, true)
 
         switchAutoClose.isChecked = autoCloseOn
 
