@@ -15,6 +15,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import cy.agorise.bitsybitshareswallet.database.entities.Balance
 import cy.agorise.bitsybitshareswallet.processors.TransfersLoader
+import cy.agorise.bitsybitshareswallet.repositories.AssetRepository
 import cy.agorise.bitsybitshareswallet.repositories.BalanceRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.BalanceViewModel
@@ -25,16 +26,12 @@ import cy.agorise.graphenej.UserAccount
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
-import cy.agorise.graphenej.api.calls.GetAccountBalances
-import cy.agorise.graphenej.api.calls.GetAccounts
-import cy.agorise.graphenej.api.calls.GetFullAccounts
-import cy.agorise.graphenej.api.calls.GetObjects
+import cy.agorise.graphenej.api.calls.*
 import cy.agorise.graphenej.models.AccountProperties
 import cy.agorise.graphenej.models.FullAccountDetails
 import cy.agorise.graphenej.models.JsonRpcResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import java.util.*
 import kotlin.collections.ArrayList
 
 /**
@@ -47,6 +44,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private lateinit var mBalanceViewModel: BalanceViewModel
 
     private lateinit var mBalanceRepository: BalanceRepository
+    private lateinit var mAssetRepository: AssetRepository
 
     /* Current user account */
     protected var mCurrentAccount: UserAccount? = null
@@ -59,7 +57,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private var storedOpCount: Long = -1
 
     private var missingUserAccounts = ArrayList<UserAccount>()
-    private var missingAssets = ArrayList<String>()
+    private var missingAssets = ArrayList<Asset>()
 
     /* Network service connection */
     protected var mNetworkService: NetworkService? = null
@@ -78,6 +76,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
             mCurrentAccount = UserAccount(userId)
 
         mBalanceRepository = BalanceRepository(this)
+        mAssetRepository = AssetRepository(this)
 
         // Configure UserAccountViewModel to obtain the missing account ids
         mUserAccountViewModel = ViewModelProviders.of(this).get(UserAccountViewModel::class.java)
@@ -98,7 +97,8 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         mBalanceViewModel.getMissingAssetIds().observe(this, Observer<List<String>>{ assetIds ->
             if (assetIds.isNotEmpty()) {
                 missingAssets.clear()
-                missingAssets.addAll(assetIds)
+                for (assetId in assetIds)
+                    missingAssets.add(Asset(assetId))
 
                 mHandler.postDelayed(mRequestMissingAssetsTask, Constants.NETWORK_SERVICE_RETRY_PERIOD)
             }
@@ -165,6 +165,10 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         }
     }
 
+    /**
+     * Receives a list of missing [AccountProperties] from which it extracts the required information to
+     * create a list of BiTSy's UserAccount objects and stores them into the database
+     */
     private fun handleAccountProperties(accountPropertiesList: List<AccountProperties>) {
         val userAccounts = ArrayList<cy.agorise.bitsybitshareswallet.database.entities.UserAccount>()
 
@@ -198,8 +202,27 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         mBalanceRepository.insertAll(balances)
     }
 
-    private fun handleAssets(assets: List<Asset>) {
-        Log.d(TAG, "handleAssets")
+    /**
+     * Receives a list of missing [Asset] from which it extracts the required information to
+     * create a list of BiTSy's Asset objects and stores them into the database
+     */
+    private fun handleAssets(_assets: List<Asset>) {
+        val assets = ArrayList<cy.agorise.bitsybitshareswallet.database.entities.Asset>()
+
+        for (_asset in _assets) {
+            val asset = cy.agorise.bitsybitshareswallet.database.entities.Asset(
+                _asset.objectId,
+                _asset.symbol,
+                _asset.precision,
+                _asset.description ?: "",
+                _asset.bitassetId ?: ""
+            )
+
+            assets.add(asset)
+        }
+
+        mAssetRepository.insertAll(assets)
+        missingAssets.clear()
     }
 
     private fun updateBalances() {
@@ -230,8 +253,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private val mRequestMissingAssetsTask = object : Runnable {
         override fun run() {
             if (mNetworkService!!.isConnected) {
-                // TODO use GetAssets to obtain the missing assets and save them into the db
-                mNetworkService!!.sendMessage(GetObjects(missingAssets), GetAccounts.REQUIRED_API)
+                mNetworkService!!.sendMessage(GetAssets(missingAssets), GetAssets.REQUIRED_API)
             } else if (missingAssets.isNotEmpty()){
                 mHandler.postDelayed(this, Constants.NETWORK_SERVICE_RETRY_PERIOD)
             }

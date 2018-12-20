@@ -1,18 +1,18 @@
 package cy.agorise.bitsybitshareswallet.repositories
 
-import android.app.Application
+import android.content.Context
 import android.os.AsyncTask
 import androidx.lifecycle.LiveData
 import cy.agorise.bitsybitshareswallet.database.daos.AssetDao
 import cy.agorise.bitsybitshareswallet.database.BitsyDatabase
 import cy.agorise.bitsybitshareswallet.database.entities.Asset
 
-class AssetRepository internal constructor(application: Application) {
+class AssetRepository internal constructor(context: Context) {
 
     private val mAssetDao: AssetDao
 
     init {
-        val db = BitsyDatabase.getDatabase(application)
+        val db = BitsyDatabase.getDatabase(context)
         mAssetDao = db!!.assetDao()
     }
 
