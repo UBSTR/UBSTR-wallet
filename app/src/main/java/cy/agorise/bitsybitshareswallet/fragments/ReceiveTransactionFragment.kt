@@ -45,6 +45,7 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class ReceiveTransactionFragment : Fragment(), ServiceConnection {
     private val TAG = this.javaClass.simpleName
@@ -73,6 +74,9 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
     private var mAssets = ArrayList<cy.agorise.bitsybitshareswallet.database.entities.Asset>()
 
     private var selectedAssetSymbol = ""
+
+    /** Used to avoid erasing the QR code when the user selects an item from the AutoComplete suggestions */
+    private var selectedInAutoCompleteTextView = false
 
     // Map used to keep track of request and response id pairs
     private val responseMap = HashMap<Long, Int>()
@@ -146,19 +150,6 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
             }
         }
 
-//        mAssetViewModel.getAll().observe(this,
-//            Observer<List<cy.agorise.bitsybitshareswallet.database.entities.Asset>> { assets ->
-//                val adapter = ArrayAdapter<cy.agorise.bitsybitshareswallet.database.entities.Asset>(context!!,
-//                    android.R.layout.simple_dropdown_item_1line, assets)
-//                actvAsset.setAdapter(adapter)
-//            })
-//
-//        actvAsset.setOnItemClickListener { parent, _, position, _ ->
-//            val asset = parent.adapter.getItem(position) as cy.agorise.bitsybitshareswallet.database.entities.Asset
-//            mAsset = Asset(asset.id, asset.symbol, asset.precision)
-//            updateQR()
-//        }
-
         // Use RxJava Debounce to create QR code only after the user stopped typing an amount
         mDisposables.add(
             RxTextView.textChanges(tietAmount)
@@ -180,8 +171,11 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
                 .map { it.toString().trim().toUpperCase() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    mAsset = null
-                    updateQR()
+                    if (!selectedInAutoCompleteTextView) {
+                        mAsset = null
+                        updateQR()
+                    }
+                    selectedInAutoCompleteTextView = false
 
                     // Get a list of assets that match the already typed string by the user
                     if (it.length > 1 && mNetworkService != null) {
@@ -191,6 +185,13 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
                     }
                 }
         )
+
+        actvAsset.setOnItemClickListener { parent, _, position, _ ->
+            val asset = parent.adapter.getItem(position) as cy.agorise.bitsybitshareswallet.database.entities.Asset
+            mAsset = Asset(asset.id, asset.symbol, asset.precision)
+            selectedInAutoCompleteTextView = true
+            updateQR()
+        }
 
         // Connect to the RxBus, which receives events from the NetworkService
         mDisposables.add(
@@ -221,7 +222,19 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
 
     private fun handleListAssets(assetList: List<Asset>) {
         Log.d(TAG, "handleListAssets")
-        mAutoSuggestAssetAdapter.setData(assetList)
+        val assets = ArrayList<cy.agorise.bitsybitshareswallet.database.entities.Asset>()
+        for (_asset in assetList) {
+            val asset = cy.agorise.bitsybitshareswallet.database.entities.Asset(
+                _asset.objectId,
+                _asset.symbol,
+                _asset.precision,
+                _asset.description ?: "",
+                _asset.bitassetId ?: ""
+            )
+
+            assets.add(asset)
+        }
+        mAutoSuggestAssetAdapter.setData(assets)
         mAutoSuggestAssetAdapter.notifyDataSetChanged()
     }
 
