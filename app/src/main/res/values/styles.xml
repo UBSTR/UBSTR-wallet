@@ -7,6 +7,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <!--Custom attributes -->
+        <item name="android:fontFamily">@font/p_f_beau_sans_pro</item>
         <item name="themedColorBackgroundFloating">@android:color/white</item>
     </style>
     <style name="Theme.Bitsy.NoActionBar">
@@ -22,6 +23,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <!--Custom attributes -->
+        <item name="android:fontFamily">@font/p_f_beau_sans_pro</item>
         <item name="themedColorBackgroundFloating">@color/colorBackgroundFloating</item>
     </style>
     <style name="Theme.Bitsy.Dark.NoActionBar">
