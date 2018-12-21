@@ -1,19 +1,21 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
+import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
 import android.preference.PreferenceManager
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.AdapterView
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -28,6 +30,7 @@ import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.AssetsAdapter
 import cy.agorise.bitsybitshareswallet.adapters.AutoSuggestAssetAdapter
 import cy.agorise.bitsybitshareswallet.utils.Constants
+import cy.agorise.bitsybitshareswallet.utils.Helper
 import cy.agorise.bitsybitshareswallet.viewmodels.AssetViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import cy.agorise.graphenej.*
@@ -51,6 +54,7 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
     private val TAG = this.javaClass.simpleName
 
     private val RESPONSE_LIST_ASSETS = 1
+    private val REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION = 100
 
     /** Number of assets to request from the NetworkService to show as suggestions in the AutoCompleteTextView */
     private val AUTO_SUGGEST_ASSET_LIMIT = 5
@@ -88,6 +92,8 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
     private var mShouldUnbindNetwork: Boolean = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        setHasOptionsMenu(true)
+
         return inflater.inflate(R.layout.fragment_receive_transaction, container, false)
     }
 
@@ -331,6 +337,69 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
 
         tvPleasePay.text = txtAmount
         tvTo.text = txtAccount
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_receive_transaction, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item?.itemId == R.id.menu_share) {
+            verifyStoragePermission()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun verifyStoragePermission() {
+        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not already granted
+            requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION)
+        } else {
+            // Permission is already granted
+            shareQRScreenshot()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                shareQRScreenshot()
+            } else {
+                // TODO extract string resource
+                Toast.makeText(context!!, "Storage permission is necessary to share QR codes.", Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+    }
+
+    /**
+     * This function takes a screenshot as a bitmap, saves it into a temporal cache image and then
+     * sends an intent so the user can select the desired method to share the image.
+     */
+    private fun shareQRScreenshot() {
+        // Get Screenshot
+        val screenshot = Helper.loadBitmapFromView(container)
+        val imageUri = Helper.saveTemporalBitmap(context!!, screenshot)
+
+        // Prepare information for share intent
+        val subject = getString(R.string.msg__invoice_subject, mUserAccount?.name)
+        val content = tvPleasePay.text.toString() + "\n" +
+                tvTo.text.toString()
+
+        // Create share intent and call it
+        val shareIntent = Intent()
+        shareIntent.action = Intent.ACTION_SEND
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // temp permission for receiving app to read this file
+        shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri)
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
+        shareIntent.putExtra(Intent.EXTRA_TEXT, content)
+        shareIntent.type = "*/*"
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.text__share_with)))
     }
 
     override fun onResume() {

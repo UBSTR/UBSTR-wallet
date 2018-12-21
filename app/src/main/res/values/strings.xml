@@ -56,6 +56,8 @@
     <string name="text__asset">Asset</string>
     <string name="template__please_pay">Please Pay: %1$s %2$s</string>
     <string name="template__to">To: %1$s</string>
+    <string name="msg__invoice_subject">BiTSy invoice from %1$s</string>
+    <string name="text__share_with">Share with</string>
 
     <!-- Settings -->
     <string name="title_settings">Settings</string>
@@ -79,5 +81,6 @@
     <string name="title_search">Search</string>
     <string name="title_filter">Filter</string>
     <string name="title_export">Export</string>
+    <string name="title_share">Share</string>
 
 </resources>
