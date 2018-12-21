@@ -57,7 +57,7 @@
         android:background="@color/darkGray"
         app:layout_constraintTop_toBottomOf="@+id/spAsset"
         app:layout_constraintEnd_toEndOf="@+id/spAsset"
-        app:layout_constraintStart_toStartOf="@+id/spAsset" />
+        app:layout_constraintStart_toStartOf="@+id/spAsset"/>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilAsset"
@@ -89,31 +89,41 @@
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/spacing_different_topic"
         android:layout_marginBottom="@dimen/spacing_different_topic"
-        android:background="@drawable/camera_view_background"
         app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintTop_toBottomOf="@id/tilAsset"
-        app:layout_constraintBottom_toTopOf="@id/tvPleasePay"
+        app:layout_constraintTop_toBottomOf="@+id/tilAsset"
+        app:layout_constraintBottom_toTopOf="@+id/llText"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"/>
 
-    <TextView
-        android:id="@+id/tvPleasePay"
+    <LinearLayout
+        android:id="@+id/llText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxLines="1"
-        tools:text="Please Pay: 12.25316 BTS"
-        android:textAppearance="@style/TextAppearance.Bitsy.Body1"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@id/tvTo"/>
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivQR">
 
-    <TextView
-        android:id="@+id/tvTo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxLines="1"
-        tools:text="To: seventest-3"
-        android:textAppearance="@style/TextAppearance.Bitsy.Body1"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        <TextView
+            android:id="@+id/tvPleasePay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            tools:text="Please Pay: 12.25316 BTS"
+            android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@id/tvTo"/>
+
+        <TextView
+            android:id="@+id/tvTo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            tools:text="To: seventest-3"
+            android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
