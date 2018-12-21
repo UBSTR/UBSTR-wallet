@@ -27,7 +27,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import com.google.android.gms.maps.model.BitmapDescriptor
-
+import cy.agorise.bitsybitshareswallet.utils.Constants
 
 
 class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<FeathersResponse<Merchant>> {
@@ -73,7 +73,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
             .setLenient()
             .create()
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://intranet.palmpay.io/")
+            .baseUrl(Constants.MERCHANTS_WEBSERVICE_URL)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
 
