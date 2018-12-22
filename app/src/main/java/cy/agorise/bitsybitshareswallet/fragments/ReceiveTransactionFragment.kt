@@ -382,6 +382,11 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
      * sends an intent so the user can select the desired method to share the image.
      */
     private fun shareQRScreenshot() {
+        // TODO improve, show errors where necessary so the user can fix it
+        // Avoid sharing the QR code image if the fields are not filled correctly
+        if (mAsset == null)
+            return
+
         // Get Screenshot
         val screenshot = Helper.loadBitmapFromView(container)
         val imageUri = Helper.saveTemporalBitmap(context!!, screenshot)
