@@ -76,6 +76,7 @@
     <string name="msg__bugs_or_ideas">Telegram chat: http://t.me/Agorise\nEmail: Agorise@protonmail.ch\nOpen Source:
         https://github.com/Agorise
     </string>
+    <string name="title__bitshares_nodes_dialog">Block: %1$s</string>
     <string name="text__coming_soon">Coming soon</string>
     <string name="title_net_worth">Net Worth</string>
     <string name="title_search">Search</string>

@@ -3,6 +3,7 @@ package cy.agorise.bitsybitshareswallet.fragments
 import android.content.*
 import android.content.Context.CLIPBOARD_SERVICE
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
 import android.preference.PreferenceManager
 import android.util.Log
@@ -13,18 +14,27 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.list.customListAdapter
 import cy.agorise.bitsybitshareswallet.BuildConfig
 import cy.agorise.bitsybitshareswallet.R
+import cy.agorise.bitsybitshareswallet.adapters.FullNodesAdapter
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
 import cy.agorise.graphenej.BrainKey
 import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
+import cy.agorise.graphenej.api.calls.GetDynamicGlobalProperties
+import cy.agorise.graphenej.models.DynamicGlobalProperties
+import cy.agorise.graphenej.models.JsonRpcResponse
+import cy.agorise.graphenej.network.FullNode
+import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_settings.*
+import java.text.NumberFormat
 
 class SettingsFragment : Fragment(), ServiceConnection {
     private val TAG = this.javaClass.simpleName
@@ -36,6 +46,14 @@ class SettingsFragment : Fragment(), ServiceConnection {
 
     /** Flag used to keep track of the NetworkService binding state */
     private var mShouldUnbindNetwork: Boolean = false
+
+    // Dialog displaying the list of nodes and their latencies
+    private var mNodesDialog: MaterialDialog? = null
+
+    /** Adapter that holds the FullNode list used in the Bitshares nodes modal */
+    private var nodesAdapter: FullNodesAdapter? = null
+
+    private val mHandler = Handler()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -54,6 +72,31 @@ class SettingsFragment : Fragment(), ServiceConnection {
 
         tvFooterAppVersion.text = String.format("%s v%s", getString(R.string.app_name), BuildConfig.VERSION_NAME)
 
+        ivConnectionStatusIcon.setOnClickListener { v ->
+            if (mNetworkService != null) {
+                // PublishSubject used to announce full node latencies updates
+                val fullNodePublishSubject = mNetworkService!!.nodeLatencyObservable
+                fullNodePublishSubject?.observeOn(AndroidSchedulers.mainThread())?.subscribe(nodeLatencyObserver)
+
+                val fullNodes = mNetworkService!!.nodes
+
+                nodesAdapter = FullNodesAdapter(v.context)
+                nodesAdapter!!.add(fullNodes)
+
+                mNodesDialog = MaterialDialog(v.context)
+                    .title(text = getString(R.string.title__bitshares_nodes_dialog, "-------"))
+                    .customListAdapter(nodesAdapter as FullNodesAdapter)
+                    .negativeButton(android.R.string.ok) {
+                        mHandler.removeCallbacks(mRequestDynamicGlobalPropertiesTask)
+                    }
+
+                mNodesDialog?.show()
+
+                // Registering a recurrent task used to poll for dynamic global properties requests
+                mHandler.post(mRequestDynamicGlobalPropertiesTask)
+            }
+        }
+
         // Connect to the RxBus, which receives events from the NetworkService
         mDisposables.add(
             RxBus.getBusInstance()
@@ -63,8 +106,56 @@ class SettingsFragment : Fragment(), ServiceConnection {
         )
     }
 
-    private fun handleIncomingMessage(message: Any?) {
+    /**
+     * Observer used to be notified about node latency measurement updates.
+     */
+    private val nodeLatencyObserver = object : Observer<FullNode> {
+        override fun onSubscribe(d: Disposable) {
+            mDisposables.add(d)
+        }
 
+        override fun onNext(fullNode: FullNode) {
+            if (!fullNode.isRemoved)
+                nodesAdapter?.add(fullNode)
+            else
+                nodesAdapter?.remove(fullNode)
+        }
+
+        override fun onError(e: Throwable) {
+            Log.e(TAG, "nodeLatencyObserver.onError.Msg: " + e.message)
+        }
+
+        override fun onComplete() {}
+    }
+
+    private fun handleIncomingMessage(message: Any?) {
+        if (message is JsonRpcResponse<*>) {
+            if (message.result is DynamicGlobalProperties) {
+                val dynamicGlobalProperties = message.result as DynamicGlobalProperties
+                if (mNodesDialog != null && mNodesDialog?.isShowing == true) {
+                    val blockNumber = NumberFormat.getInstance().format(dynamicGlobalProperties.head_block_number)
+                    mNodesDialog?.title(text = getString(R.string.title__bitshares_nodes_dialog, blockNumber))
+                }
+            }
+        }
+    }
+
+    /**
+     * Task used to obtain frequent updates on the global dynamic properties object
+     */
+    private val mRequestDynamicGlobalPropertiesTask = object : Runnable {
+        override fun run() {
+            if (mNetworkService != null) {
+                if (mNetworkService?.isConnected == true) {
+                    mNetworkService?.sendMessage(GetDynamicGlobalProperties(), GetDynamicGlobalProperties.REQUIRED_API)
+                } else {
+                    Log.d(TAG, "NetworkService exists but is not connected")
+                }
+            } else {
+                Log.d(TAG, "NetworkService reference is null")
+            }
+            mHandler.postDelayed(this, Constants.BLOCK_PERIOD)
+        }
     }
 
     /**

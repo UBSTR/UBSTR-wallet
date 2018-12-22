@@ -35,6 +35,9 @@ object Constants {
     /** Time period to wait to send a request to the NetworkService, and retry in case it is still not connected */
     const val NETWORK_SERVICE_RETRY_PERIOD: Long = 5000
 
+    /** Bitshares block period */
+    const val BLOCK_PERIOD: Long = 3000
+
     /**  Key used to store the number of operations that the currently selected account had last time we checked */
     const val KEY_ACCOUNT_OPERATION_COUNT = "key_account_operation_count"
 
