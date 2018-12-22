@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
+import cy.agorise.bitsybitshareswallet.BuildConfig
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
@@ -44,6 +45,8 @@ class SettingsFragment : Fragment() {
         initNightModeSwitch()
 
         btnViewBrainKey.setOnClickListener { getBrainkey(it) }
+
+        tvFooterAppVersion.text = String.format("%s v%s", getString(R.string.app_name), BuildConfig.VERSION_NAME)
     }
 
     /**
