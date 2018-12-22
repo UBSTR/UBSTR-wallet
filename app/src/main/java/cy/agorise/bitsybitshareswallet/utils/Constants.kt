@@ -43,6 +43,6 @@ object Constants {
 
     /** Key used to store the night mode setting into the shared preferences */
     const val KEY_NIGHT_MODE_ACTIVATED = "key_night_mode_activated"
-    
+
     const val MERCHANTS_WEBSERVICE_URL = "https://websvc.palmpay.io/"
 }

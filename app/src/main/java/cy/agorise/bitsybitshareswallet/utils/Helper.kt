@@ -54,7 +54,7 @@ class Helper {
             val newFile = File(imagePath, "image.png")
 
             // Create and return image uri
-            return FileProvider.getUriForFile(context, "cy.agorise.FileProvider", newFile)
+            return FileProvider.getUriForFile(context, "cy.agorise.bitsybitshareswallet.FileProvider", newFile)
         }
     }
 }

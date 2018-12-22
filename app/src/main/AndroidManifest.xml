@@ -51,6 +51,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Bitsy.NoActionBar"
             android:windowSoftInputMode="adjustPan"/>
+        <!-- Used to share QR code on QRCodeActivity -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="cy.agorise.bitsybitshareswallet.FileProvider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/tmp_image_path" />
+        </provider>
     </application>
 
 </manifest>
