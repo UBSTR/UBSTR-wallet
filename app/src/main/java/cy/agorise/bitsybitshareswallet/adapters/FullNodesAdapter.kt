@@ -86,7 +86,7 @@ class FullNodesAdapter(private val context: Context) : RecyclerView.Adapter<Full
 
         // Select correct color span according to the latency value
         val colorSpan = when {
-            latency < 400 -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary))
+            latency < 400 -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.ppGreen))
             latency < 800 -> ForegroundColorSpan(Color.rgb(255,136,0)) // Holo orange
             else -> ForegroundColorSpan(Color.rgb(204,0,0)) // Holo red
         }
