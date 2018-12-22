@@ -17,6 +17,7 @@ import cy.agorise.bitsybitshareswallet.utils.Constants
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.text.SimpleDateFormat
 import java.util.*
 
 class TransfersDetailsAdapter(private val context: Context) :
@@ -59,6 +60,15 @@ class TransfersDetailsAdapter(private val context: Context) :
             }
         })
 
+    private val dateFormat: SimpleDateFormat
+    private val timeFormat: SimpleDateFormat
+
+    init {
+        val locale = context.resources.configuration.locale
+        dateFormat = SimpleDateFormat("dd MMM", locale)
+        timeFormat = SimpleDateFormat("HH:mm:ss z", locale)
+    }
+
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val rootView: ConstraintLayout  = itemView.findViewById(R.id.rootView)
         val vPaymentDirection: View     = itemView.findViewById(R.id.vPaymentDirection)
@@ -91,8 +101,11 @@ class TransfersDetailsAdapter(private val context: Context) :
         viewHolder.tvFrom.text = transferDetail.from ?: ""
         viewHolder.tvTo.text = transferDetail.to ?: ""
 
-        viewHolder.tvDate.text = "02 Oct"
-        viewHolder.tvTime.text = "15:01:18 CET"
+        // Format date and time
+        val date = Date(transferDetail.date * 1000)
+
+        viewHolder.tvDate.text = dateFormat.format(date)
+        viewHolder.tvTime.text = timeFormat.format(date)
 
         // Show the crypto amount correctly formatted
         // TODO lift the DecimalFormat declaration to other place to make things more efficient

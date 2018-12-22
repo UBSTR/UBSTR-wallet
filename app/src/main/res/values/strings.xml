@@ -38,15 +38,19 @@
         more than one account, please select which account you wish to import
     </string>
 
-    <!-- Main Activity -->
-    <string name="title_activity_main">MainActivity</string>
+    <!-- Home -->
+    <string name="title_transactions">Transactions</string>
+    <string name="title_merchants">Merchants</string>
     <string name="title_receive">Receive</string>
     <string name="title_balances">Balances</string>
-    <string name="title_merchants">Merchants</string>
     <string name="title_send">Send</string>
+    <string name="title_net_worth">Net Worth</string>
+    <string name="text__coming_soon">Coming soon</string>
 
-    <!-- Balances -->
-    <string name="title_transactions">Transactions</string>
+    <!-- Transactions -->
+    <string name="title_search">Search</string>
+    <string name="title_filter">Filter</string>
+    <string name="title_export">Export</string>
 
     <!-- Send & Receive Transaction -->
     <string name="text__to">To</string>
@@ -57,6 +61,7 @@
     <string name="template__please_pay">Please Pay: %1$s %2$s</string>
     <string name="template__to">To: %1$s</string>
     <string name="msg__invoice_subject">BiTSy invoice from %1$s</string>
+    <string name="title_share">Share</string>
     <string name="text__share_with">Share with</string>
 
     <!-- Settings -->
@@ -77,11 +82,5 @@
         https://github.com/Agorise
     </string>
     <string name="title__bitshares_nodes_dialog">Block: %1$s</string>
-    <string name="text__coming_soon">Coming soon</string>
-    <string name="title_net_worth">Net Worth</string>
-    <string name="title_search">Search</string>
-    <string name="title_filter">Filter</string>
-    <string name="title_export">Export</string>
-    <string name="title_share">Share</string>
 
 </resources>
