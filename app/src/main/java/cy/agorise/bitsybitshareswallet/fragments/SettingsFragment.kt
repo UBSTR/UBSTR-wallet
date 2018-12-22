@@ -1,10 +1,11 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
-import android.content.ClipData
-import android.content.ClipboardManager
+import android.content.*
 import android.content.Context.CLIPBOARD_SERVICE
 import android.os.Bundle
+import android.os.IBinder
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,20 +19,25 @@ import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
 import cy.agorise.graphenej.BrainKey
+import cy.agorise.graphenej.api.android.NetworkService
+import cy.agorise.graphenej.api.android.RxBus
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_settings.*
 
-class SettingsFragment : Fragment() {
+class SettingsFragment : Fragment(), ServiceConnection {
     private val TAG = this.javaClass.simpleName
 
     private var mDisposables = CompositeDisposable()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    /* Network service connection */
+    private var mNetworkService: NetworkService? = null
+
+    /** Flag used to keep track of the NetworkService binding state */
+    private var mShouldUnbindNetwork: Boolean = false
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
 
         return inflater.inflate(R.layout.fragment_settings, container, false)
@@ -47,6 +53,18 @@ class SettingsFragment : Fragment() {
         btnViewBrainKey.setOnClickListener { getBrainkey(it) }
 
         tvFooterAppVersion.text = String.format("%s v%s", getString(R.string.app_name), BuildConfig.VERSION_NAME)
+
+        // Connect to the RxBus, which receives events from the NetworkService
+        mDisposables.add(
+            RxBus.getBusInstance()
+                .asFlowable()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { handleIncomingMessage(it) }
+        )
+    }
+
+    private fun handleIncomingMessage(message: Any?) {
+
     }
 
     /**
@@ -130,10 +148,43 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        val intent = Intent(context, NetworkService::class.java)
+        if (context?.bindService(intent, this, Context.BIND_AUTO_CREATE) == true) {
+            mShouldUnbindNetwork = true
+        } else {
+            Log.e(TAG, "Binding to the network service failed.")
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        // Unbinding from network service
+        if (mShouldUnbindNetwork) {
+            context?.unbindService(this)
+            mShouldUnbindNetwork = false
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
         if (!mDisposables.isDisposed) mDisposables.dispose()
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        ivConnectionStatusIcon.setImageResource(R.drawable.ic_disconnected)
+    }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        // We've bound to LocalService, cast the IBinder and get LocalService instance
+        val binder = service as NetworkService.LocalBinder
+        mNetworkService = binder.service
+
+        ivConnectionStatusIcon.setImageResource(R.drawable.ic_connected)
     }
 }
 
