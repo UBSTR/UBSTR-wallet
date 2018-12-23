@@ -21,12 +21,20 @@ class TransferRepository internal constructor(context: Context) {
         insertAllAsyncTask(mTransferDao).execute(transfers)
     }
 
+    fun setBlockTime(blockNumber: Long, timestamp: Long) {
+        setBlockTimeAsyncTask(mTransferDao).execute(Pair(blockNumber, timestamp))
+    }
+
     fun getAll(): LiveData<List<Transfer>> {
         return mTransferDao.getAll()
     }
 
     fun getCount(): Single<Int> {
         return mTransferDao.getCount()
+    }
+
+    fun getTransferBlockNumberWithMissingTime(): LiveData<Long> {
+        return mTransferDao.getTransferBlockNumberWithMissingTime()
     }
 
     fun deleteAll() {
@@ -38,6 +46,15 @@ class TransferRepository internal constructor(context: Context) {
 
         override fun doInBackground(vararg transfers: List<Transfer>): Void? {
             mAsyncTaskDao.insertAll(transfers[0])
+            return null
+        }
+    }
+
+    private class setBlockTimeAsyncTask internal constructor(private val mAsyncTaskDao: TransferDao) :
+        AsyncTask<Pair<Long, Long>, Void, Void>() {
+
+        override fun doInBackground(vararg pair: Pair<Long, Long>): Void? {
+            mAsyncTaskDao.setBlockTime(pair[0].first, pair[0].second)
             return null
         }
     }

@@ -17,11 +17,17 @@ interface TransferDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAll(transfers: List<Transfer>)
 
-    @Query("SELECT COUNT(*) FROM transfers")
-    fun getCount(): Single<Int>
+    @Query("UPDATE transfers SET timestamp=:timestamp WHERE block_number=:blockNumber")
+    fun setBlockTime(blockNumber: Long, timestamp: Long)
 
     @Query("SELECT * FROM transfers")
     fun getAll(): LiveData<List<Transfer>>
+
+    @Query("SELECT COUNT(*) FROM transfers")
+    fun getCount(): Single<Int>
+
+    @Query("SELECT block_number FROM transfers WHERE timestamp='0' LIMIT 1")
+    fun getTransferBlockNumberWithMissingTime(): LiveData<Long>
 
     @Query("DELETE FROM transfers")
     fun deleteAll()

@@ -18,6 +18,7 @@ import cy.agorise.bitsybitshareswallet.processors.TransfersLoader
 import cy.agorise.bitsybitshareswallet.repositories.AssetRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.BalanceViewModel
+import cy.agorise.bitsybitshareswallet.viewmodels.TransferViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import cy.agorise.graphenej.Asset
 import cy.agorise.graphenej.AssetAmount
@@ -27,12 +28,16 @@ import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
 import cy.agorise.graphenej.api.calls.*
 import cy.agorise.graphenej.models.AccountProperties
+import cy.agorise.graphenej.models.BlockHeader
 import cy.agorise.graphenej.models.FullAccountDetails
 import cy.agorise.graphenej.models.JsonRpcResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import java.util.HashMap
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * Class in charge of managing the connection to graphenej's NetworkService
@@ -44,9 +49,11 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private val RESPONSE_GET_ACCOUNTS = 2
     private val RESPONSE_GET_ACCOUNT_BALANCES = 3
     private val RESPONSE_GET_ASSETS = 4
+    private val RESPONSE_GET_BLOCK_HEADER = 5
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
     private lateinit var mBalanceViewModel: BalanceViewModel
+    private lateinit var mTransferViewModel: TransferViewModel
 
     private lateinit var mAssetRepository: AssetRepository
 
@@ -68,6 +75,11 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
     // Map used to keep track of request and response id pairs
     private val responseMap = HashMap<Long, Int>()
+
+    /** Map used to keep track of request id and block number pairs */
+    private val requestIdToBlockNumberMap = HashMap<Long, Long>()
+
+    private var blockNumberWithMissingTime = 0L
 
     /**
      * Flag used to keep track of the NetworkService binding state
@@ -110,6 +122,17 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
             }
         })
 
+        //Configure TransferViewModel to obtain the Transfer's block numbers with missing time information, one by one
+        mTransferViewModel = ViewModelProviders.of(this).get(TransferViewModel::class.java)
+
+        mTransferViewModel.getTransferBlockNumberWithMissingTime().observe(this, Observer<Long>{ blockNumber ->
+            if (blockNumber != null && blockNumber != blockNumberWithMissingTime) {
+                blockNumberWithMissingTime = blockNumber
+                Log.d(TAG, "Block number: $blockNumber, Time: ${System.currentTimeMillis()}")
+                mHandler.postDelayed(mRequestBlockMissingTimeTask, 10)
+            }
+        })
+
         mDisposable = RxBus.getBusInstance()
             .asFlowable()
             .observeOn(AndroidSchedulers.mainThread())
@@ -136,6 +159,12 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
                         RESPONSE_GET_ASSETS             ->
                             handleAssets(message.result as List<Asset>)
+
+                        RESPONSE_GET_BLOCK_HEADER       -> {
+                            val blockNumber = requestIdToBlockNumberMap[message.id] ?: 0L
+                            handleBlockHeader(message.result as BlockHeader, blockNumber)
+                            requestIdToBlockNumberMap.remove(message.id)
+                        }
                     }
                     responseMap.remove(message.id)
                 }
@@ -245,6 +274,22 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         missingAssets.clear()
     }
 
+    /**
+     * Receives the [BlockHeader] related to a Transfer's missing time and saves it into the database.
+     */
+    private fun handleBlockHeader(blockHeader: BlockHeader, blockNumber: Long) {
+
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+        dateFormat.timeZone = TimeZone.getTimeZone("GMT")
+
+        try {
+            val date = dateFormat.parse(blockHeader.timestamp)
+            mTransferViewModel.setBlockTime(blockNumber, date.time / 1000)
+        } catch (e: ParseException) {
+            Log.e(TAG, "ParseException. Msg: " + e.message)
+        }
+    }
+
     private fun updateBalances() {
         if (mNetworkService!!.isConnected) {
             val id = mNetworkService!!.sendMessage(GetAccountBalances(mCurrentAccount, ArrayList()),
@@ -299,9 +344,26 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                     responseMap[id] = RESPONSE_GET_FULL_ACCOUNTS
                 }
             } else {
-                Log.w(TAG, "NetworkService is null or is not connected. mNetworkService: $mNetworkService")
+                mHandler.postDelayed(this, Constants.MISSING_PAYMENT_CHECK_PERIOD)
             }
-            mHandler.postDelayed(this, Constants.MISSING_PAYMENT_CHECK_PERIOD)
+        }
+    }
+
+    /**
+     * Task used to obtain the missing time from a block from Graphenej's NetworkService.
+     */
+    private val mRequestBlockMissingTimeTask = object : Runnable {
+        override fun run() {
+
+            if (mNetworkService != null && mNetworkService!!.isConnected) {
+                val id = mNetworkService!!.sendMessage(GetBlockHeader(blockNumberWithMissingTime),
+                    GetBlockHeader.REQUIRED_API)
+
+                responseMap[id] = RESPONSE_GET_BLOCK_HEADER
+                requestIdToBlockNumberMap[id] = blockNumberWithMissingTime
+            } else {
+                mHandler.postDelayed(this, Constants.MISSING_PAYMENT_CHECK_PERIOD)
+            }
         }
     }
 

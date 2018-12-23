@@ -7,9 +7,6 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.preference.PreferenceManager
 import android.util.Log
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
 import cy.agorise.bitsybitshareswallet.database.entities.Transfer
 import cy.agorise.bitsybitshareswallet.models.HistoricalOperationEntry
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
