@@ -22,7 +22,6 @@
         android:layout_marginStart="2dp"
         tools:text="de.palmpayisthebestappinthefreakingworld.io/ws (123ms)"
         android:ellipsize="middle"
-        android:singleLine="true"
-        android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+        android:singleLine="true"/>
 
 </LinearLayout>
