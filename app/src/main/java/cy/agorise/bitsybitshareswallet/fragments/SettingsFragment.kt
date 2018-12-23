@@ -70,9 +70,7 @@ class SettingsFragment : Fragment(), ServiceConnection {
 
         btnViewBrainKey.setOnClickListener { getBrainkey(it) }
 
-        tvFooterAppVersion.text = String.format("%s v%s", getString(R.string.app_name), BuildConfig.VERSION_NAME)
-
-        ivConnectionStatusIcon.setOnClickListener { v ->
+        tvNetworkStatus.setOnClickListener { v ->
             if (mNetworkService != null) {
                 // PublishSubject used to announce full node latencies updates
                 val fullNodePublishSubject = mNetworkService!!.nodeLatencyObservable
@@ -84,7 +82,8 @@ class SettingsFragment : Fragment(), ServiceConnection {
                 nodesAdapter!!.add(fullNodes)
 
                 mNodesDialog = MaterialDialog(v.context)
-                    .title(text = getString(R.string.title__bitshares_nodes_dialog, "-------"))
+                    .title(text = String.format("%s v%s", getString(R.string.app_name), BuildConfig.VERSION_NAME))
+                    .message(text = getString(R.string.title__bitshares_nodes_dialog, "-------"))
                     .customListAdapter(nodesAdapter as FullNodesAdapter)
                     .negativeButton(android.R.string.ok) {
                         mHandler.removeCallbacks(mRequestDynamicGlobalPropertiesTask)
@@ -134,7 +133,7 @@ class SettingsFragment : Fragment(), ServiceConnection {
                 val dynamicGlobalProperties = message.result as DynamicGlobalProperties
                 if (mNodesDialog != null && mNodesDialog?.isShowing == true) {
                     val blockNumber = NumberFormat.getInstance().format(dynamicGlobalProperties.head_block_number)
-                    mNodesDialog?.title(text = getString(R.string.title__bitshares_nodes_dialog, blockNumber))
+                    mNodesDialog?.message(text = getString(R.string.title__bitshares_nodes_dialog, blockNumber))
                 }
             }
         }
@@ -267,7 +266,8 @@ class SettingsFragment : Fragment(), ServiceConnection {
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-        ivConnectionStatusIcon.setImageResource(R.drawable.ic_disconnected)
+        tvNetworkStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null,
+            resources.getDrawable(R.drawable.ic_disconnected, null), null)
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -275,7 +275,8 @@ class SettingsFragment : Fragment(), ServiceConnection {
         val binder = service as NetworkService.LocalBinder
         mNetworkService = binder.service
 
-        ivConnectionStatusIcon.setImageResource(R.drawable.ic_connected)
+        tvNetworkStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null,
+            resources.getDrawable(R.drawable.ic_connected, null), null)
     }
 }
 

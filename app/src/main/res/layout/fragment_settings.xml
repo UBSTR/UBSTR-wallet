@@ -21,6 +21,8 @@
             android:paddingEnd="@dimen/activity_horizontal_margin"
             android:orientation="vertical">
 
+            <!-- General -->
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -48,6 +50,19 @@
                 android:textColor="?android:textColorPrimary"/>
 
             <TextView
+                android:id="@+id/tvNetworkStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_same_topic"
+                android:layout_marginEnd="2dp"
+                android:text="View Network Status"
+                android:gravity="center_vertical"
+                android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+                android:drawableEnd="@drawable/ic_disconnected"/>
+
+            <!-- Backup -->
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_different_section"
@@ -70,6 +85,8 @@
                 android:layout_marginTop="@dimen/spacing_same_topic"
                 android:text="@string/btn__view_and_copy"/>
 
+            <!-- Bugs or Ideas -->
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -90,34 +107,5 @@
         </LinearLayout>
 
     </ScrollView>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/lightGray">
-        <ImageView
-            android:id="@+id/ivFooterAppLogo"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="4dp"
-            android:padding="4dp"
-            android:src="@drawable/ic_bitsy_logo"/>
-        <TextView
-            android:id="@+id/tvFooterAppVersion"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_marginStart="8dp"
-            android:gravity="center"
-            android:layout_toEndOf="@+id/ivFooterAppLogo"
-            tools:text="BiTSy v2.0"
-            android:textColor="@android:color/secondary_text_light"/>
-        <ImageView
-            android:id="@+id/ivConnectionStatusIcon"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:padding="4dp"
-            android:src="@drawable/ic_disconnected"
-            android:layout_alignParentEnd="true" />
-    </RelativeLayout>
 
 </LinearLayout>
