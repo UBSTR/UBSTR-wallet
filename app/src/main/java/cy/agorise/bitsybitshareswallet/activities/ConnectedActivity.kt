@@ -344,8 +344,10 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                     responseMap[id] = RESPONSE_GET_FULL_ACCOUNTS
                 }
             } else {
-                mHandler.postDelayed(this, Constants.MISSING_PAYMENT_CHECK_PERIOD)
+                Log.w(TAG, "NetworkService is null or is not connected. mNetworkService: $mNetworkService")
             }
+            mHandler.postDelayed(this, Constants.MISSING_PAYMENT_CHECK_PERIOD)
+
         }
     }
 
