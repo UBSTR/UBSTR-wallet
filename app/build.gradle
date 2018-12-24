@@ -40,6 +40,7 @@ dependencies {
     def lifecycle_version = "2.0.0"
     def room_version = "2.1.0-alpha03"
     def nav_version = "1.0.0-alpha09"
+    def rx_bindings_version = "3.0.0-alpha2"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':graphenejlib:graphenej')
@@ -62,6 +63,10 @@ dependencies {
     // AAC Navigation
     implementation "android.arch.navigation:navigation-fragment-ktx:$nav_version"
     implementation "android.arch.navigation:navigation-ui-ktx:$nav_version"
+    // RxBindings
+    implementation "com.jakewharton.rxbinding3:rxbinding:$rx_bindings_version"
+    implementation "com.jakewharton.rxbinding3:rxbinding-material:$rx_bindings_version" // Material Components widgets
+    implementation "com.jakewharton.rxbinding3:rxbinding-appcompat:$rx_bindings_version" // AndroidX appcompat widgets
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
@@ -70,7 +75,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-crash:16.2.1'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.7'
     // Others
-    implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
     implementation 'org.bitcoinj:bitcoinj-core:0.14.3'
     implementation 'com.moldedbits.r2d2:r2d2:1.0.1'
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'

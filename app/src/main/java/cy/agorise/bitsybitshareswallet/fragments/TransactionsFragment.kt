@@ -10,14 +10,17 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.jakewharton.rxbinding3.appcompat.queryTextChanges
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.TransfersDetailsAdapter
 import cy.agorise.bitsybitshareswallet.database.joins.TransferDetail
 import cy.agorise.bitsybitshareswallet.utils.BounceTouchListener
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.TransferDetailViewModel
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_transactions.*
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class TransactionsFragment : Fragment(), SearchView.OnQueryTextListener {
@@ -40,6 +43,8 @@ class TransactionsFragment : Fragment(), SearchView.OnQueryTextListener {
     private var filterFiatAmountAll = true
     private var filterFromFiatAmount = 0L
     private var filterToFiatAmount = 500L
+
+    private var mDisposables = CompositeDisposable()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -83,7 +88,16 @@ class TransactionsFragment : Fragment(), SearchView.OnQueryTextListener {
         // Adds listener for the SearchView
         val searchItem = menu.findItem(R.id.menuSearch)
         val searchView = searchItem.actionView as SearchView
-        searchView.setOnQueryTextListener(this)
+        mDisposables.add(
+            searchView.queryTextChanges()
+            .skipInitialValue()
+            .debounce(500, TimeUnit.MILLISECONDS)
+            .map { it.toString().toLowerCase() }
+            .subscribe {
+                filterQuery = it
+                applyFilterOptions()
+            }
+        )
 
         // Adjust SearchView width to avoid pushing other menu items out of the screen
         searchView.maxWidth = getScreenWidth(activity) * 3 / 5
@@ -153,5 +167,11 @@ class TransactionsFragment : Fragment(), SearchView.OnQueryTextListener {
 
         if (scrollToTop)
             rvTransactions.scrollToPosition(0)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (!mDisposables.isDisposed) mDisposables.dispose()
     }
 }

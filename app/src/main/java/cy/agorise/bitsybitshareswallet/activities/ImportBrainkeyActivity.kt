@@ -7,7 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
-import com.jakewharton.rxbinding2.widget.RxTextView
+import com.jakewharton.rxbinding3.widget.textChanges
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.database.entities.Authority
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
@@ -66,7 +66,7 @@ class ImportBrainkeyActivity : ConnectedActivity() {
 
         // Use RxJava Debounce to update the PIN error only after the user stops writing for > 500 ms
         mDisposables.add(
-            RxTextView.textChanges(tietPin)
+            tietPin.textChanges()
                 .skipInitialValue()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -75,7 +75,7 @@ class ImportBrainkeyActivity : ConnectedActivity() {
 
         // Use RxJava Debounce to update the PIN Confirmation error only after the user stops writing for > 500 ms
         mDisposables.add(
-            RxTextView.textChanges(tietPinConfirmation)
+            tietPinConfirmation.textChanges()
                 .skipInitialValue()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -84,7 +84,7 @@ class ImportBrainkeyActivity : ConnectedActivity() {
 
         // Use RxJava Debounce to update the BrainKey error only after the user stops writing for > 500 ms
         mDisposables.add(
-            RxTextView.textChanges(tietBrainKey)
+            tietBrainKey.textChanges()
                 .skipInitialValue()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .map { it.toString().trim() }

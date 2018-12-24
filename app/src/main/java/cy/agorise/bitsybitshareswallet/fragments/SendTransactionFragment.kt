@@ -22,7 +22,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.common.primitives.UnsignedLong
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
-import com.jakewharton.rxbinding2.widget.RxTextView
+import com.jakewharton.rxbinding3.widget.textChanges
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.BalancesDetailsAdapter
 import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
@@ -180,7 +180,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
         // Use RxJava Debounce to avoid making calls to the NetworkService on every text change event
         mDisposables.add(
-            RxTextView.textChanges(tietTo)
+            tietTo.textChanges()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .map { it.toString().trim() }
                 .filter { it.length > 1 }
@@ -192,7 +192,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
         // Use RxJava Debounce to update the Amount error only after the user stops writing for > 500 ms
         mDisposables.add(
-            RxTextView.textChanges(tietAmount)
+            tietAmount.textChanges()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .filter { it.isNotEmpty() }
                 .map { it.toString().trim().toDouble() }

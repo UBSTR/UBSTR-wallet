@@ -25,7 +25,7 @@ import com.google.zxing.EncodeHintType
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.WriterException
 import com.google.zxing.common.BitMatrix
-import com.jakewharton.rxbinding2.widget.RxTextView
+import com.jakewharton.rxbinding3.widget.textChanges
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.AssetsAdapter
 import cy.agorise.bitsybitshareswallet.adapters.AutoSuggestAssetAdapter
@@ -158,7 +158,7 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
 
         // Use RxJava Debounce to create QR code only after the user stopped typing an amount
         mDisposables.add(
-            RxTextView.textChanges(tietAmount)
+            tietAmount.textChanges()
                 .debounce(1000, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { updateQR() }
@@ -171,7 +171,7 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
         // Use RxJava Debounce to avoid making calls to the NetworkService on every text change event and also avoid
         // the first call when the View is created
         mDisposables.add(
-            RxTextView.textChanges(actvAsset)
+            actvAsset.textChanges()
                 .skipInitialValue()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .map { it.toString().trim().toUpperCase() }
