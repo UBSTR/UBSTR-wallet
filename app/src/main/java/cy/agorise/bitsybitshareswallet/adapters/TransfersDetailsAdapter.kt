@@ -101,6 +101,16 @@ class TransfersDetailsAdapter(private val context: Context) :
         viewHolder.tvFrom.text = transferDetail.from ?: ""
         viewHolder.tvTo.text = transferDetail.to ?: ""
 
+        // Shows memo if available
+        val memo = transferDetail.memo
+        if (memo == "") {
+            viewHolder.tvMemo.text = ""
+            viewHolder.llMemo.visibility = View.GONE
+        } else {
+            viewHolder.tvMemo.text = memo
+            viewHolder.llMemo.visibility = View.VISIBLE
+        }
+
         // Format date and time
         val date = Date(transferDetail.date * 1000)
 

@@ -5,6 +5,7 @@ data class TransferDetail(
     val from: String?,
     val to: String?,
     val direction: Boolean, // True -> Received, False -> Sent
+    val memo: String,
     val date: Long,
     val cryptoAmount: Long,
     val cryptoPrecision: Int,
