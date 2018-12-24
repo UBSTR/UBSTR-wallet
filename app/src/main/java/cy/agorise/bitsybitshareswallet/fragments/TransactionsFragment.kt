@@ -10,20 +10,21 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.jakewharton.rxbinding3.appcompat.queryTextChanges
+import com.jakewharton.rxbinding3.appcompat.queryTextChangeEvents
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.TransfersDetailsAdapter
 import cy.agorise.bitsybitshareswallet.database.joins.TransferDetail
 import cy.agorise.bitsybitshareswallet.utils.BounceTouchListener
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.TransferDetailViewModel
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_transactions.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class TransactionsFragment : Fragment(), SearchView.OnQueryTextListener {
+class TransactionsFragment : Fragment() {
 
     private lateinit var mTransferDetailViewModel: TransferDetailViewModel
 
@@ -89,14 +90,15 @@ class TransactionsFragment : Fragment(), SearchView.OnQueryTextListener {
         val searchItem = menu.findItem(R.id.menuSearch)
         val searchView = searchItem.actionView as SearchView
         mDisposables.add(
-            searchView.queryTextChanges()
-            .skipInitialValue()
-            .debounce(500, TimeUnit.MILLISECONDS)
-            .map { it.toString().toLowerCase() }
-            .subscribe {
-                filterQuery = it
-                applyFilterOptions()
-            }
+            searchView.queryTextChangeEvents()
+                .skipInitialValue()
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .map { it.queryText.toString().toLowerCase() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    filterQuery = it
+                    applyFilterOptions()
+                }
         )
 
         // Adjust SearchView width to avoid pushing other menu items out of the screen
@@ -114,14 +116,6 @@ class TransactionsFragment : Fragment(), SearchView.OnQueryTextListener {
         activity.windowManager.defaultDisplay.getSize(size)
         return size.x
     }
-
-    override fun onQueryTextChange(query: String): Boolean {
-        filterQuery = query.toLowerCase()
-        applyFilterOptions()
-        return true
-    }
-
-    override fun onQueryTextSubmit(query: String?) = false // Not needed since we are filtering as the user types
 
     /**
      * Filters the TransferDetail list given the user selected filter options.
