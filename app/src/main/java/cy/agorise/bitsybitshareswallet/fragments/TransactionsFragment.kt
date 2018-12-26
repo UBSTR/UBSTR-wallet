@@ -24,7 +24,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class TransactionsFragment : Fragment() {
+class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSelectedListener {
 
     private lateinit var mTransferDetailViewModel: TransferDetailViewModel
 
@@ -87,7 +87,7 @@ class TransactionsFragment : Fragment() {
         inflater.inflate(R.menu.menu_transactions, menu)
 
         // Adds listener for the SearchView
-        val searchItem = menu.findItem(R.id.menuSearch)
+        val searchItem = menu.findItem(R.id.menu_search)
         val searchView = searchItem.actionView as SearchView
         mDisposables.add(
             searchView.queryTextChangeEvents()
@@ -103,6 +103,25 @@ class TransactionsFragment : Fragment() {
 
         // Adjust SearchView width to avoid pushing other menu items out of the screen
         searchView.maxWidth = getScreenWidth(activity) * 3 / 5
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            R.id.menu_filter -> {
+                val filterOptionsDialog = FilterOptionsDialog.newInstance(
+                    filterTransactionsDirection, filterDateRangeAll, filterStartDate * 1000,
+                    filterEndDate * 1000, filterCryptocurrencyAll, filterCryptocurrency,
+                    filterFiatAmountAll, filterFromFiatAmount, filterToFiatAmount
+                )
+                filterOptionsDialog.show(childFragmentManager, "filter-options-tag")
+                true
+            }
+            R.id.menu_export -> {
+                // TODO add export options
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     /**
@@ -161,6 +180,32 @@ class TransactionsFragment : Fragment() {
 
         if (scrollToTop)
             rvTransactions.scrollToPosition(0)
+    }
+
+    /**
+     *
+     */
+    override fun onFilterOptionsSelected(
+        filterTransactionsDirection: Int,
+        filterDateRangeAll: Boolean,
+        filterStartDate: Long,
+        filterEndDate: Long,
+        filterCryptocurrencyAll: Boolean,
+        filterCryptocurrency: String,
+        filterFiatAmountAll: Boolean,
+        filterFromFiatAmount: Long,
+        filterToFiatAmount: Long
+    ) {
+        this.filterTransactionsDirection = filterTransactionsDirection
+        this.filterDateRangeAll = filterDateRangeAll
+        this.filterStartDate = filterStartDate / 1000
+        this.filterEndDate = filterEndDate / 1000
+        this.filterCryptocurrencyAll = filterCryptocurrencyAll
+        this.filterCryptocurrency = filterCryptocurrency
+        this.filterFiatAmountAll = filterFiatAmountAll
+        this.filterFromFiatAmount = filterFromFiatAmount
+        this.filterToFiatAmount = filterToFiatAmount
+        applyFilterOptions(true)
     }
 
     override fun onDestroy() {

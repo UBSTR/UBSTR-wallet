@@ -3,21 +3,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/menuSearch"
+    <item android:id="@+id/menu_search"
           android:icon="@drawable/ic_search"
           android:title="@string/title_search"
           app:actionViewClass="androidx.appcompat.widget.SearchView"
           app:showAsAction="always"/>
 
     <item
-        android:id="@+id/menuFilter"
+        android:id="@+id/menu_filter"
         android:icon="@drawable/ic_filter"
         app:showAsAction="ifRoom"
         android:title="@string/title_filter">
     </item>
 
     <item
-        android:id="@+id/menuExport"
+        android:id="@+id/menu_export"
         android:icon="@drawable/ic_file_download"
         app:showAsAction="ifRoom"
         android:title="@string/title_export">
