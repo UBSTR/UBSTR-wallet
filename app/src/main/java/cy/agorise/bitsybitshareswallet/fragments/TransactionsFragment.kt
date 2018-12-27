@@ -147,11 +147,11 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
         for (transferDetail in transfersDetails) {
             // Filter by transfer direction
             if (transferDetail.direction) { // Transfer sent
-                if (filterTransactionsDirection == 2)
+                if (filterTransactionsDirection == 1)
                 // Looking for received transfers only
                     continue
             } else { // Transfer received
-                if (filterTransactionsDirection == 1)
+                if (filterTransactionsDirection == 2)
                 // Looking for sent transactions only
                     continue
             }
