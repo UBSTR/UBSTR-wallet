@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        tools:context=".fragments.SendTransactionFragment">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/centeredVerticalGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/cameraVerticalGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.65"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilTo"
+            style="@style/Widget.Bitsy.TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:hint="@string/text__to"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tietTo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits="abcdefghijklmnopqrstuvwxyz-0123456789"
+                android:maxLines="1"
+                android:lines="1"
+                android:imeOptions="actionNext"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilAmount"
+            style="@style/Widget.Bitsy.TextInputLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/text__amount"
+            android:layout_marginTop="@dimen/spacing_same_topic"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintTop_toBottomOf="@id/tilTo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/centeredVerticalGuideline">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tietAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:inputType="numberDecimal"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Spinner
+            android:id="@+id/spAsset"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            app:layout_constraintTop_toTopOf="@+id/tilAmount"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/centeredVerticalGuideline"/>
+
+        <View
+            android:id="@+id/vSpinner"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
+            android:background="@color/darkGray"
+            app:layout_constraintTop_toBottomOf="@+id/spAsset"
+            app:layout_constraintEnd_toEndOf="@+id/spAsset"
+            app:layout_constraintStart_toStartOf="@+id/spAsset" />
+
+        <TextView
+            android:id="@+id/tvAvailableAssetAmount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.Bitsy.Caption"
+            tools:text="12.01253 BTS"
+            android:textAlignment="center"
+            app:layout_constraintTop_toBottomOf="@id/vSpinner"
+            app:layout_constraintStart_toStartOf="@id/vSpinner"
+            app:layout_constraintEnd_toEndOf="@id/vSpinner"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilMemo"
+            style="@style/Widget.Bitsy.TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_same_topic"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:hint="@string/text__memo"
+            app:layout_constraintTop_toBottomOf="@id/tilAmount">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tietMemo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:maxLines="3"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/tvScan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_same_topic"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:text="@string/text__scan_qr"
+            android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tilMemo" />
+
+        <View
+            android:id="@+id/viewCamera"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/spacing_same_topic"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:background="@drawable/camera_view_background"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintTop_toBottomOf="@+id/tvScan"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/cameraVerticalGuideline"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabOpenCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabCustomSize="32dp"
+            app:maxImageSize="20dp"
+            app:layout_constraintStart_toEndOf="@id/cameraVerticalGuideline"
+            app:layout_constraintTop_toBottomOf="@+id/tvScan"
+            app:srcCompat="@drawable/ic_camera" />
+
+        <me.dm7.barcodescanner.zxing.ZXingScannerView
+            android:id="@+id/cameraPreview"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="w,3:4"
+            app:layout_constraintTop_toTopOf="@+id/viewCamera"
+            app:layout_constraintBottom_toBottomOf="@id/viewCamera"
+            app:layout_constraintStart_toStartOf="@id/viewCamera"
+            app:layout_constraintEnd_toEndOf="@id/viewCamera" />
+
+        <View
+            android:id="@+id/vSend"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginEnd="0dp"
+            android:background="@drawable/send_fab_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/viewCamera"
+            app:layout_constraintBottom_toBottomOf="@id/viewCamera"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabSendTransaction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="15dp"
+            app:fabCustomSize="90dp"
+            app:maxImageSize="70dp"
+            app:srcCompat="@drawable/ic_arrow_forward"
+            app:layout_constraintEnd_toEndOf="@id/vSend"
+            app:layout_constraintTop_toTopOf="@+id/vSend" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

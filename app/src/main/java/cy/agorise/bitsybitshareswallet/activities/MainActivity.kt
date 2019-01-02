@@ -1,90 +1,114 @@
 package cy.agorise.bitsybitshareswallet.activities
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
-
-import androidx.fragment.app.FragmentPagerAdapter
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import cy.agorise.bitsybitshareswallet.BuildConfig
+import android.os.Handler
+import android.preference.PreferenceManager
+import android.view.MenuItem
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.onNavDestinationSelected
+import androidx.navigation.ui.setupActionBarWithNavController
 import cy.agorise.bitsybitshareswallet.R
-import cy.agorise.bitsybitshareswallet.fragments.BalancesFragment
-import cy.agorise.bitsybitshareswallet.fragments.MerchantsFragment
-import cy.agorise.bitsybitshareswallet.fragments.TransactionsFragment
-
+import cy.agorise.bitsybitshareswallet.utils.Constants
+import cy.agorise.graphenej.api.ConnectionStatusUpdate
+import cy.agorise.graphenej.models.JsonRpcResponse
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : ConnectedActivity() {
+    private val TAG = this.javaClass.simpleName
 
-    /**
-     * The [androidx.fragment.app.FragmentPagerAdapter] that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * [androidx.fragment.app.FragmentStatePagerAdapter].
-     */
-    private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
+    private lateinit var appBarConfiguration : AppBarConfiguration
+
+    // Handler and Runnable used to add a timer for user inaction and close the app if enough time has passed
+    private lateinit var mHandler: Handler
+    private lateinit var mRunnable: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Sets the theme to night mode if it has been selected by the user
+        if (PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean(Constants.KEY_NIGHT_MODE_ACTIVATED, false)) {
+            setTheme(R.style.Theme_Bitsy_Dark_NoActionBar)
+        }
         setContentView(R.layout.activity_main)
 
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
+        setSupportActionBar(toolbar)
 
-        // Set up the ViewPager with the sections adapter.
-        viewPager.adapter = mSectionsPagerAdapter
-        tabLayout.setupWithViewPager(viewPager)
+        val host: NavHostFragment = supportFragmentManager
+            .findFragmentById(R.id.navHostFragment) as NavHostFragment? ?: return
 
-        // Force first tab to show BTS icon
-        tabLayout.getTabAt(0)?.setIcon(R.drawable.tab_home_selector)
+        // Set up Action Bar with Navigation's controller
+        val navController = host.navController
 
-        initBottomBar()
+        appBarConfiguration = AppBarConfiguration(navController.graph)
 
-        ivSettings.setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
+        // Sets up the ActionBar with the navigation controller so that it automatically responds to clicks on toolbar
+        // menu items and shows the up navigation button on all fragments except home (Balances)
+        setupActionBarWithNavController(navController, appBarConfiguration)
+
+        mHandler = Handler()
+
+        // When this runnable finishes it first verifies if the auto close feature is enabled and if it is then it
+        // closes the app, if not then it just restarts the Handler (timer)
+        mRunnable = Runnable {
+            if (PreferenceManager.getDefaultSharedPreferences(this)
+                    .getBoolean(Constants.KEY_AUTO_CLOSE_ACTIVATED, true))
+                finish()
+            else
+                restartHandler()
         }
-    }
-
-    private fun initBottomBar() {
-        // Show app version number in bottom bar
-        tvBuildVersion.text = String.format("v%s", BuildConfig.VERSION_NAME)
-
-        // Show block number in bottom bar
-        tvBlockNumber.text = getString(R.string.block_number_bottom_bar, "-----")
-
-        // TODO add listener to update block number
+        startHandler()
     }
 
     /**
-     * A [FragmentPagerAdapter] that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
+     * Restarts the Handler (timer) each time there is user's interaction
      */
-    inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        restartHandler()
+    }
 
-        override fun getItem(position: Int): Fragment {
-            return when (position) {
-                0       -> BalancesFragment()
-                1       -> TransactionsFragment()
-                else    -> MerchantsFragment()
-            }
-        }
+    /**
+     * Stops and then restarts the Handler
+     */
+    private fun restartHandler() {
+        stopHandler()
+        startHandler()
+    }
 
-        override fun getCount(): Int {
-            // Show 3 total pages.
-            return 3
-        }
+    private fun stopHandler() {
+        mHandler.removeCallbacks(mRunnable)
+    }
 
-        override fun getPageTitle(position: Int): CharSequence? {
-            return when (position) {
-                0       -> ""
-                1       -> getString(R.string.title_transactions)
-                else    -> getString(R.string.title_merchants)
-            }
-        }
+    private fun startHandler() {
+        mHandler.postDelayed(mRunnable, 3 * 60 * 1000) //for 3 minutes
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Have the NavigationUI look for an action or destination matching the menu
+        // item id and navigate there if found.
+        // Otherwise, bubble up to the parent.
+        return item.onNavDestinationSelected(findNavController(R.id.navHostFragment))
+                || super.onOptionsItemSelected(item)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        // Allows NavigationUI to support proper up navigation or the drawer layout
+        // drawer menu, depending on the situation
+        return findNavController(R.id.navHostFragment).navigateUp(appBarConfiguration)
+    }
+
+    override fun handleJsonRpcResponse(response: JsonRpcResponse<*>) {
+
+    }
+
+    /**
+     * Private method called whenever there's an update to the connection status
+     * @param connectionStatusUpdate  Connection status update.
+     */
+    override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) {
+
     }
 }

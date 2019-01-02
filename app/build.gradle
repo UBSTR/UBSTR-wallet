@@ -1,7 +1,10 @@
 apply plugin: 'com.android.application'
+apply plugin: "androidx.navigation.safeargs"
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'io.fabric'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 28
@@ -15,31 +18,69 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            // TODO enabling minify breaks the debugger breakpoints, find a way to fix it and enable minify again
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue("string", "PORT_NUMBER", "8082")
+        }
+    }
+    android.packagingOptions {
+        exclude 'lib/x86_64/darwin/libscrypt.dylib'
+        exclude 'lib/x86_64/freebsd/libscrypt.so'
+        exclude 'lib/x86_64/linux/libscrypt.so'
     }
 }
 
 dependencies {
     def lifecycle_version = "2.0.0"
-    def room_version = "2.1.0-alpha02"
+    def room_version = "2.1.0-alpha03"
+    def nav_version = "1.0.0-alpha09"
+    def rx_bindings_version = "3.0.0-alpha2"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':graphenejlib:graphenej')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.0.0'
+    // AndroidX
+    implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
-    implementation 'com.google.android.material:material:1.0.0'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    // Google
     implementation 'com.google.zxing:core:3.3.1'
-    implementation 'me.dm7.barcodescanner:zxing:1.9.8'
-
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.android.gms:play-services-maps:16.0.0'
+    // AAC Lifecycle
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
-
+    // AAC Room
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-rxjava2:$room_version" // RxJava support for Room
+    // AAC Navigation
+    implementation "android.arch.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "android.arch.navigation:navigation-ui-ktx:$nav_version"
+    // RxBindings
+    implementation "com.jakewharton.rxbinding3:rxbinding:$rx_bindings_version"
+    implementation "com.jakewharton.rxbinding3:rxbinding-material:$rx_bindings_version" // Material Components widgets
+    implementation "com.jakewharton.rxbinding3:rxbinding-appcompat:$rx_bindings_version" // AndroidX appcompat widgets
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    //Firebase
+    implementation 'com.google.firebase:firebase-core:16.0.6'
+    implementation 'com.google.firebase:firebase-crash:16.2.1'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.7'
+    // Others
+    implementation 'org.bitcoinj:bitcoinj-core:0.14.3'
+    implementation 'com.moldedbits.r2d2:r2d2:1.0.1'
+    implementation 'me.dm7.barcodescanner:zxing:1.9.8'
+    implementation 'com.afollestad.material-dialogs:core:2.0.0-rc3'
+    // Android Debug Database
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
 
 //    TODO enable and make proper testing
 //    testImplementation 'junit:junit:4.12'

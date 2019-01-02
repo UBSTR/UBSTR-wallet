@@ -7,4 +7,16 @@
 
     <dimen name="layout_margin">35sp</dimen>
 
+    <!-- Spacing between widgets vertically -->
+    <dimen name="spacing_same_topic">16dp</dimen>
+    <dimen name="spacing_different_topic">24dp</dimen>
+    <dimen name="spacing_different_section">40dp</dimen>
+
+    <!-- Initial setup -->
+    <dimen name="logo_size">180dp</dimen>
+
+    <!-- Transactions -->
+    <dimen name="card_margin">4dp</dimen>
+    <dimen name="card_radius">4dp</dimen>
+
 </resources>

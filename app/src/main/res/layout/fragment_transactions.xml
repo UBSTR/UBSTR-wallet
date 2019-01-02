@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<androidx.recyclerview.widget.RecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rvTransactions"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.TransactionsFragment">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Transactions"/>
-
-</FrameLayout>
+    android:padding="@dimen/card_margin"
+    android:clipToPadding="false"
+    tools:listitem="@layout/item_transaction"
+    tools:itemCount="6"/>

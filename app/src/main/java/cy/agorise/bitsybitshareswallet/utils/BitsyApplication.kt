@@ -1,0 +1,52 @@
+package cy.agorise.bitsybitshareswallet.utils
+
+import android.app.Application
+import cy.agorise.graphenej.api.ApiAccess
+import cy.agorise.graphenej.api.android.NetworkServiceManager
+
+class BitsyApplication : Application() {
+
+    private val BITSHARES_NODE_URLS = arrayOf(
+        // PP private nodes
+        "wss://nl.palmpay.io/ws",
+
+        // Other public nodes
+        "wss://bitshares.nu/ws",                   // Stockholm, Sweden
+        "wss://bitshares.openledger.info/ws",      // Openledger node
+        "wss://dallas.bitshares.apasia.tech/ws",	// Dallas, USA
+        "wss://atlanta.bitshares.apasia.tech/ws",	// Atlanta, USA
+        "wss://dex.rnglab.org",				// Amsterdam, Netherlands
+        "wss://citadel.li/node"
+    )
+
+    override fun onCreate() {
+        super.onCreate()
+
+        // Specifying some important information regarding the connection, such as the
+        // credentials and the requested API accesses
+        val requestedApis = ApiAccess.API_DATABASE or ApiAccess.API_HISTORY or ApiAccess.API_NETWORK_BROADCAST
+        val networkManager = NetworkServiceManager.Builder()
+            .setUserName("")
+            .setPassword("")
+            .setRequestedApis(requestedApis)
+            .setCustomNodeUrls(setupNodes())
+            .setAutoConnect(true)
+            .setNodeLatencyVerification(true)
+            .build(this)
+
+        /*
+        * Registering this class as a listener to all activity's callback cycle events, in order to
+        * better estimate when the user has left the app and it is safe to disconnect the websocket connection
+        */
+        registerActivityLifecycleCallbacks(networkManager)
+    }
+
+    private fun setupNodes(): String {
+        val stringBuilder = StringBuilder()
+        for (url in BITSHARES_NODE_URLS) {
+            stringBuilder.append(url).append(",")
+        }
+        stringBuilder.replace(stringBuilder.length - 1, stringBuilder.length, "")
+        return stringBuilder.toString()
+    }
+}

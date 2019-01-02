@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/home_dest">
+
+    <fragment
+        android:id="@+id/home_dest"
+        android:name="cy.agorise.bitsybitshareswallet.fragments.HomeFragment"
+        android:label="@string/app_name"
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/receive_action"
+            app:destination="@+id/receive_dest"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/send_action"
+            app:destination="@id/send_dest"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/send_action_camera"
+            app:destination="@id/send_dest"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/merchants_dest"
+        android:name="cy.agorise.bitsybitshareswallet.fragments.MerchantsFragment"
+        android:label="@string/title_merchants"
+        tools:layout="@layout/fragment_merchants"/>
+
+    <fragment
+        android:id="@+id/transactions_dest"
+        android:name="cy.agorise.bitsybitshareswallet.fragments.TransactionsFragment"
+        android:label="@string/title_transactions"
+        tools:layout="@layout/fragment_transactions"/>
+
+    <fragment
+        android:id="@+id/settings_dest"
+        android:name="cy.agorise.bitsybitshareswallet.fragments.SettingsFragment"
+        android:label="@string/title_settings"
+        tools:layout="@layout/fragment_settings"/>
+
+    <fragment
+        android:id="@+id/receive_dest"
+        android:name="cy.agorise.bitsybitshareswallet.fragments.ReceiveTransactionFragment"
+        android:label="@string/title_receive"
+        tools:layout="@layout/fragment_receive_transaction"/>
+
+    <fragment
+        android:id="@+id/send_dest"
+        android:name="cy.agorise.bitsybitshareswallet.fragments.SendTransactionFragment"
+        android:label="@string/title_send"
+        tools:layout="@layout/fragment_send_transaction">
+
+        <argument
+            android:name="openCamera"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
+
+</navigation>

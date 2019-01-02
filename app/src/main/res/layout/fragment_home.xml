@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context=".fragments.HomeFragment">
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.MaterialComponents.CardView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        app:cardElevation="4dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/firstVerticalGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.45"/>
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/secondVerticalGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.55"/>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabReceiveTransaction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fabSize="auto"
+                app:fabCustomSize="120dp"
+                app:maxImageSize="70dp"
+                android:backgroundTint="@color/colorReceive"
+                android:src="@drawable/ic_receive"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/firstVerticalGuideline"
+                app:layout_constraintBottom_toTopOf="@+id/tvReceiveTransaction"
+                app:layout_constraintVertical_chainStyle="packed"/>
+
+            <TextView
+                android:id="@+id/tvReceiveTransaction"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/title_receive"
+                android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+                android:textAlignment="center"
+                app:layout_constraintTop_toBottomOf="@+id/fabReceiveTransaction"
+                app:layout_constraintStart_toStartOf="@id/fabReceiveTransaction"
+                app:layout_constraintEnd_toEndOf="@id/fabReceiveTransaction"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabSendTransactionCamera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fabSize="mini"
+                android:src="@drawable/ic_camera"
+                android:backgroundTint="@color/colorSend"
+                app:layout_constraintTop_toTopOf="@id/fabSendTransaction"
+                app:layout_constraintBottom_toBottomOf="@id/fabSendTransaction"
+                app:layout_constraintStart_toEndOf="@id/firstVerticalGuideline"
+                app:layout_constraintEnd_toStartOf="@id/secondVerticalGuideline"/>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabSendTransaction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fabSize="auto"
+                app:fabCustomSize="120dp"
+                app:maxImageSize="70dp"
+                android:backgroundTint="@color/colorSend"
+                android:src="@drawable/ic_send"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/secondVerticalGuideline"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/tvSendTransaction"
+                app:layout_constraintVertical_chainStyle="packed"/>
+
+            <TextView
+                android:id="@+id/tvSendTransaction"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/title_send"
+                android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+                android:textAlignment="center"
+                app:layout_constraintTop_toBottomOf="@+id/fabSendTransaction"
+                app:layout_constraintStart_toStartOf="@id/fabSendTransaction"
+                app:layout_constraintEnd_toEndOf="@id/fabSendTransaction"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/gray"
+                app:layout_constraintTop_toTopOf="@id/fabSendTransactionCamera"
+                app:layout_constraintBottom_toBottomOf="@id/fabSendTransactionCamera"
+                app:layout_constraintStart_toEndOf="@id/fabSendTransactionCamera"
+                app:layout_constraintEnd_toStartOf="@id/fabSendTransaction"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.MaterialComponents.CardView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_weight="2"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvAccountName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_same_topic"
+                android:layout_marginStart="@dimen/spacing_same_topic"
+                tools:text="seventest-5"
+                android:textAppearance="@style/TextAppearance.Bitsy.Headline6"/>
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@color/semiTransparent"
+                app:tabSelectedTextColor="?android:textColorPrimary"
+                app:tabIndicatorColor="?attr/themedColorBackgroundFloating"
+                app:tabIndicatorHeight="50dp"
+                app:tabPaddingStart="@dimen/activity_horizontal_margin"
+                app:tabMode="scrollable" />
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

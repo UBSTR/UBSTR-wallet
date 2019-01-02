@@ -1,52 +1,55 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
-import androidx.lifecycle.ViewModelProviders
-import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import cy.agorise.bitsybitshareswallet.R
-import cy.agorise.bitsybitshareswallet.activities.ReceiveTransactionActivity
-import cy.agorise.bitsybitshareswallet.activities.SendTransactionActivity
-import cy.agorise.bitsybitshareswallet.viewmodels.BalancesViewModel
+import cy.agorise.bitsybitshareswallet.adapters.BalancesAdapter
+import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
+import cy.agorise.bitsybitshareswallet.viewmodels.BalanceDetailViewModel
 import kotlinx.android.synthetic.main.fragment_balances.*
 
-class BalancesFragment : Fragment() {
+class BalancesFragment: Fragment() {
+    private val TAG = this.javaClass.simpleName
 
-    companion object {
-        fun newInstance() = BalancesFragment()
-    }
-
-    private lateinit var viewModel: BalancesViewModel
+    private lateinit var mBalanceDetailViewModel: BalanceDetailViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_balances, container, false)
-    }
+        setHasOptionsMenu(true)
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(BalancesViewModel::class.java)
-        // TODO: Use the ViewModel
+        return inflater.inflate(R.layout.fragment_balances, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        btnReceive.setOnClickListener {
-            val intent = Intent(view.context, ReceiveTransactionActivity::class.java)
-            startActivity(intent)
-        }
+        // Configure BalanceDetailViewModel to show the current balances
+        mBalanceDetailViewModel = ViewModelProviders.of(this).get(BalanceDetailViewModel::class.java)
 
-        btnSend.setOnClickListener {
-            val intent = Intent(view.context, SendTransactionActivity::class.java)
-            startActivity(intent)
-        }
+        val balancesAdapter = BalancesAdapter(context!!)
+        rvBalances.adapter = balancesAdapter
+        rvBalances.layoutManager = LinearLayoutManager(context!!)
+        rvBalances.addItemDecoration(DividerItemDecoration(context!!, DividerItemDecoration.VERTICAL))
+
+        mBalanceDetailViewModel.getAll().observe(this, Observer<List<BalanceDetail>> { balancesDetails ->
+            balancesAdapter.replaceAll(balancesDetails)
+        })
     }
 
+    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+        super.setUserVisibleHint(isVisibleToUser)
+        if (isVisibleToUser) {
+            // TODO find a better way to recreate the fragment, that does it only when the theme has been changed
+            fragmentManager!!.beginTransaction().detach(this).attach(this).commit()
+        }
+    }
 }
