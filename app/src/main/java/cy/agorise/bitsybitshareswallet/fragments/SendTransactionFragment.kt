@@ -122,7 +122,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             mUserAccount = UserAccount(userId)
 
         // Use Navigation SafeArgs to decide if we should activate or not the camera feed
-        val safeArgs = SendTransactionFragmentArgs.fromBundle(arguments)
+        val safeArgs = SendTransactionFragmentArgs.fromBundle(arguments!!)
         if (safeArgs.openCamera)
             verifyCameraPermission()
 
