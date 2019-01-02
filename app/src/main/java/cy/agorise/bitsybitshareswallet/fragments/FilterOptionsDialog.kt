@@ -282,12 +282,12 @@ class FilterOptionsDialog : DialogFragment() {
 //    }
 
     private fun validateFields() {
-        val filterTransactionsDirection =  0 //when {
-//            rbTransactionAll.isChecked -> 0
-//            rbTransactionSent.isChecked -> 1
-//            rbTransactionReceived.isChecked -> 2
-//            else -> { 0 }
-//        }
+        val filterTransactionsDirection =  when {
+            rbTransactionAll.isChecked -> 0
+            rbTransactionSent.isChecked -> 1
+            rbTransactionReceived.isChecked -> 2
+            else -> { 0 }
+        }
 
         val filterDateRangeAll = cbDateRange.isChecked
 
