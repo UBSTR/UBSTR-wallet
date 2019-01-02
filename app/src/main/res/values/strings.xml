@@ -55,11 +55,14 @@
     <string name="text__memo">Memo</string>
     <string name="text__scan_qr">Scan QR</string>
     <string name="text__asset">Asset</string>
-    <string name="template__please_pay">Please Pay: %1$s %2$s</string>
+    <string name="text__other">Other…</string>
+    <string name="template__please_send">Please Send: %1$s %2$s</string>
+    <string name="text__any_amount">Any Amount</string>
     <string name="template__to">To: %1$s</string>
     <string name="msg__invoice_subject">BiTSy invoice from %1$s</string>
     <string name="title_share">Share</string>
     <string name="text__share_with">Share with</string>
+    <string name="msg__storage__permission__necessary">Storage permission is necessary to share images.</string>
 
     <!-- Settings -->
     <string name="title_settings">Settings</string>
@@ -79,5 +82,6 @@
         https://github.com/Agorise
     </string>
     <string name="title__bitshares_nodes_dialog">Block: %1$s</string>
+
 
 </resources>

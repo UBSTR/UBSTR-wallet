@@ -121,7 +121,7 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
 
                 // Add an option at the end so the user can search for an asset other than the ones saved in the db
                 val asset = cy.agorise.bitsybitshareswallet.database.entities.Asset(
-                    OTHER_ASSET, "Other...", 0, "", ""
+                    OTHER_ASSET, getString(R.string.text__other), 0, "", ""
                 )
                 mAssets.add(asset)
 
@@ -325,14 +325,18 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
      * @param account Account to pay total
      */
     private fun updateAmountAddressUI(total: AssetAmount, account: String) {
-        val df = DecimalFormat("####."+("#".repeat(total.asset.precision)))
-        df.roundingMode = RoundingMode.CEILING
-        df.decimalFormatSymbols = DecimalFormatSymbols(Locale.getDefault())
+        val txtAmount: String = if (total.amount.toLong() == 0L) {
+            getString(R.string.template__please_send, getString(R.string.text__any_amount), " ")
+        } else {
+            val df = DecimalFormat("####."+("#".repeat(total.asset.precision)))
+            df.roundingMode = RoundingMode.CEILING
+            df.decimalFormatSymbols = DecimalFormatSymbols(Locale.getDefault())
 
-        val amount = total.amount.toDouble() / Math.pow(10.toDouble(), total.asset.precision.toDouble())
-        val strAmount = df.format(amount)
+            val amount = total.amount.toDouble() / Math.pow(10.toDouble(), total.asset.precision.toDouble())
+            val strAmount = df.format(amount)
+            getString(R.string.template__please_send, strAmount, total.asset.symbol)
+        }
 
-        val txtAmount = getString(R.string.template__please_pay, strAmount, total.asset.symbol)
         val txtAccount = getString(R.string.template__to, account)
 
         tvPleasePay.text = txtAmount
@@ -370,8 +374,7 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 shareQRScreenshot()
             } else {
-                // TODO extract string resource
-                Toast.makeText(context!!, "Storage permission is necessary to share QR codes.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context!!, getString(R.string.msg__storage__permission__necessary), Toast.LENGTH_SHORT).show()
             }
             return
         }
