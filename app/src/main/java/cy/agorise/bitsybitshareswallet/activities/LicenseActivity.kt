@@ -22,7 +22,7 @@ class LicenseActivity : AppCompatActivity() {
         if (agreedLicenseVersion == Constants.CURRENT_LICENSE_VERSION) {
             agree()
         } else {
-            wbLA.loadData(getString(R.string.licence_html), "text/html", "UTF-8")
+            wbLA.loadUrl("file:///android_asset/eula.html")
 
             btnDisagree.setOnClickListener { finish() }
 
