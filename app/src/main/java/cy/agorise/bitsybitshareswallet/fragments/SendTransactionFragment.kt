@@ -180,9 +180,9 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
         // Use RxJava Debounce to avoid making calls to the NetworkService on every text change event
         mDisposables.add(
             tietTo.textChanges()
+                .skipInitialValue()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .map { it.toString().trim() }
-                .filter { it.length > 1 }
                 .subscribe {
                     val id = mNetworkService!!.sendMessage(GetAccountByName(it!!), GetAccountByName.REQUIRED_API)
                     responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME
@@ -192,9 +192,9 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
         // Use RxJava Debounce to update the Amount error only after the user stops writing for > 500 ms
         mDisposables.add(
             tietAmount.textChanges()
+                .skipInitialValue()
                 .debounce(500, TimeUnit.MILLISECONDS)
-                .filter { it.isNotEmpty() }
-                .map { it.toString().trim().toDouble() }
+                .map { it.toString().trim() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { validateAmount(it!!) }
         )
@@ -370,17 +370,30 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
         }
     }
 
-    private fun validateAmount(amount: Double) {
+    private fun validateAmount(txtAmount: String) {
         if (mBalancesDetailsAdapter?.isEmpty != false) return
         val balance = mBalancesDetailsAdapter?.getItem(spAsset.selectedItemPosition) ?: return
         val currentAmount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
 
-        if (currentAmount < amount) {
-            tilAmount.error = getString(R.string.error__not_enough_funds)
-            isAmountCorrect = false
-        } else {
-            tilAmount.isErrorEnabled = false
-            isAmountCorrect = true
+        val amount: Double = try {
+            txtAmount.toDouble()
+        } catch (e: Exception) {
+            0.0
+        }
+
+        when {
+            currentAmount < amount -> {
+                tilAmount.error = getString(R.string.error__not_enough_funds)
+                isAmountCorrect = false
+            }
+            amount == 0.0 -> {
+                tilAmount.isErrorEnabled = false
+                isAmountCorrect = false
+            }
+            else -> {
+                tilAmount.isErrorEnabled = false
+                isAmountCorrect = true
+            }
         }
 
         enableDisableSendFAB()
