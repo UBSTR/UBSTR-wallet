@@ -10,9 +10,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.preference.PreferenceManager
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -108,6 +106,8 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
     private var destinationPublicKey: PublicKey? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        setHasOptionsMenu(true)
+
         return inflater.inflate(R.layout.fragment_send_transaction, container, false)
     }
 
@@ -445,6 +445,18 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             responseMap[id] =  RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS
         } else
             Log.d(TAG, "Network Service is not connected")
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_send_transaction, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item?.itemId == R.id.menu_info) {
+            context?.toast("Info")
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onResume() {
