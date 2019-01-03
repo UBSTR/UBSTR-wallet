@@ -186,7 +186,6 @@
             app:fabCustomSize="90dp"
             app:maxImageSize="70dp"
             app:srcCompat="@drawable/ic_arrow_forward"
-            android:backgroundTint="@color/colorSend"
             app:layout_constraintEnd_toEndOf="@id/vSend"
             app:layout_constraintTop_toTopOf="@+id/vSend" />
 

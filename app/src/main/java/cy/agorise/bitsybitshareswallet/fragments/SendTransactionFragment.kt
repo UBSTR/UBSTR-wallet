@@ -29,6 +29,8 @@ import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
+import cy.agorise.bitsybitshareswallet.utils.disable
+import cy.agorise.bitsybitshareswallet.utils.enable
 import cy.agorise.bitsybitshareswallet.viewmodels.BalanceDetailViewModel
 import cy.agorise.graphenej.*
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
@@ -160,7 +162,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
         }
 
         fabSendTransaction.setOnClickListener { startSendTransferOperation() }
-        fabSendTransaction.hide()
+        fabSendTransaction.disable(R.color.lightGray)
 
         authorityRepository = AuthorityRepository(context!!)
 
@@ -391,9 +393,9 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
     private fun enableDisableSendFAB() {
         if (isToAccountCorrect && isAmountCorrect)
-            fabSendTransaction.show()
+            fabSendTransaction.enable(R.color.colorSend)
         else
-            fabSendTransaction.hide()
+            fabSendTransaction.disable(R.color.lightGray)
     }
 
     private fun startSendTransferOperation() {
