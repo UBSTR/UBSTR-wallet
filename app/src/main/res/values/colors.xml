@@ -6,6 +6,8 @@
 
     <!-- Dark theme -->
     <color name="colorBackgroundFloating">#424242</color>
+    <color name="colorToolbarDark">#424242</color>
+    <color name="colorStatusBarDark">#212121</color>
 
     <color name="black">#000</color>
     <color name="gray">#888</color>
@@ -17,6 +19,5 @@
     <color name="colorReceiveDark">#1B5E20</color>
     <color name="colorSend">#D32F2F</color>
     <color name="colorSendDark">#B71C1C</color>
-    <color name="errorRed">#F44336</color>
     <color name="semiTransparent">#2888</color>
 </resources>

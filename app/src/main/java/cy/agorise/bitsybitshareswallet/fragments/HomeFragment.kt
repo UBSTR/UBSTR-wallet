@@ -23,20 +23,21 @@ class HomeFragment : Fragment() {
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
+
+        val nightMode = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean(Constants.KEY_NIGHT_MODE_ACTIVATED, false)
 
         // Sets the toolbar background color to primaryColor and forces shows the Bitsy icon to the left
         val toolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
         toolbar?.navigationIcon = resources.getDrawable(R.drawable.ic_bitsy_logo_2, null)
-        toolbar?.setBackgroundResource(R.color.colorPrimary)
+        toolbar?.setBackgroundResource(if (!nightMode) R.color.colorPrimary else R.color.colorToolbarDark)
 
         // Sets the status bar background color to a primaryColorDark
         val window = activity?.window
-        window?.statusBarColor = ContextCompat.getColor(context!!, R.color.colorPrimaryDark)
+        window?.statusBarColor = ContextCompat.getColor(context!!,
+            if (!nightMode) R.color.colorPrimaryDark else R.color.colorStatusBarDark)
 
         return inflater.inflate(R.layout.fragment_home, container, false)
     }

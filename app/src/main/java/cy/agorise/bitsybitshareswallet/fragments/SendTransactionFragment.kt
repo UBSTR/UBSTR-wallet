@@ -111,13 +111,17 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
 
+        val nightMode = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean(Constants.KEY_NIGHT_MODE_ACTIVATED, false)
+
         // Sets the toolbar background color to red
         val toolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
-        toolbar?.setBackgroundResource(R.color.colorSend)
+        toolbar?.setBackgroundResource(if (!nightMode) R.color.colorSend else R.color.colorToolbarDark)
 
         // Sets the status bar background color to a dark red
         val window = activity?.window
-        window?.statusBarColor = ContextCompat.getColor(context!!, R.color.colorSendDark)
+        window?.statusBarColor = ContextCompat.getColor(context!!,
+            if (!nightMode) R.color.colorSendDark else R.color.colorStatusBarDark)
 
         return inflater.inflate(R.layout.fragment_send_transaction, container, false)
     }

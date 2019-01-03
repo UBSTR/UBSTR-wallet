@@ -95,13 +95,17 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
 
+        val nightMode = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean(Constants.KEY_NIGHT_MODE_ACTIVATED, false)
+
         // Sets the toolbar background color to green
         val toolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
-        toolbar?.setBackgroundResource(R.color.colorReceive)
+        toolbar?.setBackgroundResource(if (!nightMode) R.color.colorReceive else R.color.colorToolbarDark)
 
         // Sets the status bar background color to a dark green
         val window = activity?.window
-        window?.statusBarColor = ContextCompat.getColor(context!!, R.color.colorReceiveDark)
+        window?.statusBarColor = ContextCompat.getColor(context!!,
+            if (!nightMode) R.color.colorReceiveDark else R.color.colorStatusBarDark)
 
         return inflater.inflate(R.layout.fragment_receive_transaction, container, false)
     }
