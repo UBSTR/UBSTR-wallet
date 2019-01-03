@@ -68,7 +68,7 @@ class HomeFragment : Fragment() {
         // Navigate to the Send Transaction Fragment using Navigation's SafeArgs to activate the camera
         fabSendTransactionCamera.setOnClickListener {
             val action = HomeFragmentDirections.sendActionCamera()
-            action.setOpenCamera(true)
+            action.openCamera = true
             findNavController().navigate(action)
         }
 
