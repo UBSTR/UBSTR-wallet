@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -93,6 +94,14 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
+
+        // Sets the toolbar background color to green
+        val toolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
+        toolbar?.setBackgroundResource(R.color.colorReceive)
+
+        // Sets the status bar background color to a dark green
+        val window = activity?.window
+        window?.statusBarColor = ContextCompat.getColor(context!!, R.color.colorReceiveDark)
 
         return inflater.inflate(R.layout.fragment_receive_transaction, container, false)
     }

@@ -3,9 +3,9 @@ package cy.agorise.bitsybitshareswallet.fragments
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.util.Log
 import android.view.*
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -29,8 +29,14 @@ class HomeFragment : Fragment() {
     ): View? {
         setHasOptionsMenu(true)
 
+        // Sets the toolbar background color to primaryColor and forces shows the Bitsy icon to the left
         val toolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
         toolbar?.navigationIcon = resources.getDrawable(R.drawable.ic_bitsy_logo_2, null)
+        toolbar?.setBackgroundResource(R.color.colorPrimary)
+
+        // Sets the status bar background color to a primaryColorDark
+        val window = activity?.window
+        window?.statusBarColor = ContextCompat.getColor(context!!, R.color.colorPrimaryDark)
 
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
