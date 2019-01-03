@@ -17,6 +17,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
 import com.google.common.primitives.UnsignedLong
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
@@ -453,7 +455,10 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == R.id.menu_info) {
-            context?.toast("Info")
+            MaterialDialog(context!!).show {
+                customView(R.layout.dialog_send_transaction_info, scrollable = true)
+                positiveButton(android.R.string.ok) { dismiss() }
+            }
             return true
         }
         return super.onOptionsItemSelected(item)

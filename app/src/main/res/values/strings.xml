@@ -51,6 +51,28 @@
     <string name="text__transaction_sent">Transaction sent!</string>
     <string name="msg__transaction_not_sent">Unable to send transaction</string>
 
+    <!-- Send Transaction info dialog -->
+    <string name="msg__to_explanation">Type in the Bitshares account name of the person you want to send funds
+        to.\nFor example: agorise-faucet
+    </string>
+    <string name="text__asset_balance">Asset Balance</string>
+    <string name="msg__asset_balance_explanation">You can tap on the balance displayed to send all of that asset. Doing
+        so will fill in the Amount field for you.
+    </string>
+    <string name="msg__memo_explanation">Entering a Memo is not required, but taking notes on why you sent the funds is
+        nice for future reference. Memos are only visible to you and the person whom you sent funds to.
+    </string>
+    <string name="text__network_fee">Network Fee</string>
+    <string name="msg__network_fee_explanation">The Network fee is included in the amount that you want to send. For
+        example, if you want to send 50 BTS, BiTSy will actually send ~50.21 BTS. The added 0.21 in this example is the
+        Bitshares transaction fee plus 0.01% to the BiTSy Developer Team (typically ~1 cent).
+    </string>
+    <string name="text__qr_code">QR Code</string>
+    <string name="msg__qr_code_explanation">You do not need to scan someone’s QR to send funds, but it does help you to
+        avoid mistakes. Once you send funds from your account, they are gone forever, so always make sure the account
+        name in the “To” field is correct.
+    </string>
+
     <!-- Receive Transaction -->
     <string name="text__asset">Asset</string>
     <string name="text__other">Other…</string>
