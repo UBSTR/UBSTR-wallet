@@ -400,10 +400,13 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
     }
 
     private fun enableDisableSendFAB() {
-        if (isToAccountCorrect && isAmountCorrect)
+        if (isToAccountCorrect && isAmountCorrect) {
             fabSendTransaction.enable(R.color.colorSend)
-        else
+            vSend.setBackgroundResource(R.drawable.send_fab_background)
+        } else {
             fabSendTransaction.disable(R.color.lightGray)
+            vSend.setBackgroundResource(R.drawable.send_fab_background_disabled)
+        }
     }
 
     private fun startSendTransferOperation() {

@@ -172,7 +172,7 @@
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:layout_marginEnd="0dp"
-            android:background="@drawable/send_fab_background"
+            android:background="@drawable/send_fab_background_disabled"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/viewCamera"
             app:layout_constraintBottom_toBottomOf="@id/viewCamera"/>
