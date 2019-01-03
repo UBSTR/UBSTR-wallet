@@ -27,10 +27,7 @@ import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.BalancesDetailsAdapter
 import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
-import cy.agorise.bitsybitshareswallet.utils.Constants
-import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
-import cy.agorise.bitsybitshareswallet.utils.disable
-import cy.agorise.bitsybitshareswallet.utils.enable
+import cy.agorise.bitsybitshareswallet.utils.*
 import cy.agorise.bitsybitshareswallet.viewmodels.BalanceDetailViewModel
 import cy.agorise.graphenej.*
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
@@ -241,7 +238,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
         } else {
             mSelectedUserAccount = null
             destinationPublicKey = null
-            tilTo.error = "Invalid account"
+            tilTo.error = getString(R.string.error__invalid_account)
             isToAccountCorrect = false
         }
 
@@ -261,7 +258,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             val id = mNetworkService!!.sendMessage(GetRequiredFees(transaction!!, asset), GetRequiredFees.REQUIRED_API)
             responseMap[id] = RESPONSE_GET_REQUIRED_FEES
         } else {
-            // TODO unableToSendTransactionError()
+            context?.toast(getString(R.string.msg__transaction_not_sent))
         }
     }
 
@@ -273,14 +270,13 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             val id = mNetworkService!!.sendMessage(BroadcastTransaction(transaction), BroadcastTransaction.REQUIRED_API)
             responseMap[id] = RESPONSE_BROADCAST_TRANSACTION
         } else {
-            // TODO unableToSendTransactionError()
+            context?.toast(getString(R.string.msg__transaction_not_sent))
         }
     }
 
     private fun handleBroadcastTransaction(message: JsonRpcResponse<*>) {
         if (message.result == null && message.error == null) {
-            // TODO extract string resources
-            Toast.makeText(context!!, "Transaction sent!", Toast.LENGTH_SHORT).show()
+            context?.toast(getString(R.string.text__transaction_sent))
 
             // Remove information from the text fields and disable send button
             tietTo.setText("")
@@ -289,9 +285,10 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             isToAccountCorrect = false
             isAmountCorrect = false
             enableDisableSendFAB()
+
+            // TODO return to Main fragment ??
         } else {
-            // TODO extract error messages to show a better explanation to the user
-            Toast.makeText(context!!, message.error.message, Toast.LENGTH_LONG).show()
+            context?.toast(message.error.message, Toast.LENGTH_LONG)
         }
     }
 
@@ -313,8 +310,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 startCameraPreview()
             } else {
-                // TODO extract string resource
-                Toast.makeText(context!!, "Camera permission is necessary to read QR codes.", Toast.LENGTH_SHORT).show()
+                context?.toast(getString(R.string.msg__camera_permission_necessary))
             }
             return
         }
@@ -380,8 +376,7 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
         val currentAmount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
 
         if (currentAmount < amount) {
-            // TODO extract string resource
-            tilAmount.error = "Not enough funds"
+            tilAmount.error = getString(R.string.error__not_enough_funds)
             isAmountCorrect = false
         } else {
             tilAmount.isErrorEnabled = false

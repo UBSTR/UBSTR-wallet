@@ -49,11 +49,18 @@
     <string name="title_filter">Filter</string>
     <string name="title_export">Export</string>
 
-    <!-- Send & Receive Transaction -->
+    <!-- Send Transaction -->
     <string name="text__to">To</string>
     <string name="text__amount">Amount</string>
     <string name="text__memo">Memo</string>
     <string name="text__scan_qr">Scan QR</string>
+    <string name="error__invalid_account">Invalid account</string>
+    <string name="error__not_enough_funds">Not enough funds</string>
+    <string name="msg__camera_permission_necessary">Camera permission is necessary to read QR codes.</string>
+    <string name="text__transaction_sent">Transaction sent!</string>
+    <string name="msg__transaction_not_sent">Unable to send transaction</string>
+
+    <!-- Receive Transaction -->
     <string name="text__asset">Asset</string>
     <string name="text__other">Other…</string>
     <string name="template__please_send">Please Send: %1$s %2$s</string>
@@ -82,6 +89,5 @@
         https://github.com/Agorise
     </string>
     <string name="title__bitshares_nodes_dialog">Block: %1$s</string>
-
 
 </resources>
