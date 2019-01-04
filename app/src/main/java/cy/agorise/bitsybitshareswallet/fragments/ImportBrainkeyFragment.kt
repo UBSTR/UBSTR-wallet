@@ -1,10 +1,13 @@
-package cy.agorise.bitsybitshareswallet.activities
+package cy.agorise.bitsybitshareswallet.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
-import android.widget.Toast
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
+import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.jakewharton.rxbinding3.widget.textChanges
@@ -14,6 +17,7 @@ import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.repositories.UserAccountRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
+import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.graphenej.*
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.calls.GetAccounts
@@ -21,25 +25,20 @@ import cy.agorise.graphenej.api.calls.GetKeyReferences
 import cy.agorise.graphenej.models.AccountProperties
 import cy.agorise.graphenej.models.JsonRpcResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.activity_import_brainkey.*
+import kotlinx.android.synthetic.main.fragment_import_brainkey.*
 import org.bitcoinj.core.ECKey
 import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 
-// TODO add progress bar or something while the user waits for the import response from the node
+class ImportBrainkeyFragment : ConnectedFragment() {
+    companion object {
+        private const val TAG = "ImportBrainkeyActivity"
+    }
 
-class ImportBrainkeyActivity : ConnectedActivity() {
-    private val TAG = "ImportBrainkeyActivity"
-
-    /**
-     * Private variable that will hold an instance of the [BrainKey] class
-     */
+    /** Private variable that will hold an instance of the [BrainKey] class */
     private var mBrainKey: BrainKey? = null
 
-    /**
-     * User account associated with the key derived from the brainkey that the user just typed in
-     */
+    /** User account associated with the key derived from the brainkey that the user just typed in */
     private var mUserAccount: UserAccount? = null
 
     /**
@@ -53,15 +52,20 @@ class ImportBrainkeyActivity : ConnectedActivity() {
     private var keyReferencesRequestId: Long = 0
     private var getAccountsRequestId: Long = 0
 
-    private var mDisposables = CompositeDisposable()
-
     private var isPINValid = false
     private var isPINConfirmationValid = false
     private var isBrainKeyValid = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_import_brainkey)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        // Remove up navigation icon from the toolbar
+        val toolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
+        toolbar?.navigationIcon = null
+
+        return inflater.inflate(R.layout.fragment_import_brainkey, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         // Use RxJava Debounce to update the PIN error only after the user stops writing for > 500 ms
         mDisposables.add(
@@ -202,7 +206,7 @@ class ImportBrainkeyActivity : ConnectedActivity() {
             } else {
                 if (accountList.isEmpty()) {
                     //hideDialog()
-                    Toast.makeText(applicationContext, R.string.error__invalid_brainkey, Toast.LENGTH_SHORT).show()
+                    context?.toast(getString(R.string.error__invalid_brainkey))
                 } else {
                     if (accountList.size == 1) {
                         // If we only found one account linked to this key, then we just proceed
@@ -231,7 +235,7 @@ class ImportBrainkeyActivity : ConnectedActivity() {
                     candidates.add(accountProperties.name)
                 }
 //                hideDialog()
-                MaterialDialog(this)
+                MaterialDialog(context!!)
                     .title(R.string.dialog__account_candidates_title)
                     .message(R.string.dialog__account_candidates_content)
                     .listItemsSingleChoice (items = candidates, initialSelection = -1) { _, index, _ ->
@@ -251,7 +255,7 @@ class ImportBrainkeyActivity : ConnectedActivity() {
             } else if (accountPropertiesList.size == 1) {
                 onAccountSelected(accountPropertiesList[0])
             } else {
-                Toast.makeText(applicationContext, R.string.error__try_again, Toast.LENGTH_SHORT).show()
+                context?.toast(getString(R.string.error__try_again))
             }
         }
     }
@@ -273,10 +277,10 @@ class ImportBrainkeyActivity : ConnectedActivity() {
     private fun onAccountSelected(accountProperties: AccountProperties) {
         mUserAccount!!.name = accountProperties.name
 
-        val encryptedPIN = CryptoUtils.encrypt(this, tietPin.text!!.toString())
+        val encryptedPIN = CryptoUtils.encrypt(context!!, tietPin.text!!.toString())
 
         // Stores the user selected PIN encrypted
-        PreferenceManager.getDefaultSharedPreferences(this)
+        PreferenceManager.getDefaultSharedPreferences(context!!)
             .edit()
             .putString(Constants.KEY_ENCRYPTED_PIN, encryptedPIN)
             .apply()
@@ -288,14 +292,12 @@ class ImportBrainkeyActivity : ConnectedActivity() {
 
         val userAccount = cy.agorise.bitsybitshareswallet.database.entities.UserAccount(id, name, isLTM)
 
-        val userAccountRepository = UserAccountRepository(application)
+        val userAccountRepository = UserAccountRepository(context!!.applicationContext)
         userAccountRepository.insert(userAccount)
 
         // Stores the id of the currently active user account
-        PreferenceManager.getDefaultSharedPreferences(this)
-            .edit()
-            .putString(Constants.KEY_CURRENT_ACCOUNT_ID, mUserAccount!!.objectId)
-            .apply()
+        PreferenceManager.getDefaultSharedPreferences(context!!).edit()
+            .putString(Constants.KEY_CURRENT_ACCOUNT_ID, mUserAccount!!.objectId).apply()
 
         // Trying to store all possible authorities (owner, active and memo) into the database
         val ownerAuthority = accountProperties.owner
@@ -317,17 +319,8 @@ class ImportBrainkeyActivity : ConnectedActivity() {
             }
         }
 
-        // Stores a flag into the SharedPreferences to tell the app there is an active account and there is no need
-        // to show this activity again, until the account is removed.
-        PreferenceManager.getDefaultSharedPreferences(this)
-            .edit()
-            .putBoolean(Constants.KEY_INITIAL_SETUP_DONE, true)
-            .apply()
-
-        // Send the user to the MainActivity
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        finish()
+        // Send the user back to HomeFragment
+        findNavController().popBackStack()
     }
 
     /**
@@ -338,19 +331,13 @@ class ImportBrainkeyActivity : ConnectedActivity() {
         val wif = brainKey.walletImportFormat
         val sequenceNumber = brainKey.sequenceNumber
 
-        val encryptedBrainKey = CryptoUtils.encrypt(this, brainKeyWords)
-        val encryptedSequenceNumber = CryptoUtils.encrypt(this, sequenceNumber.toString())
-        val encryptedWIF = CryptoUtils.encrypt(this, wif)
+        val encryptedBrainKey = CryptoUtils.encrypt(context!!, brainKeyWords)
+        val encryptedSequenceNumber = CryptoUtils.encrypt(context!!, sequenceNumber.toString())
+        val encryptedWIF = CryptoUtils.encrypt(context!!, wif)
 
         val authority = Authority(0, userId, authorityType, encryptedWIF, encryptedBrainKey, encryptedSequenceNumber)
 
-        val authorityRepository = AuthorityRepository(this)
+        val authorityRepository = AuthorityRepository(context!!)
         authorityRepository.insert(authority)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        if (!mDisposables.isDisposed) mDisposables.dispose()
     }
 }

@@ -43,24 +43,12 @@ class LicenseFragment : Fragment() {
 
     /**
      * This function stores the version of the current accepted license version into the Shared Preferences and
-     * sends the user to import/create account if there is no active account or to the MainActivity otherwise.
+     * sends the user to import/create account.
      */
     private fun agree() {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
             .putInt(Constants.KEY_LAST_AGREED_LICENSE_VERSION, Constants.CURRENT_LICENSE_VERSION).apply()
 
-//        val intent : Intent?
-//
-//        val initialSetupDone = PreferenceManager.getDefaultSharedPreferences(this)
-//            .getBoolean(Constants.KEY_INITIAL_SETUP_DONE, false)
-//
-//        intent = if (!initialSetupDone)
-//            Intent(this, ImportBrainkeyActivity::class.java)
-//        else
-//            Intent(this, MainActivity::class.java)
-//
-//
-//        startActivity(intent)
-//        finish()
+        findNavController().navigate(R.id.import_brainkey_action)
     }
 }

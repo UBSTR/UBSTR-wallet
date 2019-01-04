@@ -111,4 +111,13 @@ class MainActivity : ConnectedActivity() {
     override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) {
 
     }
+
+    override fun onBackPressed() {
+        // Trick used to avoid crashes when the user is in the License or ImportBrainkey and presses the back button
+        val currentDestination=NavHostFragment.findNavController(navHostFragment).currentDestination
+        when(currentDestination?.id) {
+            R.id.license_dest, R.id.import_brainkey_dest -> finish()
+            else -> super.onBackPressed()
+        }
+    }
 }
