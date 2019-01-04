@@ -45,13 +45,22 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Get version number of the last agreed license version
+        val agreedLicenseVersion = PreferenceManager.getDefaultSharedPreferences(context)
+            .getInt(Constants.KEY_LAST_AGREED_LICENSE_VERSION, 0)
+
+        val userId = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "") ?: ""
+
+        if (agreedLicenseVersion != Constants.CURRENT_LICENSE_VERSION || userId == "") {
+            findNavController().navigate(R.id.setup_action)
+            return
+        }
+
         // Configure UserAccountViewModel to show the current account
         mUserAccountViewModel = ViewModelProviders.of(this).get(UserAccountViewModel::class.java)
 
-        val userId = PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "")
-
-        mUserAccountViewModel.getUserAccount(userId!!).observe(this, Observer<UserAccount>{ user ->
+        mUserAccountViewModel.getUserAccount(userId).observe(this, Observer<UserAccount>{ user ->
             tvAccountName.text = user.name
         })
 

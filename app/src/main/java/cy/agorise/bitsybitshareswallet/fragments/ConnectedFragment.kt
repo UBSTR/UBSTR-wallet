@@ -20,7 +20,7 @@ import io.reactivex.disposables.CompositeDisposable
  * Base fragment that defines the methods and variables commonly used in all fragments that directly connect and
  * talk to the BitShares nodes through graphenej's NetworkService
  */
-abstract class ConnectedFragment: Fragment(), ServiceConnection {
+abstract class ConnectedFragment : Fragment(), ServiceConnection {
 
     companion object {
         private const val TAG = "ConnectedFragment"

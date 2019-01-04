@@ -35,6 +35,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/setup_action"
+            app:destination="@id/navigation_setup"
+            app:popUpTo="@id/home_dest"
+            app:popUpToInclusive="true"/>
+
     </fragment>
 
     <fragment
@@ -72,5 +79,17 @@
             app:argType="boolean"
             android:defaultValue="false" />
     </fragment>
+
+    <navigation
+        android:id="@+id/navigation_setup"
+        app:startDestination="@id/license_dest">
+
+        <fragment
+            android:id="@+id/license_dest"
+            android:name="cy.agorise.bitsybitshareswallet.fragments.LicenseFragment"
+            android:label="LicenseFragment"
+            tools:layout="@layout/fragment_license"/>
+
+    </navigation>
 
 </navigation>

@@ -44,7 +44,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activities.LicenseActivity"/>
         <activity android:name=".activities.ImportBrainkeyActivity"/>
         <activity
             android:name=".activities.MainActivity"
