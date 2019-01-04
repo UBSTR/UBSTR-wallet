@@ -40,16 +40,21 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 /**
- * Class in charge of managing the connection to graphenej's NetworkService
+ * The app uses the single Activity methodology, but this activity was created so that MainActivity can extend from it.
+ * This class manages everything related to keeping the information in the database updated using graphenej's
+ * NetworkService, leaving to MainActivity only the Navigation work and some other UI features.
  */
 abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
-    private val TAG = this.javaClass.simpleName
 
-    private val RESPONSE_GET_FULL_ACCOUNTS = 1
-    private val RESPONSE_GET_ACCOUNTS = 2
-    private val RESPONSE_GET_ACCOUNT_BALANCES = 3
-    private val RESPONSE_GET_ASSETS = 4
-    private val RESPONSE_GET_BLOCK_HEADER = 5
+    companion object {
+        private const val TAG = "ConnectedActivity"
+
+        private const val RESPONSE_GET_FULL_ACCOUNTS = 1
+        private const val RESPONSE_GET_ACCOUNTS = 2
+        private const val RESPONSE_GET_ACCOUNT_BALANCES = 3
+        private const val RESPONSE_GET_ASSETS = 4
+        private const val RESPONSE_GET_BLOCK_HEADER = 5
+    }
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
     private lateinit var mBalanceViewModel: BalanceViewModel
@@ -141,8 +146,6 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
     private fun handleIncomingMessage(message: Any?) {
         if (message is JsonRpcResponse<*>) {
-            // Generic processing taken care by subclasses
-            handleJsonRpcResponse(message)
 
             if (message.error == null) {
                 if (responseMap.containsKey(message.id)) {
@@ -178,7 +181,6 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                 ).show()
             }
         } else if (message is ConnectionStatusUpdate) {
-            handleConnectionStatusUpdate(message)
             if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
                 // If we got a disconnection notification, we should clear our response map, since
                 // all its stored request ids will now be reset
@@ -405,16 +407,4 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         super.onDestroy()
         if (!mDisposable!!.isDisposed) mDisposable!!.dispose()
     }
-
-    /**
-     * Method to be implemented by all subclasses in order to be notified of JSON-RPC responses.
-     * @param response
-     */
-    internal abstract fun handleJsonRpcResponse(response: JsonRpcResponse<*>)
-
-    /**
-     * Method to be implemented by all subclasses in order to be notified of connection status updates
-     * @param connectionStatusUpdate
-     */
-    internal abstract fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate)
 }
