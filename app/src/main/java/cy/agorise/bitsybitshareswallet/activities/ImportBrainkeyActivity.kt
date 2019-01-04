@@ -27,7 +27,6 @@ import org.bitcoinj.core.ECKey
 import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 
-// TODO Add method to load the 20? most important assets
 // TODO add progress bar or something while the user waits for the import response from the node
 
 class ImportBrainkeyActivity : ConnectedActivity() {

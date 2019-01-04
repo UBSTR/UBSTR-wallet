@@ -1,13 +1,8 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
 import android.Manifest
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.IBinder
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.*
@@ -15,7 +10,6 @@ import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.afollestad.materialdialogs.MaterialDialog
@@ -32,8 +26,6 @@ import cy.agorise.bitsybitshareswallet.utils.*
 import cy.agorise.bitsybitshareswallet.viewmodels.BalanceDetailViewModel
 import cy.agorise.graphenej.*
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
-import cy.agorise.graphenej.api.android.NetworkService
-import cy.agorise.graphenej.api.android.RxBus
 import cy.agorise.graphenej.api.calls.BroadcastTransaction
 import cy.agorise.graphenej.api.calls.GetAccountByName
 import cy.agorise.graphenej.api.calls.GetDynamicGlobalProperties
@@ -43,7 +35,6 @@ import cy.agorise.graphenej.models.DynamicGlobalProperties
 import cy.agorise.graphenej.models.JsonRpcResponse
 import cy.agorise.graphenej.operations.TransferOperationBuilder
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_send_transaction.*
 import me.dm7.barcodescanner.zxing.ZXingScannerView
@@ -57,7 +48,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.crypto.AEADBadTagException
 
-class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, ServiceConnection {
+class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHandler {
     private val TAG = this.javaClass.simpleName
 
     // Camera Permission
@@ -85,14 +76,6 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
 
     /** User account to which send the funds */
     private var mSelectedUserAccount: UserAccount? = null
-
-    private var mDisposables = CompositeDisposable()
-
-    /* Network service connection */
-    private var mNetworkService: NetworkService? = null
-
-    /** Flag used to keep track of the NetworkService binding state */
-    private var mShouldUnbindNetwork: Boolean = false
 
     // Map used to keep track of request and response id pairs
     private val responseMap = HashMap<Long, Int>()
@@ -213,34 +196,26 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { validateAmount(it!!) }
         )
-
-        // Connect to the RxBus, which receives events from the NetworkService
-        mDisposables.add(
-            RxBus.getBusInstance()
-                .asFlowable()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { handleIncomingMessage(it) }
-        )
     }
 
-    private fun handleIncomingMessage(message: Any?) {
-        if (message is JsonRpcResponse<*>) {
-            if (responseMap.containsKey(message.id)) {
-                val responseType = responseMap[message.id]
-                when (responseType) {
-                    RESPONSE_GET_ACCOUNT_BY_NAME            -> handleAccountName(message.result)
-                    RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS  -> handleDynamicGlobalProperties(message.result)
-                    RESPONSE_GET_REQUIRED_FEES              -> handleRequiredFees(message.result)
-                    RESPONSE_BROADCAST_TRANSACTION          -> handleBroadcastTransaction(message)
-                }
-                responseMap.remove(message.id)
+    override fun handleJsonRpcResponse(response: JsonRpcResponse<*>) {
+        if (responseMap.containsKey(response.id)) {
+            val responseType = responseMap[response.id]
+            when (responseType) {
+                RESPONSE_GET_ACCOUNT_BY_NAME            -> handleAccountName(response.result)
+                RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS  -> handleDynamicGlobalProperties(response.result)
+                RESPONSE_GET_REQUIRED_FEES              -> handleRequiredFees(response.result)
+                RESPONSE_BROADCAST_TRANSACTION          -> handleBroadcastTransaction(response)
             }
-        } else if (message is ConnectionStatusUpdate) {
-            if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
-                // If we got a disconnection notification, we should clear our response map, since
-                // all its stored request ids will now be reset
-                responseMap.clear()
-            }
+            responseMap.remove(response.id)
+        }
+    }
+
+    override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) {
+        if (connectionStatusUpdate.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
+            // If we got a disconnection notification, we should clear our response map, since
+            // all its stored request ids will now be reset
+            responseMap.clear()
         }
     }
 
@@ -481,39 +456,12 @@ class SendTransactionFragment : Fragment(), ZXingScannerView.ResultHandler, Serv
         super.onResume()
         if (isCameraPreviewVisible)
             startCameraPreview()
-
-        val intent = Intent(context, NetworkService::class.java)
-        if (context?.bindService(intent, this, Context.BIND_AUTO_CREATE) == true) {
-            mShouldUnbindNetwork = true
-        } else {
-            Log.e(TAG, "Binding to the network service failed.")
-        }
     }
 
     override fun onPause() {
         super.onPause()
 
-        // Unbinding from network service
-        if (mShouldUnbindNetwork) {
-            context?.unbindService(this)
-            mShouldUnbindNetwork = false
-        }
-
         if (!isCameraPreviewVisible)
             stopCameraPreview()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        if (!mDisposables.isDisposed) mDisposables.dispose()
-    }
-
-    override fun onServiceDisconnected(name: ComponentName?) { }
-
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        // We've bound to LocalService, cast the IBinder and get LocalService instance
-        val binder = service as NetworkService.LocalBinder
-        mNetworkService = binder.service
     }
 }
