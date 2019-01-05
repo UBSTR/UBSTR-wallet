@@ -27,6 +27,7 @@
 
     <!-- Create Account -->
     <string name="text__bitshares_account_name">BitShares account name</string>
+    <string name="error__read_dict_file">Error reading dictionary file</string>
 
     <!-- Home -->
     <string name="title_transactions">Transactions</string>
