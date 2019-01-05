@@ -6,7 +6,7 @@
     <string name="button__agree">Agree</string>
     <string name="button__disagree">Disagree</string>
 
-    <!-- Import Brainkey Activity -->
+    <!-- Import Brainkey -->
     <string name="text_field__6_digit_pin">6+ digits PIN</string>
     <string name="error__pin_too_short">PIN too short</string>
     <string name="text_field__confirm_pin">Confirm PIN</string>
@@ -24,6 +24,9 @@
     <string name="dialog__account_candidates_content">The keys derived from this brainkey seem to be used to control
         more than one account, please select which account you wish to import
     </string>
+
+    <!-- Create Account -->
+    <string name="text__bitshares_account_name">BitShares account name</string>
 
     <!-- Home -->
     <string name="title_transactions">Transactions</string>
@@ -93,10 +96,10 @@
     <string name="msg__brainkey_description">BrainKey. Account recovery words that can be captured or copied, but not
         edited.
     </string>
-    <string name="msg__brainkey_info">Print this out, or write it down. Anyone with access to your recovery key will
-        have access to funds within this wallet.
+    <string name="msg__brainkey_info">Write this down! Be sure you have 2 copies of this BrainKey in 2 secure locations
+        in case of fire or loss. Security First! Anyone with access to your BrainKey can access the funds in your account!
     </string>
-    <string name="btn__view_and_copy"><![CDATA[View & Copy]]></string>
+    <string name="button__view_and_copy"><![CDATA[View & Copy]]></string>
     <string name="title__bugs_or_ideas">Bugs or Ideas?</string>
     <string name="msg__bugs_or_ideas">Telegram chat: http://t.me/Agorise\nEmail: Agorise@protonmail.ch\nOpen Source:
         https://github.com/Agorise

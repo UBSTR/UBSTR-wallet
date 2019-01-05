@@ -100,7 +100,23 @@
             android:id="@+id/import_brainkey_dest"
             android:name="cy.agorise.bitsybitshareswallet.fragments.ImportBrainkeyFragment"
             android:label="@string/app_name"
-            tools:layout="@layout/fragment_import_brainkey"/>
+            tools:layout="@layout/fragment_import_brainkey">
+
+            <action
+                android:id="@+id/create_account_action"
+                app:destination="@id/create_account_dest"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left"
+                app:popExitAnim="@anim/slide_out_right"/>
+
+        </fragment>
+
+        <fragment
+            android:id="@+id/create_account_dest"
+            android:name="cy.agorise.bitsybitshareswallet.fragments.CreateAccountFragment"
+            android:label="@string/app_name"
+            tools:layout="@layout/fragment_create_account"/>
 
     </navigation>
 

@@ -83,7 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_same_topic"
-                android:text="@string/btn__view_and_copy"/>
+                android:text="@string/button__view_and_copy"/>
 
             <!-- Bugs or Ideas -->
 
