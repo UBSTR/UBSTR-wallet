@@ -5,17 +5,22 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
+import com.jakewharton.rxbinding3.widget.textChanges
 import cy.agorise.bitsybitshareswallet.R
+import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.graphenej.Address
 import cy.agorise.graphenej.BrainKey
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.models.JsonRpcResponse
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_create_account.*
 import org.bitcoinj.core.ECKey
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.util.concurrent.TimeUnit
 
 class CreateAccountFragment : ConnectedFragment() {
 
@@ -28,6 +33,11 @@ class CreateAccountFragment : ConnectedFragment() {
     private lateinit var mBrainKey: BrainKey
     private lateinit var mAddress: String
 
+    /** Variables used to store the validation status of the form fields */
+    private var isPINValid = false
+    private var isPINConfirmationValid = false
+    private var isAccountValid = true // TODO make false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
 
@@ -37,8 +47,62 @@ class CreateAccountFragment : ConnectedFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Use RxJava Debounce to update the PIN error only after the user stops writing for > 500 ms
+        mDisposables.add(
+            tietPin.textChanges()
+                .skipInitialValue()
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { validatePIN() }
+        )
+
+        // Use RxJava Debounce to update the PIN Confirmation error only after the user stops writing for > 500 ms
+        mDisposables.add(
+            tietPinConfirmation.textChanges()
+                .skipInitialValue()
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { validatePINConfirmation() }
+        )
+
+        btnCancel.setOnClickListener { findNavController().navigateUp() }
+
+        btnCreate.isEnabled = false
+
         // Generating BrainKey
         generateKeys()
+    }
+
+    private fun validatePIN() {
+        val pin = tietPin.text.toString()
+
+        if (pin.length < Constants.MIN_PIN_LENGTH) {
+            tilPin.error = getString(R.string.error__pin_too_short)
+            isPINValid = false
+        } else {
+            tilPin.isErrorEnabled = false
+            isPINValid = true
+        }
+
+        validatePINConfirmation()
+    }
+
+    private fun validatePINConfirmation() {
+        val pinConfirmation = tietPinConfirmation.text.toString()
+
+        if (pinConfirmation != tietPin.text.toString()) {
+            tilPinConfirmation.error = getString(R.string.error__pin_mismatch)
+            isPINConfirmationValid = false
+        } else {
+            tilPinConfirmation.isErrorEnabled = false
+            isPINConfirmationValid = true
+        }
+
+        enableDisableCreateButton()
+    }
+
+    private fun enableDisableCreateButton() {
+        btnCreate.isEnabled =  (isPINValid && isPINConfirmationValid && isAccountValid)
     }
 
     override fun handleJsonRpcResponse(response: JsonRpcResponse<*>) {
