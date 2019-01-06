@@ -28,6 +28,8 @@
     <!-- Create Account -->
     <string name="text__bitshares_account_name">BitShares account name</string>
     <string name="error__read_dict_file">Error reading dictionary file</string>
+    <string name="error__invalid_account_name">The account name has to either have more than 8 characters, contain a number or have no vowels. The underscore character is also not allowed. </string>
+    <string name="text__verifying_account_availability">Verifying account availability…</string>
 
     <!-- Home -->
     <string name="title_transactions">Transactions</string>

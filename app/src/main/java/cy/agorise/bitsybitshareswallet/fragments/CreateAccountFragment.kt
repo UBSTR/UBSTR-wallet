@@ -9,6 +9,8 @@ import androidx.navigation.fragment.findNavController
 import com.jakewharton.rxbinding3.widget.textChanges
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.utils.Constants
+import cy.agorise.bitsybitshareswallet.utils.containsDigits
+import cy.agorise.bitsybitshareswallet.utils.containsVowels
 import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.graphenej.Address
 import cy.agorise.graphenej.BrainKey
@@ -28,6 +30,7 @@ class CreateAccountFragment : ConnectedFragment() {
         private const val TAG = "CreateAccountFragment"
 
         private const val BRAINKEY_FILE = "brainkeydict.txt"
+        private const val MIN_ACCOUNT_NAME_LENGTH = 8
     }
 
     private lateinit var mBrainKey: BrainKey
@@ -36,7 +39,7 @@ class CreateAccountFragment : ConnectedFragment() {
     /** Variables used to store the validation status of the form fields */
     private var isPINValid = false
     private var isPINConfirmationValid = false
-    private var isAccountValid = true // TODO make false
+    private var isAccountValidAndAvailable = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -46,6 +49,15 @@ class CreateAccountFragment : ConnectedFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Use RxJava Debounce to check the validity and availability of the user's proposed account name
+        mDisposables.add(
+            tietAccountName.textChanges()
+                .skipInitialValue()
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { validateAccountName(it.toString()) }
+        )
 
         // Use RxJava Debounce to update the PIN error only after the user stops writing for > 500 ms
         mDisposables.add(
@@ -71,6 +83,31 @@ class CreateAccountFragment : ConnectedFragment() {
 
         // Generating BrainKey
         generateKeys()
+    }
+
+    private fun validateAccountName(accountName: String) {
+        isAccountValidAndAvailable = false
+
+        if ( !isAccountNameValid(accountName) ) {
+            tilAccountName.error = getString(R.string.error__invalid_account_name)
+            tilAccountName.helperText = ""
+        } else {
+            tilAccountName.isErrorEnabled = false
+            tilAccountName.helperText = getString(R.string.text__verifying_account_availability)
+        }
+
+        enableDisableCreateButton()
+    }
+
+    /**
+     * Method used to determine if the account name entered by the user is valid
+     * @param accountName   The proposed account name
+     * @return              True if the name is valid, false otherwise
+     */
+    private fun isAccountNameValid(accountName: String): Boolean {
+        return accountName.length >= MIN_ACCOUNT_NAME_LENGTH &&
+                (accountName.containsDigits() || !accountName.containsVowels()) &&
+                !accountName.contains("_")
     }
 
     private fun validatePIN() {
@@ -102,7 +139,7 @@ class CreateAccountFragment : ConnectedFragment() {
     }
 
     private fun enableDisableCreateButton() {
-        btnCreate.isEnabled =  (isPINValid && isPINConfirmationValid && isAccountValid)
+        btnCreate.isEnabled =  (isPINValid && isPINConfirmationValid && isAccountValidAndAvailable)
     }
 
     override fun handleJsonRpcResponse(response: JsonRpcResponse<*>) {
