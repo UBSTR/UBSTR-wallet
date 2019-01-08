@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.jakewharton.rxbinding3.widget.textChanges
 import cy.agorise.bitsybitshareswallet.R
+import cy.agorise.bitsybitshareswallet.network.FaucetService
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.containsDigits
 import cy.agorise.bitsybitshareswallet.utils.containsVowels
@@ -21,12 +22,20 @@ import cy.agorise.graphenej.models.JsonRpcResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_create_account.*
 import org.bitcoinj.core.ECKey
+import retrofit2.Callback
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
+import com.afollestad.materialdialogs.MaterialDialog
+import cy.agorise.bitsybitshareswallet.models.FaucetRequest
+import cy.agorise.bitsybitshareswallet.models.FaucetResponse
+import cy.agorise.bitsybitshareswallet.network.ServiceGenerator
+import retrofit2.Call
+import retrofit2.Response
 
-class CreateAccountFragment : ConnectedFragment() {
+
+class CreateAccountFragment : BaseAccountFragment() {
 
     companion object {
         private const val TAG = "CreateAccountFragment"
@@ -34,10 +43,12 @@ class CreateAccountFragment : ConnectedFragment() {
         private const val BRAINKEY_FILE = "brainkeydict.txt"
         private const val MIN_ACCOUNT_NAME_LENGTH = 8
 
-        private const val RESPONSE_GET_ACCOUNT_BY_NAME = 1
+        // Used when trying to validate that the account name is available
+        private const val RESPONSE_GET_ACCOUNT_BY_NAME_VALIDATION = 1
+        // Used when trying to obtain the info of the newly created account
+        private const val RESPONSE_GET_ACCOUNT_BY_NAME_CREATED = 2
     }
 
-    private lateinit var mBrainKey: BrainKey
     private lateinit var mAddress: String
 
     /** Variables used to store the validation status of the form fields */
@@ -87,6 +98,7 @@ class CreateAccountFragment : ConnectedFragment() {
         btnCancel.setOnClickListener { findNavController().navigateUp() }
 
         btnCreate.isEnabled = false
+        btnCreate.setOnClickListener { createAccount() }
 
         // Generating BrainKey
         generateKeys()
@@ -104,7 +116,7 @@ class CreateAccountFragment : ConnectedFragment() {
             val id = mNetworkService?.sendMessage(GetAccountByName(accountName), GetAccountByName.REQUIRED_API)
 
             if (id != null)
-                responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME
+                responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME_VALIDATION
         }
 
         enableDisableCreateButton()
@@ -157,7 +169,8 @@ class CreateAccountFragment : ConnectedFragment() {
         if (responseMap.containsKey(response.id)) {
             val responseType = responseMap[response.id]
             when (responseType) {
-                RESPONSE_GET_ACCOUNT_BY_NAME            -> handleAccountName(response.result)
+                RESPONSE_GET_ACCOUNT_BY_NAME_VALIDATION -> handleAccountNameValidation(response.result)
+                RESPONSE_GET_ACCOUNT_BY_NAME_CREATED    -> handleAccountNameCreated(response.result)
             }
             responseMap.remove(response.id)
         }
@@ -171,7 +184,7 @@ class CreateAccountFragment : ConnectedFragment() {
      * Handles the response from the NetworkService's GetAccountByName call to decide if the user's suggested
      * account is available or not.
      */
-    private fun handleAccountName(result: Any?) {
+    private fun handleAccountNameValidation(result: Any?) {
         if (result is AccountProperties) {
             tilAccountName.helperText = ""
             tilAccountName.error = getString(R.string.error__account_not_available)
@@ -186,6 +199,71 @@ class CreateAccountFragment : ConnectedFragment() {
     }
 
     /**
+     * Handles the response from the NetworkService's GetAccountByName call and stores the information of the newly
+     * created account if the result is successful, shows a toast error otherwise
+     */
+    private fun handleAccountNameCreated(result: Any?) {
+        if (result is AccountProperties) {
+            onAccountSelected(result, tietPin.text.toString())
+        } else {
+            context?.toast(getString(R.string.error__created_account_not_found))
+        }
+    }
+
+    /**
+     * Sends the account-creation request to the faucet server.
+     * Only account name and public address is sent here.
+     */
+    private fun createAccount() {
+        val accountName = tietAccountName.text.toString()
+        val faucetRequest = FaucetRequest(accountName, mAddress, Constants.FAUCET_REFERRER)
+
+        val sg = ServiceGenerator(Constants.FAUCET_URL)
+        val faucetService = sg.getService(FaucetService::class.java)
+
+        val call = faucetService.registerPrivateAccount(faucetRequest)
+
+        // Execute the call asynchronously. Get a positive or negative callback.
+        call.enqueue(object : Callback<FaucetResponse> {
+            override fun onResponse(call: Call<FaucetResponse>, response: Response<FaucetResponse>) {
+                // The network call was a success and we got a response
+                getCreatedAccountInfo(response.body())
+            }
+
+            override fun onFailure(call: Call<FaucetResponse>, t: Throwable) {
+                // the network call was a failure
+                MaterialDialog(context!!)
+                    .title(R.string.title_error)
+                    .message(cy.agorise.bitsybitshareswallet.R.string.error__faucet)
+                    .negativeButton(android.R.string.ok)
+                    .show()
+            }
+        })
+    }
+
+    private fun getCreatedAccountInfo(faucetResponse: FaucetResponse?) {
+        if (faucetResponse?.account != null) {
+            val id = mNetworkService?.sendMessage(GetAccountByName(faucetResponse.account?.name),
+                GetAccountByName.REQUIRED_API)
+
+            if (id != null)
+                responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME_CREATED
+        } else {
+            Log.d(TAG, "Private account creation failed ")
+            val content = if (faucetResponse?.error?.base?.size ?: 0 > 0) {
+                getString(R.string.error__faucet_template, faucetResponse?.error?.base?.get(0))
+            } else {
+                getString(R.string.error__faucet_template, "None")
+            }
+
+            MaterialDialog(context!!)
+                .title(R.string.title_error)
+                .message(text = content)
+                .show()
+        }
+    }
+
+    /**
      * Method that generates a fresh key that will be controlling the newly created account.
      */
     private fun generateKeys() {
@@ -197,11 +275,11 @@ class CreateAccountFragment : ConnectedFragment() {
 
             val brainKeySuggestion = BrainKey.suggest(dictionary)
             mBrainKey = BrainKey(brainKeySuggestion, 0)
-            val address = Address(ECKey.fromPublicOnly(mBrainKey.privateKey.pubKey))
+            val address = Address(ECKey.fromPublicOnly(mBrainKey?.privateKey?.pubKey))
             Log.d(TAG, "brain key: $brainKeySuggestion")
             Log.d(TAG, "address would be: " + address.toString())
             mAddress = address.toString()
-            tvBrainKey.text = mBrainKey.brainKey
+            tvBrainKey.text = mBrainKey?.brainKey
 
         } catch (e: IOException) {
             Log.e(TAG, "IOException while trying to generate key. Msg: " + e.message)

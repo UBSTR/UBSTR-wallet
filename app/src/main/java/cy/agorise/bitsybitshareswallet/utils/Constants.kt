@@ -14,6 +14,12 @@ object Constants {
     /** The minimum required length for a PIN number */
     const val MIN_PIN_LENGTH = 6
 
+    /** Name of the account passed to the faucet as the referrer */
+    const val FAUCET_REFERRER = "agorise"
+
+    /** Faucet URL used to create new accounts */
+    const val FAUCET_URL = "https://faucet.palmpay.io"
+
     /** The user selected encrypted PIN */
     const val KEY_ENCRYPTED_PIN = "key_encrypted_pin"
 

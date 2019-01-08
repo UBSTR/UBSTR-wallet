@@ -32,6 +32,10 @@
     <string name="text__verifying_account_availability">Verifying account availability…</string>
     <string name="error__account_not_available">Account not available</string>
     <string name="text__account_is_available">Account is available</string>
+    <string name="title_error">Error</string>
+    <string name="error__faucet">The server returned an error. This might be due to a limitation purposefully set in place to disallow frequent requests coming from the same IP address in a short time lapse. Please wait 5 minutes and try again, or switch to a different network, for example from wifi to cell.</string>
+    <string name="error__faucet_template">The faucet returned an error. Msg: %1$s</string>
+    <string name="error__created_account_not_found">The app could not retrieve information about the newly created account</string>
 
     <!-- Home -->
     <string name="title_transactions">Transactions</string>
