@@ -15,6 +15,8 @@ import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.graphenej.Address
 import cy.agorise.graphenej.BrainKey
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
+import cy.agorise.graphenej.api.calls.GetAccountByName
+import cy.agorise.graphenej.models.AccountProperties
 import cy.agorise.graphenej.models.JsonRpcResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_create_account.*
@@ -31,6 +33,8 @@ class CreateAccountFragment : ConnectedFragment() {
 
         private const val BRAINKEY_FILE = "brainkeydict.txt"
         private const val MIN_ACCOUNT_NAME_LENGTH = 8
+
+        private const val RESPONSE_GET_ACCOUNT_BY_NAME = 1
     }
 
     private lateinit var mBrainKey: BrainKey
@@ -40,6 +44,9 @@ class CreateAccountFragment : ConnectedFragment() {
     private var isPINValid = false
     private var isPINConfirmationValid = false
     private var isAccountValidAndAvailable = false
+
+    // Map used to keep track of request and response id pairs
+    private val responseMap = HashMap<Long, Int>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -54,7 +61,7 @@ class CreateAccountFragment : ConnectedFragment() {
         mDisposables.add(
             tietAccountName.textChanges()
                 .skipInitialValue()
-                .debounce(500, TimeUnit.MILLISECONDS)
+                .debounce(800, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { validateAccountName(it.toString()) }
         )
@@ -89,11 +96,15 @@ class CreateAccountFragment : ConnectedFragment() {
         isAccountValidAndAvailable = false
 
         if ( !isAccountNameValid(accountName) ) {
-            tilAccountName.error = getString(R.string.error__invalid_account_name)
             tilAccountName.helperText = ""
+            tilAccountName.error = getString(R.string.error__invalid_account_name)
         } else {
             tilAccountName.isErrorEnabled = false
             tilAccountName.helperText = getString(R.string.text__verifying_account_availability)
+            val id = mNetworkService?.sendMessage(GetAccountByName(accountName), GetAccountByName.REQUIRED_API)
+
+            if (id != null)
+                responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME
         }
 
         enableDisableCreateButton()
@@ -143,11 +154,35 @@ class CreateAccountFragment : ConnectedFragment() {
     }
 
     override fun handleJsonRpcResponse(response: JsonRpcResponse<*>) {
-        // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (responseMap.containsKey(response.id)) {
+            val responseType = responseMap[response.id]
+            when (responseType) {
+                RESPONSE_GET_ACCOUNT_BY_NAME            -> handleAccountName(response.result)
+            }
+            responseMap.remove(response.id)
+        }
     }
 
     override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) {
         // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    /**
+     * Handles the response from the NetworkService's GetAccountByName call to decide if the user's suggested
+     * account is available or not.
+     */
+    private fun handleAccountName(result: Any?) {
+        if (result is AccountProperties) {
+            tilAccountName.helperText = ""
+            tilAccountName.error = getString(R.string.error__account_not_available)
+            isAccountValidAndAvailable = false
+        } else {
+            tilAccountName.isErrorEnabled = false
+            tilAccountName.helperText = getString(R.string.text__account_is_available)
+            isAccountValidAndAvailable = true
+        }
+
+        enableDisableCreateButton()
     }
 
     /**
