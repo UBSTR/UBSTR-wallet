@@ -37,8 +37,8 @@
             app:popExitAnim="@anim/slide_out_right"/>
 
         <action
-            android:id="@+id/setup_action"
-            app:destination="@id/navigation_setup"/>
+            android:id="@+id/license_action"
+            app:destination="@id/license_dest"/>
 
     </fragment>
 
@@ -78,46 +78,48 @@
             android:defaultValue="false" />
     </fragment>
 
-    <navigation
-        android:id="@+id/navigation_setup"
-        app:startDestination="@id/license_dest">
+    <fragment
+        android:id="@+id/license_dest"
+        android:name="cy.agorise.bitsybitshareswallet.fragments.LicenseFragment"
+        android:label="@string/app_name"
+        tools:layout="@layout/fragment_license">
 
-        <fragment
-            android:id="@+id/license_dest"
-            android:name="cy.agorise.bitsybitshareswallet.fragments.LicenseFragment"
-            android:label="@string/app_name"
-            tools:layout="@layout/fragment_license">
+        <action
+            android:id="@+id/import_brainkey_action"
+            app:destination="@id/import_brainkey_dest"/>
 
-            <action
-                android:id="@+id/import_brainkey_action"
-                app:destination="@id/import_brainkey_dest"
-                app:popUpTo="@id/license_dest"
-                app:popUpToInclusive="true"/>
+    </fragment>
 
-        </fragment>
+    <fragment
+        android:id="@+id/import_brainkey_dest"
+        android:name="cy.agorise.bitsybitshareswallet.fragments.ImportBrainkeyFragment"
+        android:label="@string/app_name"
+        tools:layout="@layout/fragment_import_brainkey">
 
-        <fragment
-            android:id="@+id/import_brainkey_dest"
-            android:name="cy.agorise.bitsybitshareswallet.fragments.ImportBrainkeyFragment"
-            android:label="@string/app_name"
-            tools:layout="@layout/fragment_import_brainkey">
+        <action
+            android:id="@+id/create_account_action"
+            app:destination="@id/create_account_dest"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
 
-            <action
-                android:id="@+id/create_account_action"
-                app:destination="@id/create_account_dest"
-                app:enterAnim="@anim/slide_in_right"
-                app:exitAnim="@anim/slide_out_left"
-                app:popEnterAnim="@anim/slide_in_left"
-                app:popExitAnim="@anim/slide_out_right"/>
+        <action
+            android:id="@+id/home_action"
+            app:popUpTo="@id/home_dest"/>
 
-        </fragment>
+    </fragment>
 
-        <fragment
-            android:id="@+id/create_account_dest"
-            android:name="cy.agorise.bitsybitshareswallet.fragments.CreateAccountFragment"
-            android:label="@string/app_name"
-            tools:layout="@layout/fragment_create_account"/>
+    <fragment
+        android:id="@+id/create_account_dest"
+        android:name="cy.agorise.bitsybitshareswallet.fragments.CreateAccountFragment"
+        android:label="@string/app_name"
+        tools:layout="@layout/fragment_create_account">
 
-    </navigation>
+        <action
+            android:id="@+id/home_action"
+            app:popUpTo="@id/home_dest"/>
+
+    </fragment>
 
 </navigation>

@@ -2,6 +2,7 @@ package cy.agorise.bitsybitshareswallet.fragments
 
 import android.preference.PreferenceManager
 import androidx.navigation.fragment.findNavController
+import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.database.entities.Authority
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.repositories.UserAccountRepository
@@ -72,7 +73,7 @@ abstract class BaseAccountFragment : ConnectedFragment() {
         }
 
         // Send the user back to HomeFragment
-        findNavController().popBackStack()
+        findNavController().navigate(R.id.home_action)
     }
 
     /**

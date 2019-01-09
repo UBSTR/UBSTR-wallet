@@ -53,7 +53,7 @@ class HomeFragment : Fragment() {
             .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "") ?: ""
 
         if (agreedLicenseVersion != Constants.CURRENT_LICENSE_VERSION || userId == "") {
-            findNavController().navigate(R.id.setup_action)
+            findNavController().navigate(R.id.license_action)
             return
         }
 
@@ -61,7 +61,7 @@ class HomeFragment : Fragment() {
         mUserAccountViewModel = ViewModelProviders.of(this).get(UserAccountViewModel::class.java)
 
         mUserAccountViewModel.getUserAccount(userId).observe(this, Observer<UserAccount>{ user ->
-            tvAccountName.text = user.name
+            tvAccountName.text = user?.name ?: ""
         })
 
         // Navigate to the Receive Transaction Fragment
