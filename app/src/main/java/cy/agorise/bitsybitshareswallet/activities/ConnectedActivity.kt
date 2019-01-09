@@ -94,10 +94,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val userId = PreferenceManager.getDefaultSharedPreferences(this)
-            .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "")
-        if (userId != "")
-            mCurrentAccount = UserAccount(userId)
+        getUserAccount()
 
         mAssetRepository = AssetRepository(this)
 
@@ -142,6 +139,17 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
             .asFlowable()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { handleIncomingMessage(it) }
+    }
+
+    /**
+     * Obtains the userId from the shared preferences and creates a [UserAccount] instance.
+     * Created as a public function, so that it can be called from its Fragments.
+     */
+    fun getUserAccount() {
+        val userId = PreferenceManager.getDefaultSharedPreferences(this)
+            .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "") ?: ""
+        if (userId != "")
+            mCurrentAccount = UserAccount(userId)
     }
 
     private fun handleIncomingMessage(message: Any?) {
@@ -200,7 +208,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         if (latestOpCount == 0L) {
             Log.d(TAG, "The node returned 0 total_ops for current account and may not have installed the history plugin. " +
                     "\nAsk the NetworkService to remove the node from the list and connect to another one.")
-            mNetworkService!!.removeCurrentNodeAndReconnect()
+            mNetworkService?.removeCurrentNodeAndReconnect()
         } else if (storedOpCount == -1L) {
             // Initial case when the app starts
             storedOpCount = latestOpCount
@@ -293,7 +301,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun updateBalances() {
-        if (mNetworkService!!.isConnected) {
+        if (mNetworkService?.isConnected == true) {
             val id = mNetworkService!!.sendMessage(GetAccountBalances(mCurrentAccount, ArrayList()),
                 GetAccountBalances.REQUIRED_API)
 
@@ -306,7 +314,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
      */
     private val mRequestMissingUserAccountsTask = object : Runnable {
         override fun run() {
-            if (mNetworkService!!.isConnected) {
+            if (mNetworkService?.isConnected == true) {
                 val id = mNetworkService!!.sendMessage(GetAccounts(missingUserAccounts), GetAccounts.REQUIRED_API)
 
                 responseMap[id] = RESPONSE_GET_ACCOUNTS
@@ -321,7 +329,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
      */
     private val mRequestMissingAssetsTask = object : Runnable {
         override fun run() {
-            if (mNetworkService!!.isConnected) {
+            if (mNetworkService?.isConnected == true) {
                 val id = mNetworkService!!.sendMessage(GetAssets(missingAssets), GetAssets.REQUIRED_API)
 
                 responseMap[id] = RESPONSE_GET_ASSETS
@@ -336,7 +344,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
      */
     private val mCheckMissingPaymentsTask = object : Runnable {
         override fun run() {
-            if (mNetworkService != null && mNetworkService!!.isConnected) {
+            if (mNetworkService?.isConnected == true) {
                 if (mCurrentAccount != null) {
                     val userAccounts = ArrayList<String>()
                     userAccounts.add(mCurrentAccount!!.objectId)
@@ -359,7 +367,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private val mRequestBlockMissingTimeTask = object : Runnable {
         override fun run() {
 
-            if (mNetworkService != null && mNetworkService!!.isConnected) {
+            if (mNetworkService?.isConnected == true) {
                 val id = mNetworkService!!.sendMessage(GetBlockHeader(blockNumberWithMissingTime),
                     GetBlockHeader.REQUIRED_API)
 
@@ -389,6 +397,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         mHandler.removeCallbacks(mCheckMissingPaymentsTask)
         mHandler.removeCallbacks(mRequestMissingUserAccountsTask)
         mHandler.removeCallbacks(mRequestMissingAssetsTask)
+        mHandler.removeCallbacks(mRequestBlockMissingTimeTask)
     }
 
     override fun onResume() {

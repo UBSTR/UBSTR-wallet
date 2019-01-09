@@ -13,6 +13,8 @@ import cy.agorise.graphenej.BrainKey
 import cy.agorise.graphenej.PublicKey
 import cy.agorise.graphenej.models.AccountProperties
 import org.bitcoinj.core.ECKey
+import cy.agorise.bitsybitshareswallet.activities.ConnectedActivity
+
 
 abstract class BaseAccountFragment : ConnectedFragment() {
 
@@ -71,6 +73,10 @@ abstract class BaseAccountFragment : ConnectedFragment() {
                 addAuthorityToDatabase(accountProperties.id, AuthorityType.MEMO.ordinal, mBrainKey!!)
             }
         }
+
+        // Force [ConnectedActivity] to refresh the userId from the SharedPreferences, so that the app can immediately
+        // to fetch the account's transactions.
+        (activity as ConnectedActivity).getUserAccount()
 
         // Send the user back to HomeFragment
         findNavController().navigate(R.id.home_action)
