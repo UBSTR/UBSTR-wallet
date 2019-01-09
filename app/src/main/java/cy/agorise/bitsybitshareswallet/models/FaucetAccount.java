@@ -4,7 +4,6 @@ package cy.agorise.bitsybitshareswallet.models;
  * Class used to deserialize a the "account" object contained in the faucet response to the
  * {@link cy.agorise.bitsybitshareswallet.network.FaucetService#registerPrivateAccount(FaucetRequest)} API call.
  */
-
 public class FaucetAccount {
     public String name;
     public String owner_key;

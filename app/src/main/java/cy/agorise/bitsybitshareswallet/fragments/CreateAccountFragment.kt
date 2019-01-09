@@ -1,7 +1,7 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
 import android.os.Bundle
-import android.preference.PreferenceManager
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -35,7 +35,6 @@ import cy.agorise.bitsybitshareswallet.network.ServiceGenerator
 import retrofit2.Call
 import retrofit2.Response
 import java.util.*
-import kotlin.concurrent.timerTask
 
 
 class CreateAccountFragment : BaseAccountFragment() {
@@ -231,7 +230,9 @@ class CreateAccountFragment : BaseAccountFragment() {
             override fun onResponse(call: Call<FaucetResponse>, response: Response<FaucetResponse>) {
                 // The network call was a success and we got a response, obtain the info of the newly created account
                 // with a delay to let the nodes update their information
-                Timer().schedule(timerTask {
+                val handler = Handler()
+
+                handler.postDelayed({
                     getCreatedAccountInfo(response.body())
                 }, 4000)
             }
