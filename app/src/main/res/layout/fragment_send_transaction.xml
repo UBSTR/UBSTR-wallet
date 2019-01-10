@@ -153,6 +153,7 @@
             app:fabCustomSize="32dp"
             app:maxImageSize="20dp"
             app:srcCompat="@drawable/ic_camera"
+            app:borderWidth="0dp"
             android:backgroundTint="@color/colorSend"
             app:layout_constraintStart_toEndOf="@id/cameraVerticalGuideline"
             app:layout_constraintTop_toBottomOf="@+id/tvScan"/>
@@ -186,6 +187,7 @@
             app:fabCustomSize="90dp"
             app:maxImageSize="70dp"
             app:srcCompat="@drawable/ic_arrow_forward"
+            app:borderWidth="0dp"
             app:layout_constraintEnd_toEndOf="@id/vSend"
             app:layout_constraintTop_toTopOf="@+id/vSend" />
 
