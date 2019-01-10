@@ -100,19 +100,19 @@
 
     </LinearLayout>
 
-    <!-- Cryptocurrency -->
+    <!-- Asset -->
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:text="Cryptocurrency"
+        android:text="Asset"
         android:textSize="16sp"
-        app:layout_constraintTop_toTopOf="@id/cbCryptocurrency"
+        app:layout_constraintTop_toTopOf="@id/cbAsset"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <CheckBox
-        android:id="@+id/cbCryptocurrency"
+        android:id="@+id/cbAsset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_different_topic"
@@ -121,11 +121,11 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <Spinner
-        android:id="@+id/sCryptocurrency"
+        android:id="@+id/sAsset"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:listitem="@android:layout/simple_list_item_1"
-        app:layout_constraintTop_toBottomOf="@id/cbCryptocurrency"/>
+        app:layout_constraintTop_toBottomOf="@id/cbAsset"/>
 
     <!-- Fiat Amount -->
 
@@ -145,7 +145,7 @@
         android:layout_marginTop="@dimen/spacing_same_topic"
         android:text="All"
         android:enabled="false"
-        app:layout_constraintTop_toBottomOf="@id/sCryptocurrency"
+        app:layout_constraintTop_toBottomOf="@id/sAsset"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <!--<LinearLayout-->

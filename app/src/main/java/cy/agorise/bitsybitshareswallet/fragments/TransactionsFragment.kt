@@ -39,8 +39,8 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
     private var filterDateRangeAll = true
     private var filterStartDate = 0L
     private var filterEndDate = 0L
-    private var filterCryptocurrencyAll = true
-    private var filterCryptocurrency = "BTS"
+    private var filterAssetAll = true
+    private var filterAsset = "BTS"
     private var filterFiatAmountAll = true
     private var filterFromFiatAmount = 0L
     private var filterToFiatAmount = 500L
@@ -110,7 +110,7 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
             R.id.menu_filter -> {
                 val filterOptionsDialog = FilterOptionsDialog.newInstance(
                     filterTransactionsDirection, filterDateRangeAll, filterStartDate * 1000,
-                    filterEndDate * 1000, filterCryptocurrencyAll, filterCryptocurrency,
+                    filterEndDate * 1000, filterAssetAll, filterAsset,
                     filterFiatAmountAll, filterFromFiatAmount, filterToFiatAmount
                 )
                 filterOptionsDialog.show(childFragmentManager, "filter-options-tag")
@@ -160,8 +160,8 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
             if (!filterDateRangeAll && (transferDetail.date < filterStartDate || transferDetail.date > filterEndDate))
                 continue
 
-            // Filter by cryptocurrency
-            if (!filterCryptocurrencyAll && transferDetail.cryptoSymbol != filterCryptocurrency)
+            // Filter by asset
+            if (!filterAssetAll && transferDetail.cryptoSymbol != filterAsset)
                 continue
 
 //            // Filter by fiat amount
@@ -183,15 +183,15 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
     }
 
     /**
-     *
+     * Gets called when the user selects some filter options in the [FilterOptionsDialog] and wants to apply them.
      */
     override fun onFilterOptionsSelected(
         filterTransactionsDirection: Int,
         filterDateRangeAll: Boolean,
         filterStartDate: Long,
         filterEndDate: Long,
-        filterCryptocurrencyAll: Boolean,
-        filterCryptocurrency: String,
+        filterAssetAll: Boolean,
+        filterAsset: String,
         filterFiatAmountAll: Boolean,
         filterFromFiatAmount: Long,
         filterToFiatAmount: Long
@@ -200,8 +200,8 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
         this.filterDateRangeAll = filterDateRangeAll
         this.filterStartDate = filterStartDate / 1000
         this.filterEndDate = filterEndDate / 1000
-        this.filterCryptocurrencyAll = filterCryptocurrencyAll
-        this.filterCryptocurrency = filterCryptocurrency
+        this.filterAssetAll = filterAssetAll
+        this.filterAsset = filterAsset
         this.filterFiatAmountAll = filterFiatAmountAll
         this.filterFromFiatAmount = filterFromFiatAmount
         this.filterToFiatAmount = filterToFiatAmount

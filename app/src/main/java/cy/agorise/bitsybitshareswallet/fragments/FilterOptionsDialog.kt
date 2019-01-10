@@ -11,7 +11,12 @@ import androidx.fragment.app.DialogFragment
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
 import cy.agorise.bitsybitshareswallet.R
+import cy.agorise.bitsybitshareswallet.adapters.BalancesDetailsAdapter
+import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
+import cy.agorise.bitsybitshareswallet.viewmodels.BalanceDetailViewModel
 import cy.agorise.bitsybitshareswallet.views.DatePickerFragment
 import java.text.SimpleDateFormat
 import java.util.*
@@ -24,18 +29,56 @@ import kotlin.ClassCastException
  */
 class FilterOptionsDialog : DialogFragment() {
 
+    companion object {
+
+        const val KEY_FILTER_TRANSACTION_DIRECTION = "key_filter_transaction_direction"
+        const val KEY_FILTER_DATE_RANGE_ALL = "key_filter_date_range_all"
+        const val KEY_FILTER_START_DATE = "key_filter_start_date"
+        const val KEY_FILTER_END_DATE = "key_filter_end_date"
+        const val KEY_FILTER_ASSET_ALL = "key_filter_asset_all"
+        const val KEY_FILTER_ASSET = "key_filter_asset"
+        const val KEY_FILTER_FIAT_AMOUNT_ALL = "key_filter_fiat_amount_all"
+        const val KEY_FILTER_FROM_FIAT_AMOUNT = "filter_from_fiat_amount"
+        const val KEY_FILTER_TO_FIAT_AMOUNT = "filter_to_fiat_amount"
+
+        const val KEY_TIMESTAMP = "key_timestamp"
+
+        const val START_DATE_PICKER = 0
+        const val END_DATE_PICKER = 1
+
+        fun newInstance(filterTransactionsDirection: Int, filterDateRangeAll: Boolean,
+                        filterStartDate: Long, filterEndDate: Long, filterAssetAll: Boolean,
+                        filterAsset: String, filterFiatAmountAll: Boolean,
+                        filterFromFiatAmount: Long, filterToFiatAmount: Long): FilterOptionsDialog {
+            val frag = FilterOptionsDialog()
+            val args = Bundle()
+            args.putInt(KEY_FILTER_TRANSACTION_DIRECTION, filterTransactionsDirection)
+            args.putBoolean(KEY_FILTER_DATE_RANGE_ALL, filterDateRangeAll)
+            args.putLong(KEY_FILTER_START_DATE, filterStartDate)
+            args.putLong(KEY_FILTER_END_DATE, filterEndDate)
+            args.putBoolean(KEY_FILTER_ASSET_ALL, filterAssetAll)
+            args.putString(KEY_FILTER_ASSET, filterAsset)
+            args.putBoolean(KEY_FILTER_FIAT_AMOUNT_ALL, filterFiatAmountAll)
+            args.putLong(KEY_FILTER_FROM_FIAT_AMOUNT, filterFromFiatAmount)
+            args.putLong(KEY_FILTER_TO_FIAT_AMOUNT, filterToFiatAmount)
+            frag.arguments = args
+            return frag
+        }
+
+    }
+
     // Widgets TODO use android-kotlin-extensions {onViewCreated}
-    lateinit var rbTransactionAll: RadioButton
-    lateinit var rbTransactionSent: RadioButton
-    lateinit var rbTransactionReceived: RadioButton
-    lateinit var cbDateRange: CheckBox
-    lateinit var llDateRange: LinearLayout
-    lateinit var tvStartDate: TextView
-    lateinit var tvEndDate: TextView
-    lateinit var cbCryptocurrency: CheckBox
-    lateinit var sCryptocurrency: Spinner
-    lateinit var cbFiatAmount: CheckBox
-    lateinit var llFiatAmount: LinearLayout
+    private lateinit var rbTransactionAll: RadioButton
+    private lateinit var rbTransactionSent: RadioButton
+    private lateinit var rbTransactionReceived: RadioButton
+    private lateinit var cbDateRange: CheckBox
+    private lateinit var llDateRange: LinearLayout
+    private lateinit var tvStartDate: TextView
+    private lateinit var tvEndDate: TextView
+    private lateinit var cbAsset: CheckBox
+    private lateinit var sAsset: Spinner
+    private lateinit var cbFiatAmount: CheckBox
+    private lateinit var llFiatAmount: LinearLayout
 //    lateinit var etFromFiatAmount: CurrencyEditText
 //    lateinit var etToFiatAmount: CurrencyEditText
 
@@ -54,43 +97,9 @@ class FilterOptionsDialog : DialogFragment() {
 //     */
 //    private val mUserCurrency = RuntimeData.EXTERNAL_CURRENCY
 
-    companion object {
+    private lateinit var mBalanceDetailViewModel: BalanceDetailViewModel
 
-        const val KEY_FILTER_TRANSACTION_DIRECTION = "key_filter_transaction_direction"
-        const val KEY_FILTER_DATE_RANGE_ALL = "key_filter_date_range_all"
-        const val KEY_FILTER_START_DATE = "key_filter_start_date"
-        const val KEY_FILTER_END_DATE = "key_filter_end_date"
-        const val KEY_FILTER_CRYPTOCURRENCY_ALL = "key_filter_cryptocurrency_all"
-        const val KEY_FILTER_CRYPTOCURRENCY = "key_filter_cryptocurrency"
-        const val KEY_FILTER_FIAT_AMOUNT_ALL = "key_filter_fiat_amount_all"
-        const val KEY_FILTER_FROM_FIAT_AMOUNT = "filter_from_fiat_amount"
-        const val KEY_FILTER_TO_FIAT_AMOUNT = "filter_to_fiat_amount"
-
-        const val KEY_TIMESTAMP = "key_timestamp"
-
-        const val START_DATE_PICKER = 0
-        const val END_DATE_PICKER = 1
-
-        fun newInstance(filterTransactionsDirection: Int, filterDateRangeAll: Boolean,
-                        filterStartDate: Long, filterEndDate: Long, filterCryptocurrencyAll: Boolean,
-                        filterCryptocurrency: String, filterFiatAmountAll: Boolean,
-                        filterFromFiatAmount: Long, filterToFiatAmount: Long): FilterOptionsDialog {
-            val frag = FilterOptionsDialog()
-            val args = Bundle()
-            args.putInt(KEY_FILTER_TRANSACTION_DIRECTION, filterTransactionsDirection)
-            args.putBoolean(KEY_FILTER_DATE_RANGE_ALL, filterDateRangeAll)
-            args.putLong(KEY_FILTER_START_DATE, filterStartDate)
-            args.putLong(KEY_FILTER_END_DATE, filterEndDate)
-            args.putBoolean(KEY_FILTER_CRYPTOCURRENCY_ALL, filterCryptocurrencyAll)
-            args.putString(KEY_FILTER_CRYPTOCURRENCY, filterCryptocurrency)
-            args.putBoolean(KEY_FILTER_FIAT_AMOUNT_ALL, filterFiatAmountAll)
-            args.putLong(KEY_FILTER_FROM_FIAT_AMOUNT, filterFromFiatAmount)
-            args.putLong(KEY_FILTER_TO_FIAT_AMOUNT, filterToFiatAmount)
-            frag.arguments = args
-            return frag
-        }
-
-    }
+    private var mBalancesDetailsAdapter: BalancesDetailsAdapter? = null
 
     /**
      * DatePicker message handler.
@@ -141,8 +150,8 @@ class FilterOptionsDialog : DialogFragment() {
                                     filterDateRangeAll: Boolean,
                                     filterStartDate: Long,
                                     filterEndDate: Long,
-                                    filterCryptocurrencyAll: Boolean,
-                                    filterCryptocurrency: String,
+                                    filterAssetAll: Boolean,
+                                    filterAsset: String,
                                     filterFiatAmountAll: Boolean,
                                     filterFromFiatAmount: Long,
                                     filterToFiatAmount: Long)
@@ -193,16 +202,31 @@ class FilterOptionsDialog : DialogFragment() {
 
         updateDateTextViews()
 
-        // Initialize Cryptocurrency
-        cbCryptocurrency = view.findViewById(R.id.cbCryptocurrency)
-//        sCryptocurrency = view.findViewById(R.id.sCryptocurrency)
-//        cbCryptocurrency.setOnCheckedChangeListener { _, isChecked ->
-//            sCryptocurrency.visibility = if(isChecked) View.GONE else View.VISIBLE }
-        cbCryptocurrency.isChecked = arguments!!.getBoolean(KEY_FILTER_CRYPTOCURRENCY_ALL, true)
+        // Initialize Asset
+        cbAsset = view.findViewById(R.id.cbAsset)
+        sAsset = view.findViewById(R.id.sAsset)
+        cbAsset.setOnCheckedChangeListener { _, isChecked ->
+            sAsset.visibility = if(isChecked) View.GONE else View.VISIBLE
+        }
+        cbAsset.isChecked = arguments!!.getBoolean(KEY_FILTER_ASSET_ALL, true)
 
-//        sCryptocurrency = view.findViewById(R.id.sCryptocurrency)
-//        initializeCryptocurrencySpinner()
+        // Configure BalanceDetailViewModel to obtain the user's Balances
+        mBalanceDetailViewModel = ViewModelProviders.of(this).get(BalanceDetailViewModel::class.java)
 
+        mBalanceDetailViewModel.getAll().observe(this, Observer<List<BalanceDetail>> { balancesDetails ->
+            mBalancesDetailsAdapter = BalancesDetailsAdapter(context!!, android.R.layout.simple_spinner_item, balancesDetails!!)
+            sAsset.adapter = mBalancesDetailsAdapter
+
+            val assetSelected = arguments!!.getString(KEY_FILTER_ASSET)
+
+            // Try to select the selectedAssetSymbol
+            for (i in 0 until mBalancesDetailsAdapter!!.count) {
+                if (mBalancesDetailsAdapter!!.getItem(i)!!.symbol == assetSelected) {
+                    sAsset.setSelection(i)
+                    break
+                }
+            }
+        })
 
         // Initialize Fiat amount
         cbFiatAmount = view.findViewById(R.id.cbFiatAmount)
@@ -240,25 +264,6 @@ class FilterOptionsDialog : DialogFragment() {
         }
     }
 
-//    private fun initializeCryptocurrencySpinner() {
-//        val cryptoCurrencyList = database!!.getSortedCryptoCurrencies(false,
-//            SortType.DESCENDING, true)
-//
-//        val cryptocurrencySpinnerAdapter = CryptocurrencySpinnerAdapter(context!!,
-//            R.layout.item_cryptocurrency,
-//            R.id.tvCryptocurrencyName,
-//            cryptoCurrencyList)
-//
-//        sCryptocurrency.adapter = cryptocurrencySpinnerAdapter
-//
-//        val cryptocurrencySelected = arguments!!.getString(KEY_FILTER_CRYPTOCURRENCY)
-//
-//        val index = Math.max(cryptocurrencySpinnerAdapter.getPosition(database!!.getCryptocurrencyBySymbol(
-//            cryptocurrencySelected)), 0)
-//
-//        sCryptocurrency.setSelection(index)
-//    }
-
     private val mDateClickListener = View.OnClickListener { v ->
         val calendar = Calendar.getInstance()
 
@@ -293,9 +298,9 @@ class FilterOptionsDialog : DialogFragment() {
 
         val filterDateRangeAll = cbDateRange.isChecked
 
-        val filterCryptocurrencyAll = cbCryptocurrency.isChecked
+        val filterAssetAll = cbAsset.isChecked
 
-        val filterCryptocurrency = "" //(sCryptocurrency.selectedItem as CryptoCurrency).symbol
+        val filterAsset = (sAsset.selectedItem as BalanceDetail).symbol
 
         val filterFiatAmountAll = cbFiatAmount.isChecked
 
@@ -312,7 +317,7 @@ class FilterOptionsDialog : DialogFragment() {
 //        }
 
         mCallback!!.onFilterOptionsSelected(filterTransactionsDirection, filterDateRangeAll,
-            startDate, endDate, filterCryptocurrencyAll, filterCryptocurrency, filterFiatAmountAll,
+            startDate, endDate, filterAssetAll, filterAsset, filterFiatAmountAll,
             filterFromFiatAmount, filterToFiatAmount)
     }
 }
