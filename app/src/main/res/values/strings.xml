@@ -51,6 +51,15 @@
     <string name="title_filter">Filter</string>
     <string name="title_export">Export</string>
 
+    <!-- Transactions filter options -->
+    <string name="title_filter_options">Filter options</string>
+    <string name="text__all">All</string>
+    <string name="text__sent">Sent</string>
+    <string name="text__received">Received</string>
+    <string name="text__date_range">Date Range</string>
+    <string name="text__fiat_amount">Fiat Amount</string>
+    <string name="button__filter">Filter</string>
+
     <!-- Send Transaction -->
     <string name="title_info">Info</string>
     <string name="text__to">To</string>

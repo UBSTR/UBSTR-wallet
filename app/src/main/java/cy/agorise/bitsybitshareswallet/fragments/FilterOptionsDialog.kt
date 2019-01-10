@@ -165,9 +165,9 @@ class FilterOptionsDialog : DialogFragment() {
         mDatePickerHandler = DatePickerHandler()
 
         val builder = AlertDialog.Builder(context!!)
-            .setTitle("Filter options")
-            .setPositiveButton("Filter") { _, _ ->  validateFields() }
-            .setNegativeButton("Cancel") { _, _ ->  dismiss() }
+            .setTitle(getString(R.string.title_filter_options))
+            .setPositiveButton(getString(R.string.button__filter)) { _, _ ->  validateFields() }
+            .setNegativeButton(getString(android.R.string.cancel)) { _, _ ->  dismiss() }
 
         // Inflate layout
         val inflater = activity!!.layoutInflater

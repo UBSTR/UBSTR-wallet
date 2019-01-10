@@ -14,7 +14,7 @@
         android:id="@+id/tvTransactionDirection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Transactions"
+        android:text="@string/title_transactions"
         android:textSize="16sp"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -31,21 +31,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="All"/>
+            android:text="@string/text__all"/>
 
         <RadioButton
             android:id="@+id/rbTransactionSent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Sent"/>
+            android:text="@string/text__sent"/>
 
         <RadioButton
             android:id="@+id/rbTransactionReceived"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Received"/>
+            android:text="@string/text__received"/>
 
     </RadioGroup>
 
@@ -55,7 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:text="Date Range"
+        android:text="@string/text__date_range"
         android:textSize="16sp"
         app:layout_constraintTop_toTopOf="@id/cbDateRange"
         app:layout_constraintStart_toStartOf="parent"/>
@@ -65,7 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_different_topic"
-        android:text="All"
+        android:text="@string/text__all"
         app:layout_constraintTop_toBottomOf="@id/rgTransactionDirection"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -106,7 +106,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:text="Asset"
+        android:text="@string/text__asset"
         android:textSize="16sp"
         app:layout_constraintTop_toTopOf="@id/cbAsset"
         app:layout_constraintStart_toStartOf="parent"/>
@@ -116,7 +116,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_different_topic"
-        android:text="All"
+        android:text="@string/text__all"
         app:layout_constraintTop_toBottomOf="@+id/llDateRange"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -133,7 +133,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:text="Fiat Amount"
+        android:text="@string/text__fiat_amount"
         android:textSize="16sp"
         app:layout_constraintTop_toTopOf="@id/cbFiatAmount"
         app:layout_constraintStart_toStartOf="parent"/>
@@ -143,7 +143,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_same_topic"
-        android:text="All"
+        android:text="@string/text__all"
         android:enabled="false"
         app:layout_constraintTop_toBottomOf="@id/sAsset"
         app:layout_constraintEnd_toEndOf="parent"/>
