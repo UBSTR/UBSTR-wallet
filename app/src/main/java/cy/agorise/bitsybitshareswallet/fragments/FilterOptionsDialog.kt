@@ -6,11 +6,13 @@ import android.content.res.Resources
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.view.View
 import androidx.fragment.app.DialogFragment
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import cy.agorise.bitsybitshareswallet.R
+import cy.agorise.bitsybitshareswallet.views.DatePickerFragment
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.ClassCastException
@@ -39,7 +41,7 @@ class FilterOptionsDialog : DialogFragment() {
 
     private var mCallback: OnFilterOptionsSelectedListener? = null
 
-    private var mDatePickerHandler: DatePickerHandler? = null
+    private lateinit var mDatePickerHandler: DatePickerHandler
 
     private var dateFormat: SimpleDateFormat = SimpleDateFormat("d/MMM/yyyy",
         Resources.getSystem().configuration.locale)
@@ -175,21 +177,21 @@ class FilterOptionsDialog : DialogFragment() {
 
         // Initialize Date range
         cbDateRange = view.findViewById(R.id.cbDateRange)
-//        llDateRange = view.findViewById(R.id.llDateRange)
-//        cbDateRange.setOnCheckedChangeListener { _, isChecked ->
-//            llDateRange.visibility = if(isChecked) View.GONE else View.VISIBLE }
+        llDateRange = view.findViewById(R.id.llDateRange)
+        cbDateRange.setOnCheckedChangeListener { _, isChecked ->
+            llDateRange.visibility = if(isChecked) View.GONE else View.VISIBLE }
         cbDateRange.isChecked = arguments!!.getBoolean(KEY_FILTER_DATE_RANGE_ALL, true)
-//
-//        tvStartDate = view.findViewById(R.id.tvStartDate)
-//        tvEndDate = view.findViewById(R.id.tvEndDate)
-//
-//        startDate = arguments!!.getLong(KEY_FILTER_START_DATE, 0)
-//        tvStartDate.setOnClickListener(mDateClickListener)
-//
-//        endDate = arguments!!.getLong(KEY_FILTER_END_DATE, 0)
-//        tvEndDate.setOnClickListener(mDateClickListener)
-//
-//        updateDateTextViews()
+
+        tvStartDate = view.findViewById(R.id.tvStartDate)
+        tvEndDate = view.findViewById(R.id.tvEndDate)
+
+        startDate = arguments!!.getLong(KEY_FILTER_START_DATE, 0)
+        tvStartDate.setOnClickListener(mDateClickListener)
+
+        endDate = arguments!!.getLong(KEY_FILTER_END_DATE, 0)
+        tvEndDate.setOnClickListener(mDateClickListener)
+
+        updateDateTextViews()
 
         // Initialize Cryptocurrency
         cbCryptocurrency = view.findViewById(R.id.cbCryptocurrency)
@@ -257,29 +259,29 @@ class FilterOptionsDialog : DialogFragment() {
 //        sCryptocurrency.setSelection(index)
 //    }
 
-//    private val mDateClickListener = View.OnClickListener { v ->
-//        val calendar = Calendar.getInstance()
-//
-//        // Variable used to select that date on the calendar
-//        var currentTime = calendar.timeInMillis
-//        var maxTime = currentTime
-//
-//        var which = -1
-//        if (v.id == R.id.tvStartDate) {
-//            which = START_DATE_PICKER
-//            currentTime = startDate
-//            calendar.timeInMillis = endDate
-//            calendar.add(Calendar.MONTH, -1)
-//            maxTime = calendar.timeInMillis
-//        } else if (v.id == R.id.tvEndDate) {
-//            which = END_DATE_PICKER
-//            currentTime = endDate
-//        }
-//
-//        val datePickerFragment = DatePickerFragment.newInstance(which, currentTime,
-//            maxTime, mDatePickerHandler)
-//        datePickerFragment.show(activity!!.supportFragmentManager, "date-picker")
-//    }
+    private val mDateClickListener = View.OnClickListener { v ->
+        val calendar = Calendar.getInstance()
+
+        // Variable used to select that date on the calendar
+        var currentTime = calendar.timeInMillis
+        var maxTime = currentTime
+
+        var which = -1
+        if (v.id == R.id.tvStartDate) {
+            which = START_DATE_PICKER
+            currentTime = startDate
+            calendar.timeInMillis = endDate
+            calendar.add(Calendar.MONTH, -1)
+            maxTime = calendar.timeInMillis
+        } else if (v.id == R.id.tvEndDate) {
+            which = END_DATE_PICKER
+            currentTime = endDate
+        }
+
+        val datePickerFragment = DatePickerFragment.newInstance(which, currentTime,
+            maxTime, mDatePickerHandler)
+        datePickerFragment.show(activity!!.supportFragmentManager, "date-picker")
+    }
 
     private fun validateFields() {
         val filterTransactionsDirection =  when {
