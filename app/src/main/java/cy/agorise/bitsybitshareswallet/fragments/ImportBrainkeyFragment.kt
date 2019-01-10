@@ -41,8 +41,8 @@ class ImportBrainkeyFragment : BaseAccountFragment() {
 
     private var mKeyReferencesAttempts = 0
 
-    private var keyReferencesRequestId: Long = 0
-    private var getAccountsRequestId: Long = 0
+    private var keyReferencesRequestId: Long? = null
+    private var getAccountsRequestId: Long? = null
 
     private var isPINValid = false
     private var isPINConfirmationValid = false
@@ -188,49 +188,75 @@ class ImportBrainkeyFragment : BaseAccountFragment() {
         mBrainKey = BrainKey(brainKey, 0)
         val address = Address(ECKey.fromPublicOnly(mBrainKey!!.privateKey.pubKey))
         Log.d(TAG, String.format("Brainkey would generate address: %s", address.toString()))
-        keyReferencesRequestId = mNetworkService!!.sendMessage(GetKeyReferences(address), GetKeyReferences.REQUIRED_API)
+        keyReferencesRequestId = mNetworkService?.sendMessage(GetKeyReferences(address), GetKeyReferences.REQUIRED_API)
     }
 
     override fun handleJsonRpcResponse(response: JsonRpcResponse<*>) {
-        Log.d(TAG, "handleResponse.Thread: " + Thread.currentThread().name)
         if (response.id == keyReferencesRequestId) {
-            val resp = response.result as List<List<UserAccount>>
-            val accountList: List<UserAccount> = resp[0].distinct()
-            if (accountList.isEmpty() && mKeyReferencesAttempts == 0) {
+            handleBrainKeyAccountReferences(response.result)
+        } else if (response.id == getAccountsRequestId) {
+            handleAccountProperties(response.result)
+        }
+    }
+
+    override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) {
+        Log.d(TAG, "handleConnectionStatusUpdate. code: " + connectionStatusUpdate.updateCode)
+    }
+
+    /**
+     * Handles the response from the NetworkService when the app asks for the accounts that are controlled by a
+     * specified BrainKey
+     */
+    private fun handleBrainKeyAccountReferences(result: Any?) {
+        if (result !is List<*>)
+            return
+
+        val list = result[0] as? List<*> ?: return
+
+        if (list[0] !is UserAccount)
+            return
+
+        val resp = result as List<List<UserAccount>>
+        val accountList: List<UserAccount> = resp[0].distinct()
+
+        if (accountList.isEmpty()) {
+            if (mKeyReferencesAttempts == 0) {
                 mKeyReferencesAttempts++
                 verifyBrainKey(true)
             } else {
-                if (accountList.isEmpty()) {
-                    //hideDialog()
-                    context?.toast(getString(R.string.error__invalid_brainkey))
-                } else {
-                    if (accountList.size == 1) {
-                        // If we only found one account linked to this key, then we just proceed
-                        // trying to find out the account name
-                        mUserAccount = accountList[0]
-                        getAccountsRequestId =
-                                mNetworkService!!.sendMessage(GetAccounts(mUserAccount), GetAccounts.REQUIRED_API)
-                    } else {
-                        // If we found more than one account linked to this key, we must also
-                        // find out the account names, but the procedure is a bit different in
-                        // that after having those, we must still ask the user to decide which
-                        // account should be imported.
-                        mUserAccountCandidates = accountList
-                        getAccountsRequestId = mNetworkService!!.sendMessage(
-                            GetAccounts(mUserAccountCandidates),
-                            GetAccounts.REQUIRED_API
-                        )
-                    }
-                }
+                context?.toast(getString(R.string.error__invalid_brainkey))
             }
-        } else if (response.id == getAccountsRequestId) {
-            val accountPropertiesList = response.result as List<AccountProperties>
+        } else if (accountList.size == 1) {
+            // If we only found one account linked to this key, then we just proceed
+            // trying to find out the account name
+            mUserAccount = accountList[0]
+            getAccountsRequestId =
+                    mNetworkService?.sendMessage(GetAccounts(mUserAccount), GetAccounts.REQUIRED_API)
+        } else {
+            // If we found more than one account linked to this key, we must also
+            // find out the account names, but the procedure is a bit different in
+            // that after having those, we must still ask the user to decide which
+            // account should be imported.
+            mUserAccountCandidates = accountList
+            getAccountsRequestId = mNetworkService?.sendMessage(
+                GetAccounts(mUserAccountCandidates),
+                GetAccounts.REQUIRED_API
+            )
+        }
+    }
+
+    /**
+     * Handles the response from the NetworkService when the app asks for the AccountProperties of a list of
+     * Accounts controlled by the given BrainKey
+     */
+    private fun handleAccountProperties(result: Any?) {
+        if (result is List<*> && result[0] is AccountProperties) {
+            val accountPropertiesList = result as List<AccountProperties>
             if (accountPropertiesList.size > 1) {
                 val candidates = ArrayList<String>()
                 for (accountProperties in accountPropertiesList) {
                     candidates.add(accountProperties.name)
                 }
-//                hideDialog()
                 MaterialDialog(context!!)
                     .title(R.string.dialog__account_candidates_title)
                     .message(R.string.dialog__account_candidates_content)
@@ -254,9 +280,5 @@ class ImportBrainkeyFragment : BaseAccountFragment() {
                 context?.toast(getString(R.string.error__try_again))
             }
         }
-    }
-
-    override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) {
-        Log.d(TAG, "handleConnectionStatusUpdate. code: " + connectionStatusUpdate.updateCode)
     }
 }
