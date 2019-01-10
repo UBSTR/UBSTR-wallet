@@ -79,24 +79,40 @@
         android:layout_marginTop="@dimen/spacing_different_topic"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:text="@string/button__import"/>
+        android:text="@string/button__import_existing_account"/>
 
-    <View
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="@dimen/spacing_different_topic"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:background="@color/black"/>
+        android:layout_height="wrap_content"
+        android:padding="@dimen/activity_horizontal_margin">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_centerVertical="true"
+            android:background="@color/black"/>
+
+        <TextView
+            android:id="@+id/tvOR"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="?android:colorBackground"
+            android:layout_centerHorizontal="true"
+            android:text="@string/text__or"
+            android:textAllCaps="true"
+            android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
+    </RelativeLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCreate"
         style="@style/Widget.Bitsy.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_different_topic"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:text="@string/button__create"/>
+        android:text="@string/button__create_new_account"/>
 
 </LinearLayout>

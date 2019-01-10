@@ -12,11 +12,10 @@
     <string name="text_field__confirm_pin">Confirm PIN</string>
     <string name="error__pin_mismatch">PIN mismatch</string>
     <string name="text__brain_key">BrainKey</string>
-    <string name="error__enter_correct_brainkey">Please enter correct brainkey, it should have between 12 and 16
-        words.
-    </string>
-    <string name="button__import">Import</string>
-    <string name="button__create">Create</string>
+    <string name="error__enter_correct_brainkey">Please enter correct brainkey, it should have 12 or 16 words.</string>
+    <string name="button__import_existing_account">Import existing account</string>
+    <string name="text__or">Or</string>
+    <string name="button__create_new_account">Create new account</string>
     <!-- TODO improve below error explanation -->
     <string name="error__invalid_brainkey">Invalid account, please check your brainkey for typing errors</string>
     <string name="error__try_again">Please try again after 5 minutes</string>
@@ -36,6 +35,7 @@
     <string name="error__faucet">The server returned an error. This might be due to a limitation purposefully set in place to disallow frequent requests coming from the same IP address in a short time lapse. Please wait 5 minutes and try again, or switch to a different network, for example from wifi to cell.</string>
     <string name="error__faucet_template">The faucet returned an error. Msg: %1$s</string>
     <string name="error__created_account_not_found">The app could not retrieve information about the newly created account</string>
+    <string name="button__create">Create</string>
 
     <!-- Home -->
     <string name="title_transactions">Transactions</string>
