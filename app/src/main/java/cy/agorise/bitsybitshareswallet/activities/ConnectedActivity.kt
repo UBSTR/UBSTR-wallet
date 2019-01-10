@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.crashlytics.android.Crashlytics
 import cy.agorise.bitsybitshareswallet.database.entities.Balance
 import cy.agorise.bitsybitshareswallet.processors.TransfersLoader
 import cy.agorise.bitsybitshareswallet.repositories.AssetRepository
@@ -189,7 +190,11 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                 ).show()
             }
         } else if (message is ConnectionStatusUpdate) {
-            if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
+            if (message.updateCode == ConnectionStatusUpdate.CONNECTED) {
+                // Make sure the Crashlytics report contains the currently selected node
+                val selectedNode = mNetworkService?.selectedNode
+                Crashlytics.log(selectedNode?.url)
+            } else if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
                 // If we got a disconnection notification, we should clear our response map, since
                 // all its stored request ids will now be reset
                 responseMap.clear()
