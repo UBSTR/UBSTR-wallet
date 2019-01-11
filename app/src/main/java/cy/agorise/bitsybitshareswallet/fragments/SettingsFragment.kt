@@ -35,7 +35,10 @@ import kotlinx.android.synthetic.main.fragment_settings.*
 import java.text.NumberFormat
 
 class SettingsFragment : Fragment(), ServiceConnection {
-    private val TAG = this.javaClass.simpleName
+
+    companion object {
+        private const val TAG = "SettingsFragment"
+    }
 
     private var mDisposables = CompositeDisposable()
 
@@ -77,7 +80,7 @@ class SettingsFragment : Fragment(), ServiceConnection {
                 val fullNodes = mNetworkService!!.nodes
 
                 nodesAdapter = FullNodesAdapter(v.context)
-                nodesAdapter!!.add(fullNodes)
+                nodesAdapter?.add(fullNodes)
 
                 mNodesDialog = MaterialDialog(v.context)
                     .title(text = String.format("%s v%s", getString(R.string.app_name), BuildConfig.VERSION_NAME))

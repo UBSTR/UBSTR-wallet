@@ -1,6 +1,9 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
+import android.content.ComponentName
 import android.os.Bundle
+import android.os.Handler
+import android.os.IBinder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -8,24 +11,34 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.Navigation
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.list.customListAdapter
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.jakewharton.rxbinding3.widget.textChanges
+import cy.agorise.bitsybitshareswallet.BuildConfig
 import cy.agorise.bitsybitshareswallet.R
+import cy.agorise.bitsybitshareswallet.adapters.FullNodesAdapter
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.graphenej.*
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.calls.GetAccounts
+import cy.agorise.graphenej.api.calls.GetDynamicGlobalProperties
 import cy.agorise.graphenej.api.calls.GetKeyReferences
 import cy.agorise.graphenej.models.AccountProperties
+import cy.agorise.graphenej.models.DynamicGlobalProperties
 import cy.agorise.graphenej.models.JsonRpcResponse
+import cy.agorise.graphenej.network.FullNode
+import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_import_brainkey.*
 import org.bitcoinj.core.ECKey
+import java.text.NumberFormat
 import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 
 class ImportBrainkeyFragment : BaseAccountFragment() {
+
     companion object {
         private const val TAG = "ImportBrainkeyActivity"
     }
@@ -47,6 +60,15 @@ class ImportBrainkeyFragment : BaseAccountFragment() {
     private var isPINValid = false
     private var isPINConfirmationValid = false
     private var isBrainKeyValid = false
+
+    // Dialog displaying the list of nodes and their latencies
+    private var mNodesDialog: MaterialDialog? = null
+
+    /** Adapter that holds the FullNode list used in the Bitshares nodes modal */
+    private var mNodesAdapter: FullNodesAdapter? = null
+
+    /** Handler that will be used to make recurrent calls to get the latest BitShares block number*/
+    private val mHandler = Handler()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Remove up navigation icon from the toolbar
@@ -93,6 +115,32 @@ class ImportBrainkeyFragment : BaseAccountFragment() {
         btnCreate.setOnClickListener (
             Navigation.createNavigateOnClickListener(R.id.create_account_action)
         )
+
+        tvNetworkStatus.setOnClickListener { v ->
+            if (mNetworkService != null) {
+                // PublishSubject used to announce full node latencies updates
+                val fullNodePublishSubject = mNetworkService!!.nodeLatencyObservable
+                fullNodePublishSubject?.observeOn(AndroidSchedulers.mainThread())?.subscribe(nodeLatencyObserver)
+
+                val fullNodes = mNetworkService!!.nodes
+
+                mNodesAdapter = FullNodesAdapter(v.context)
+                mNodesAdapter?.add(fullNodes)
+
+                mNodesDialog = MaterialDialog(v.context)
+                    .title(text = String.format("%s v%s", getString(R.string.app_name), BuildConfig.VERSION_NAME))
+                    .message(text = getString(R.string.title__bitshares_nodes_dialog, "-------"))
+                    .customListAdapter(mNodesAdapter as FullNodesAdapter)
+                    .negativeButton(android.R.string.ok) {
+                        mHandler.removeCallbacks(mRequestDynamicGlobalPropertiesTask)
+                    }
+
+                mNodesDialog?.show()
+
+                // Registering a recurrent task used to poll for dynamic global properties requests
+                mHandler.post(mRequestDynamicGlobalPropertiesTask)
+            }
+        }
     }
 
     private fun validatePIN() {
@@ -196,6 +244,12 @@ class ImportBrainkeyFragment : BaseAccountFragment() {
             handleBrainKeyAccountReferences(response.result)
         } else if (response.id == getAccountsRequestId) {
             handleAccountProperties(response.result)
+        } else if (response.result is DynamicGlobalProperties) {
+            val dynamicGlobalProperties = response.result as DynamicGlobalProperties
+            if (mNodesDialog != null && mNodesDialog?.isShowing == true) {
+                val blockNumber = NumberFormat.getInstance().format(dynamicGlobalProperties.head_block_number)
+                mNodesDialog?.message(text = getString(R.string.title__bitshares_nodes_dialog, blockNumber))
+            }
         }
     }
 
@@ -280,5 +334,59 @@ class ImportBrainkeyFragment : BaseAccountFragment() {
                 context?.toast(getString(R.string.error__try_again))
             }
         }
+    }
+
+    /**
+     * Observer used to be notified about node latency measurement updates.
+     */
+    private val nodeLatencyObserver = object : Observer<FullNode> {
+        override fun onSubscribe(d: Disposable) {
+            mDisposables.add(d)
+        }
+
+        override fun onNext(fullNode: FullNode) {
+            if (!fullNode.isRemoved)
+                mNodesAdapter?.add(fullNode)
+            else
+                mNodesAdapter?.remove(fullNode)
+        }
+
+        override fun onError(e: Throwable) {
+            Log.e(TAG, "nodeLatencyObserver.onError.Msg: " + e.message)
+        }
+
+        override fun onComplete() {}
+    }
+
+    /**
+     * Task used to obtain frequent updates on the global dynamic properties object
+     */
+    private val mRequestDynamicGlobalPropertiesTask = object : Runnable {
+        override fun run() {
+            if (mNetworkService != null) {
+                if (mNetworkService?.isConnected == true) {
+                    mNetworkService?.sendMessage(GetDynamicGlobalProperties(), GetDynamicGlobalProperties.REQUIRED_API)
+                } else {
+                    Log.d(TAG, "NetworkService exists but is not connected")
+                }
+            } else {
+                Log.d(TAG, "NetworkService reference is null")
+            }
+            mHandler.postDelayed(this, Constants.BLOCK_PERIOD)
+        }
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        super.onServiceDisconnected(name)
+
+        tvNetworkStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null,
+            resources.getDrawable(R.drawable.ic_disconnected, null), null)
+    }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        super.onServiceConnected(name, service)
+
+        tvNetworkStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null,
+            resources.getDrawable(R.drawable.ic_connected, null), null)
     }
 }
