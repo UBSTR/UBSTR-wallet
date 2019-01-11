@@ -124,5 +124,6 @@
         https://github.com/Agorise
     </string>
     <string name="title__bitshares_nodes_dialog">Block: %1$s</string>
+    <string name="text__view_network_status">View Network Status</string>
 
 </resources>
