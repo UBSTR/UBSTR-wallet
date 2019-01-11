@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.Navigation
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.list.customListAdapter
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.jakewharton.rxbinding3.widget.textChanges
@@ -131,9 +132,8 @@ class ImportBrainkeyFragment : BaseAccountFragment() {
                     .title(text = String.format("%s v%s", getString(R.string.app_name), BuildConfig.VERSION_NAME))
                     .message(text = getString(R.string.title__bitshares_nodes_dialog, "-------"))
                     .customListAdapter(mNodesAdapter as FullNodesAdapter)
-                    .negativeButton(android.R.string.ok) {
-                        mHandler.removeCallbacks(mRequestDynamicGlobalPropertiesTask)
-                    }
+                    .negativeButton(android.R.string.ok)
+                    .onDismiss { mHandler.removeCallbacks(mRequestDynamicGlobalPropertiesTask) }
 
                 mNodesDialog?.show()
 

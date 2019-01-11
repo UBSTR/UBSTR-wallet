@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.customListAdapter
 import cy.agorise.bitsybitshareswallet.BuildConfig
@@ -86,9 +87,8 @@ class SettingsFragment : Fragment(), ServiceConnection {
                     .title(text = String.format("%s v%s", getString(R.string.app_name), BuildConfig.VERSION_NAME))
                     .message(text = getString(R.string.title__bitshares_nodes_dialog, "-------"))
                     .customListAdapter(nodesAdapter as FullNodesAdapter)
-                    .negativeButton(android.R.string.ok) {
-                        mHandler.removeCallbacks(mRequestDynamicGlobalPropertiesTask)
-                    }
+                    .negativeButton(android.R.string.ok)
+                    .onDismiss { mHandler.removeCallbacks(mRequestDynamicGlobalPropertiesTask) }
 
                 mNodesDialog?.show()
 
