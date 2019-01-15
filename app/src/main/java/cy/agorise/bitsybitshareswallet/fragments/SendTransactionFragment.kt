@@ -191,9 +191,8 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
             tietAmount.textChanges()
                 .skipInitialValue()
                 .debounce(500, TimeUnit.MILLISECONDS)
-                .map { it.toString().trim() }
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { validateAmount(it!!) }
+                .subscribe { validateAmount() }
         )
     }
 
@@ -210,6 +209,8 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
             tvAvailableAssetAmount.text =
                     String.format("%." + Math.min(balance.precision, 8) + "f %s", amount, balance.symbol)
+
+            validateAmount()
         }
     }
 
@@ -381,7 +382,9 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         }
     }
 
-    private fun validateAmount(txtAmount: String) {
+    private fun validateAmount() {
+        val txtAmount = tietAmount.text.toString()
+
         if (mBalancesDetailsAdapter?.isEmpty != false) return
         val balance = mBalancesDetailsAdapter?.getItem(spAsset.selectedItemPosition) ?: return
         val currentAmount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
