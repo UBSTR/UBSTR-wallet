@@ -12,6 +12,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.google.common.primitives.UnsignedLong
@@ -276,15 +277,8 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         if (message.result == null && message.error == null) {
             context?.toast(getString(R.string.text__transaction_sent))
 
-            // Remove information from the text fields and disable send button
-            tietTo.setText("")
-            tietAmount.setText("")
-            tietMemo.setText("")
-            isToAccountCorrect = false
-            isAmountCorrect = false
-            enableDisableSendFAB()
-
-            // TODO return to Main fragment ??
+            // Return to the main screen
+            findNavController().navigateUp()
         } else {
             context?.toast(message.error.message, Toast.LENGTH_LONG)
         }
@@ -422,7 +416,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
             val privateKey = ECKey.fromPrivate(DumpedPrivateKey.fromBase58(null, wifKey).key.privKeyBytes)
 
-            // Add memo if exists TODO enable memo
+            // Add memo if exists
             val memoMsg = tietMemo.text.toString()
             if (memoMsg.isNotEmpty()) {
                 val nonce = Math.abs(SecureRandomGenerator.getSecureRandom().nextLong()).toBigInteger()
