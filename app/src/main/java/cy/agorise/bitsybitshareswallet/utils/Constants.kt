@@ -1,5 +1,8 @@
 package cy.agorise.bitsybitshareswallet.utils
 
+import cy.agorise.graphenej.Asset
+import cy.agorise.graphenej.UserAccount
+
 object Constants {
 
     /** Key used to store the number of the last agreed License version */
@@ -25,6 +28,12 @@ object Constants {
 
     /** The fee to send in every transfer (0.01%) */
     const val FEE_PERCENTAGE = 0.0001
+
+    /** The account used to send the fees */
+    val AGORISE_ACCOUNT = UserAccount("1.2.390320", "agorise")
+
+    /** Core BTS token */
+    val BTS = Asset("1.3.0")
 
     /**
      * LTM accounts come with an expiration date expressed as this string.

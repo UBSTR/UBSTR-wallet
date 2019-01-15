@@ -66,12 +66,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         private const val RESPONSE_BROADCAST_TRANSACTION = 4
     }
 
-    /** The account used to send the fees */
-    private val AGORISE_ACCOUNT = UserAccount("1.2.390320", "agorise")
-
-    /** Core BTS token */
-    private val BTS = Asset("1.3.0")
-
+    /** Variables used in field's validation */
     private var isCameraPreviewVisible = false
     private var isToAccountCorrect = false
     private var isAmountCorrect = false
@@ -82,6 +77,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
     private var mBalancesDetailsAdapter: BalancesDetailsAdapter? = null
 
+    /** Keeps track of the asset's symbol selected in the Asset spinner */
     private var selectedAssetSymbol = ""
 
     private var selectedAssetToBTSExchangeRatio = 1.0
@@ -95,6 +91,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
     // Map used to keep track of request and response id pairs
     private val responseMap = HashMap<Long, Int>()
 
+    /** Transaction being built */
     private var transaction: Transaction? = null
 
     /** Variable holding the current user's private key in the WIF format */
@@ -103,7 +100,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
     /** Repository to access and update Authorities */
     private var authorityRepository: AuthorityRepository? = null
 
-    /* This is one of the of the recipient account's public key, it will be used for memo encoding */
+    /** This is one of the recipient account's public key, it will be used for memo encoding */
     private var destinationPublicKey: PublicKey? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -128,7 +125,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         super.onViewCreated(view, savedInstanceState)
 
         val userId = PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "")
+            .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "") ?: ""
 
         if (userId != "")
             mUserAccount = UserAccount(userId)
@@ -157,37 +154,16 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
             }
         })
 
-        spAsset.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-            override fun onNothingSelected(parent: AdapterView<*>?) { }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val balance = mBalancesDetailsAdapter!!.getItem(position)!!
-                selectedAssetSymbol = balance.symbol
-                val asset = Asset(balance.id)
-
-                val amount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
-
-                tvAvailableAssetAmount.text =
-                        String.format("%." + Math.min(balance.precision, 8) + "f %s", amount, balance.symbol)
-
-                // Obtain current selected asset to BTS exchange rate
-                if (balance.symbol == "BTS")
-                    selectedAssetToBTSExchangeRatio = 1.0
-                else {
-                    // TODO obtain exchange ratio when selected asset is not BTS
-//                var id = mNetworkService?.sendMessage(GetRequiredFees(exchangeOperation, asset),
-//                    GetRequiredFees.REQUIRED_API)
-                }
-            }
-        }
+        spAsset.onItemSelectedListener = assetItemSelectedListener
 
         fabSendTransaction.setOnClickListener { startSendTransferOperation() }
         fabSendTransaction.disable(R.color.lightGray)
 
         authorityRepository = AuthorityRepository(context!!)
 
+        // Obtain the WifKey from the db, which is used in the Send Transfer procedure
         mDisposables.add(
-            authorityRepository!!.getWIF(userId!!, AuthorityType.ACTIVE.ordinal)
+            authorityRepository!!.getWIF(userId, AuthorityType.ACTIVE.ordinal)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { encryptedWIF ->
@@ -207,8 +183,8 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .map { it.toString().trim() }
                 .subscribe {
-                    val id = mNetworkService!!.sendMessage(GetAccountByName(it!!), GetAccountByName.REQUIRED_API)
-                    responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME
+                    val id = mNetworkService?.sendMessage(GetAccountByName(it!!), GetAccountByName.REQUIRED_API)
+                    if (id != null) responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME
                 }
         )
 
@@ -223,11 +199,38 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         )
     }
 
+    /** Handles the selection of items in the Asset spinner, to keep track of the selectedAssetSymbol, show the
+     * current user's balance of the selected asset and make a call to obtain the Asset <-> BTS exchange rate in case
+     * Asset != BTS, this latest item is needed to correctly calculate and send the fee to Agorise. */
+    private val assetItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+        override fun onNothingSelected(parent: AdapterView<*>?) { }
+
+        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            val balance = mBalancesDetailsAdapter!!.getItem(position)!!
+            selectedAssetSymbol = balance.symbol
+            val asset = Asset(balance.id)
+
+            val amount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
+
+            tvAvailableAssetAmount.text =
+                    String.format("%." + Math.min(balance.precision, 8) + "f %s", amount, balance.symbol)
+
+            // Obtain current selected asset to BTS exchange rate
+            if (balance.symbol == "BTS")
+                selectedAssetToBTSExchangeRatio = 1.0
+            else {
+                // TODO obtain exchange ratio when selected asset is not BTS
+//                var id = mNetworkService?.sendMessage(GetRequiredFees(exchangeOperation, asset),
+//                    GetRequiredFees.REQUIRED_API)
+            }
+        }
+    }
+
     override fun handleJsonRpcResponse(response: JsonRpcResponse<*>) {
         if (responseMap.containsKey(response.id)) {
             val responseType = responseMap[response.id]
             when (responseType) {
-                RESPONSE_GET_ACCOUNT_BY_NAME            -> handleAccountName(response.result)
+                RESPONSE_GET_ACCOUNT_BY_NAME            -> handleAccountProperties(response.result)
                 RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS  -> handleDynamicGlobalProperties(response.result)
                 RESPONSE_GET_REQUIRED_FEES              -> handleRequiredFees(response.result)
                 RESPONSE_BROADCAST_TRANSACTION          -> handleBroadcastTransaction(response)
@@ -244,7 +247,9 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         }
     }
 
-    private fun handleAccountName(result: Any?) {
+    /** Handles the result of the [GetAccountByName] api call to find out if the account written in the To text
+     * field corresponds to an actual BitShares account or not and acts accordingly */
+    private fun handleAccountProperties(result: Any?) {
         if (result is AccountProperties) {
             mSelectedUserAccount = UserAccount(result.id, result.name)
             destinationPublicKey = result.active.keyAuths.keys.iterator().next()
@@ -260,6 +265,9 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         enableDisableSendFAB()
     }
 
+    /** Handles the result of the [GetDynamicGlobalProperties] api call to add the needed metadata to the [Transaction]
+     * the app is building and ultimately send, if everything is correct adds the needed info to the [Transaction] and
+     * calls the next step which is [GetRequiredFees] else it shows an error */
     private fun handleDynamicGlobalProperties(result: Any?) {
         if (result is DynamicGlobalProperties) {
             val expirationTime = (result.time.time / 1000) + Transaction.DEFAULT_EXPIRATION_TIME
@@ -270,36 +278,41 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
             val asset = Asset(mBalancesDetailsAdapter!!.getItem(spAsset.selectedItemPosition)!!.id)
 
-            val id = mNetworkService!!.sendMessage(GetRequiredFees(transaction!!, asset), GetRequiredFees.REQUIRED_API)
-            responseMap[id] = RESPONSE_GET_REQUIRED_FEES
+            val id = mNetworkService?.sendMessage(GetRequiredFees(transaction!!, asset), GetRequiredFees.REQUIRED_API)
+            if (id != null) responseMap[id] = RESPONSE_GET_REQUIRED_FEES
         } else {
             context?.toast(getString(R.string.msg__transaction_not_sent))
         }
     }
 
+    /** Handles the result of the [GetRequiredFees] api call to add the fees to the [Transaction] the app is building
+     * and ultimately send, and if everything is correct broadcasts the [Transaction] else it shows an error */
     private fun handleRequiredFees(result: Any?) {
         if (result is List<*> && result[0] is AssetAmount) {
             Log.d(TAG, "GetRequiredFees: " + transaction.toString())
             transaction!!.setFees(result as List<AssetAmount>) // TODO find how to remove this warning
 
-            val id = mNetworkService!!.sendMessage(BroadcastTransaction(transaction), BroadcastTransaction.REQUIRED_API)
-            responseMap[id] = RESPONSE_BROADCAST_TRANSACTION
+            val id = mNetworkService?.sendMessage(BroadcastTransaction(transaction), BroadcastTransaction.REQUIRED_API)
+            if (id != null) responseMap[id] = RESPONSE_BROADCAST_TRANSACTION
         } else {
             context?.toast(getString(R.string.msg__transaction_not_sent))
         }
     }
 
+    /** Handles the result of the [BroadcastTransaction] api call to find out if the Transaction was sent successfully
+     * or not and acts accordingly */
     private fun handleBroadcastTransaction(message: JsonRpcResponse<*>) {
         if (message.result == null && message.error == null) {
             context?.toast(getString(R.string.text__transaction_sent))
 
             // Return to the main screen
             findNavController().navigateUp()
-        } else {
+        } else if (message.error != null) {
             context?.toast(message.error.message, Toast.LENGTH_LONG)
         }
     }
 
+    /** Verifies if the user has already granted the Camera permission, if not the asks for it */
     private fun verifyCameraPermission() {
         if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED) {
@@ -311,6 +324,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         }
     }
 
+    /** Handles the result from the camera permission request */
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
@@ -346,6 +360,8 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         cameraPreview.stopCamera()
     }
 
+    /** Handles the result of the QR code read from the camera and tries to populate the Account, Amount and Memo fields
+     * and the Asset spinner with the obtained information */
     override fun handleResult(result: Result?) {
         try {
             val invoice = Invoice.fromQrCode(result!!.text)
@@ -417,13 +433,11 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         }
     }
 
-    /**
-     * Starts the Send Transfer operation procedure, creating a [TransferOperation] and sending a call to the
-     * NetworkService to obtain the [DynamicGlobalProperties] object needed to successfully send a Transfer
-     */
+    /** Starts the Send Transfer operation procedure, creating a [TransferOperation] and sending a call to the
+     * NetworkService to obtain the [DynamicGlobalProperties] object needed to successfully send a Transfer */
     private fun startSendTransferOperation() {
         // Create TransferOperation
-        if (mNetworkService!!.isConnected) {
+        if (mNetworkService?.isConnected == true) {
             val balance = mBalancesDetailsAdapter!!.getItem(spAsset.selectedItemPosition)!!
             val amount = (tietAmount.text.toString().toDouble() * Math.pow(10.0, balance.precision.toDouble())).toLong()
 
@@ -480,13 +494,13 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
      *      Agorise.
      */
     private fun getAgoriseFeeOperation(transferOperation: TransferOperation): TransferOperation? {
-        if (transferOperation.assetAmount?.asset?.equals(BTS) == true) {
+        if (transferOperation.assetAmount?.asset?.equals(Constants.BTS) == true) {
             // The transfer operation is already in BTS so the fee amount can be easily calculated
             val fee = transferOperation.assetAmount?.multiplyBy(Constants.FEE_PERCENTAGE) ?: return null
 
             return TransferOperationBuilder()
                 .setSource(mUserAccount)
-                .setDestination(AGORISE_ACCOUNT)
+                .setDestination(Constants.AGORISE_ACCOUNT)
                 .setTransferAmount(fee)
                 .build()
         }
