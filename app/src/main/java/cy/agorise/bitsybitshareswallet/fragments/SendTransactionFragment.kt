@@ -30,6 +30,7 @@ import cy.agorise.graphenej.api.calls.BroadcastTransaction
 import cy.agorise.graphenej.api.calls.GetAccountByName
 import cy.agorise.graphenej.api.calls.GetDynamicGlobalProperties
 import cy.agorise.graphenej.api.calls.GetRequiredFees
+import cy.agorise.graphenej.crypto.SecureRandomGenerator
 import cy.agorise.graphenej.models.AccountProperties
 import cy.agorise.graphenej.models.DynamicGlobalProperties
 import cy.agorise.graphenej.models.JsonRpcResponse
@@ -49,15 +50,22 @@ import java.util.concurrent.TimeUnit
 import javax.crypto.AEADBadTagException
 
 class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHandler {
-    private val TAG = this.javaClass.simpleName
 
-    // Camera Permission
-    private val REQUEST_CAMERA_PERMISSION = 1
+    companion object {
+        private const val TAG = "SendTransactionFragment"
 
-    private val RESPONSE_GET_ACCOUNT_BY_NAME = 1
-    private val RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS = 2
-    private val RESPONSE_GET_REQUIRED_FEES = 3
-    private val RESPONSE_BROADCAST_TRANSACTION = 4
+        /** The account used to send the fees */
+        private val FEE_ACCOUNT = UserAccount("1.2.390320", "agorise")
+
+        // Camera Permission
+        private const val REQUEST_CAMERA_PERMISSION = 1
+
+        // Constants used to organize NetworkService requests
+        private const val RESPONSE_GET_ACCOUNT_BY_NAME = 1
+        private const val RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS = 2
+        private const val RESPONSE_GET_REQUIRED_FEES = 3
+        private const val RESPONSE_BROADCAST_TRANSACTION = 4
+    }
 
     private var isCameraPreviewVisible = false
     private var isToAccountCorrect = false
@@ -350,7 +358,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
                 amount += nextItem.quantity * nextItem.price
             }
             // TODO Improve pattern to account for different asset precisions
-            val df = DecimalFormat("####.#####")
+            val df = DecimalFormat("####.########")
             df.roundingMode = RoundingMode.CEILING
             df.decimalFormatSymbols = DecimalFormatSymbols(Locale.getDefault())
             tietAmount.setText(df.format(amount))
@@ -415,15 +423,15 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
             val privateKey = ECKey.fromPrivate(DumpedPrivateKey.fromBase58(null, wifKey).key.privKeyBytes)
 
             // Add memo if exists TODO enable memo
-//            val memoMsg = tietMemo.text.toString()
-//            if (memoMsg.isNotEmpty()) {
-//                val nonce = SecureRandomGenerator.getSecureRandom().nextLong().toBigInteger()
-//                val encryptedMemo = Memo.encryptMessage(privateKey, destinationPublicKey!!, nonce, memoMsg)
-//                val from = Address(ECKey.fromPublicOnly(privateKey.pubKey))
-//                val to = Address(destinationPublicKey!!.key)
-//                val memo = Memo(from, to, nonce, encryptedMemo)
-//                operationBuilder.setMemo(memo)
-//            }
+            val memoMsg = tietMemo.text.toString()
+            if (memoMsg.isNotEmpty()) {
+                val nonce = Math.abs(SecureRandomGenerator.getSecureRandom().nextLong()).toBigInteger()
+                val encryptedMemo = Memo.encryptMessage(privateKey, destinationPublicKey!!, nonce, memoMsg)
+                val from = Address(ECKey.fromPublicOnly(privateKey.pubKey))
+                val to = Address(destinationPublicKey!!.key)
+                val memo = Memo(from, to, nonce, encryptedMemo)
+                operationBuilder.setMemo(memo)
+            }
 
             val operations = ArrayList<BaseOperation>()
             operations.add(operationBuilder.build())

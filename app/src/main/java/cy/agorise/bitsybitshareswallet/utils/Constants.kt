@@ -23,6 +23,9 @@ object Constants {
     /** The user selected encrypted PIN */
     const val KEY_ENCRYPTED_PIN = "key_encrypted_pin"
 
+    /** The fee to send in every transfer (0.01%) */
+    const val FEE_PERCENTAGE = 0.0001
+
     /**
      * LTM accounts come with an expiration date expressed as this string.
      * This is used to recognize such accounts from regular ones.
