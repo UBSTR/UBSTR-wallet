@@ -35,6 +35,7 @@ import cy.agorise.graphenej.crypto.SecureRandomGenerator
 import cy.agorise.graphenej.models.AccountProperties
 import cy.agorise.graphenej.models.DynamicGlobalProperties
 import cy.agorise.graphenej.models.JsonRpcResponse
+import cy.agorise.graphenej.operations.TransferOperation
 import cy.agorise.graphenej.operations.TransferOperationBuilder
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -55,9 +56,6 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
     companion object {
         private const val TAG = "SendTransactionFragment"
 
-        /** The account used to send the fees */
-        private val FEE_ACCOUNT = UserAccount("1.2.390320", "agorise")
-
         // Camera Permission
         private const val REQUEST_CAMERA_PERMISSION = 1
 
@@ -67,6 +65,12 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         private const val RESPONSE_GET_REQUIRED_FEES = 3
         private const val RESPONSE_BROADCAST_TRANSACTION = 4
     }
+
+    /** The account used to send the fees */
+    private val AGORISE_ACCOUNT = UserAccount("1.2.390320", "agorise")
+
+    /** Core BTS token */
+    private val BTS = Asset("1.3.0")
 
     private var isCameraPreviewVisible = false
     private var isToAccountCorrect = false
@@ -79,6 +83,8 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
     private var mBalancesDetailsAdapter: BalancesDetailsAdapter? = null
 
     private var selectedAssetSymbol = ""
+
+    private var selectedAssetToBTSExchangeRatio = 1.0
 
     /** Current user account */
     private var mUserAccount: UserAccount? = null
@@ -157,11 +163,21 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val balance = mBalancesDetailsAdapter!!.getItem(position)!!
                 selectedAssetSymbol = balance.symbol
+                val asset = Asset(balance.id)
 
                 val amount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
 
                 tvAvailableAssetAmount.text =
                         String.format("%." + Math.min(balance.precision, 8) + "f %s", amount, balance.symbol)
+
+                // Obtain current selected asset to BTS exchange rate
+                if (balance.symbol == "BTS")
+                    selectedAssetToBTSExchangeRatio = 1.0
+                else {
+                    // TODO obtain exchange ratio when selected asset is not BTS
+//                var id = mNetworkService?.sendMessage(GetRequiredFees(exchangeOperation, asset),
+//                    GetRequiredFees.REQUIRED_API)
+                }
             }
         }
 
@@ -401,6 +417,10 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         }
     }
 
+    /**
+     * Starts the Send Transfer operation procedure, creating a [TransferOperation] and sending a call to the
+     * NetworkService to obtain the [DynamicGlobalProperties] object needed to successfully send a Transfer
+     */
     private fun startSendTransferOperation() {
         // Create TransferOperation
         if (mNetworkService!!.isConnected) {
@@ -416,7 +436,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
             val privateKey = ECKey.fromPrivate(DumpedPrivateKey.fromBase58(null, wifKey).key.privKeyBytes)
 
-            // Add memo if exists
+            // Add memo if it is not empty
             val memoMsg = tietMemo.text.toString()
             if (memoMsg.isNotEmpty()) {
                 val nonce = Math.abs(SecureRandomGenerator.getSecureRandom().nextLong()).toBigInteger()
@@ -427,16 +447,51 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
                 operationBuilder.setMemo(memo)
             }
 
+            // Object that will contain all operations to be sent at once
             val operations = ArrayList<BaseOperation>()
-            operations.add(operationBuilder.build())
+            // Transfer from the current user to the selected one
+            val transferOperation = operationBuilder.build()
+            operations.add(transferOperation)
+
+            // Transfer operation to be sent as a fee to Agorise
+            val feeOperation = getAgoriseFeeOperation(transferOperation)
+            if (feeOperation != null)
+                operations.add(feeOperation)
 
             transaction = Transaction(privateKey, null, operations)
 
-            val id = mNetworkService!!.sendMessage(GetDynamicGlobalProperties(),
+            val id = mNetworkService?.sendMessage(GetDynamicGlobalProperties(),
                 GetDynamicGlobalProperties.REQUIRED_API)
-            responseMap[id] =  RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS
+            if (id != null ) responseMap[id] =  RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS
         } else
             Log.d(TAG, "Network Service is not connected")
+    }
+
+    /**
+     * Obtains the correct [TransferOperation] object to send the fee to Agorise. This operation has to always send
+     * BTS so, depending on the Asset selected there are three possible options:
+     * a)   The Asset is BTS, this is the easiest case because we only need to calculate the fee as a percentage
+     *      of transferOperation's AssetAmount
+     * b)   The Asset is other than BTS and the user has enough BTS to pay the fee, in this case we need to calculate
+     *      the fee in BTS taking into account the Asset <-> BTS exchange rate.
+     * c)   The Asset is other than BTS but the user has not enough BTS to pay the fee, this is the most complex
+     *      scenario because we first need to calculate the fee in BTS taking into account the Asset <-> BTS exchange
+     *      rate, then create an exchange operation to obtain that amount of BTS and finally send that BTS as a fee to
+     *      Agorise.
+     */
+    private fun getAgoriseFeeOperation(transferOperation: TransferOperation): TransferOperation? {
+        if (transferOperation.assetAmount?.asset?.equals(BTS) == true) {
+            // The transfer operation is already in BTS so the fee amount can be easily calculated
+            val fee = transferOperation.assetAmount?.multiplyBy(Constants.FEE_PERCENTAGE) ?: return null
+
+            return TransferOperationBuilder()
+                .setSource(mUserAccount)
+                .setDestination(AGORISE_ACCOUNT)
+                .setTransferAmount(fee)
+                .build()
+        }
+        // TODO obtain fee amount when the asset to transfer is not BTS
+        return null
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -456,6 +511,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
     override fun onResume() {
         super.onResume()
+
         if (isCameraPreviewVisible)
             startCameraPreview()
     }
