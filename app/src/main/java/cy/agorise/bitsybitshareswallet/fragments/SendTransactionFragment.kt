@@ -80,8 +80,6 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
     /** Keeps track of the asset's symbol selected in the Asset spinner */
     private var selectedAssetSymbol = ""
 
-    private var selectedAssetToBTSExchangeRatio = 1.0
-
     /** Current user account */
     private var mUserAccount: UserAccount? = null
 
@@ -199,30 +197,19 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         )
     }
 
-    /** Handles the selection of items in the Asset spinner, to keep track of the selectedAssetSymbol, show the
-     * current user's balance of the selected asset and make a call to obtain the Asset <-> BTS exchange rate in case
-     * Asset != BTS, this latest item is needed to correctly calculate and send the fee to Agorise. */
+    /** Handles the selection of items in the Asset spinner, to keep track of the selectedAssetSymbol and show the
+     * current user's balance of the selected asset. */
     private val assetItemSelectedListener = object : AdapterView.OnItemSelectedListener{
         override fun onNothingSelected(parent: AdapterView<*>?) { }
 
         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
             val balance = mBalancesDetailsAdapter!!.getItem(position)!!
             selectedAssetSymbol = balance.symbol
-            val asset = Asset(balance.id)
 
             val amount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
 
             tvAvailableAssetAmount.text =
                     String.format("%." + Math.min(balance.precision, 8) + "f %s", amount, balance.symbol)
-
-            // Obtain current selected asset to BTS exchange rate
-            if (balance.symbol == "BTS")
-                selectedAssetToBTSExchangeRatio = 1.0
-            else {
-                // TODO obtain exchange ratio when selected asset is not BTS
-//                var id = mNetworkService?.sendMessage(GetRequiredFees(exchangeOperation, asset),
-//                    GetRequiredFees.REQUIRED_API)
-            }
         }
     }
 
@@ -474,6 +461,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
             transaction = Transaction(privateKey, null, operations)
 
+            // Start the send transaction procedure which includes a series of calls
             val id = mNetworkService?.sendMessage(GetDynamicGlobalProperties(),
                 GetDynamicGlobalProperties.REQUIRED_API)
             if (id != null ) responseMap[id] =  RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS
@@ -482,20 +470,12 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
     }
 
     /**
-     * Obtains the correct [TransferOperation] object to send the fee to Agorise. This operation has to always send
-     * BTS so, depending on the Asset selected there are three possible options:
-     * a)   The Asset is BTS, this is the easiest case because we only need to calculate the fee as a percentage
-     *      of transferOperation's AssetAmount
-     * b)   The Asset is other than BTS and the user has enough BTS to pay the fee, in this case we need to calculate
-     *      the fee in BTS taking into account the Asset <-> BTS exchange rate.
-     * c)   The Asset is other than BTS but the user has not enough BTS to pay the fee, this is the most complex
-     *      scenario because we first need to calculate the fee in BTS taking into account the Asset <-> BTS exchange
-     *      rate, then create an exchange operation to obtain that amount of BTS and finally send that BTS as a fee to
-     *      Agorise.
+     * Obtains the correct [TransferOperation] object to send the fee to Agorise. A fee is only sent if the Asset is
+     * BTS or a SmartCoin.
      */
     private fun getAgoriseFeeOperation(transferOperation: TransferOperation): TransferOperation? {
-        if (transferOperation.assetAmount?.asset?.equals(Constants.BTS) == true) {
-            // The transfer operation is already in BTS so the fee amount can be easily calculated
+        // Verify that the current Asset is either BTS or a SmartCoin
+        if (Constants.assetsWhichSendFeeToAgorise.contains(transferOperation.assetAmount?.asset?.objectId ?: "")) {
             val fee = transferOperation.assetAmount?.multiplyBy(Constants.FEE_PERCENTAGE) ?: return null
 
             return TransferOperationBuilder()
@@ -503,9 +483,8 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
                 .setDestination(Constants.AGORISE_ACCOUNT)
                 .setTransferAmount(fee)
                 .build()
-        }
-        // TODO obtain fee amount when the asset to transfer is not BTS
-        return null
+        } else
+            return null
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

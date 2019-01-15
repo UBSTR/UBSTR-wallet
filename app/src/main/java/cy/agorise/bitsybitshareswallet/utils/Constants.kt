@@ -32,8 +32,32 @@ object Constants {
     /** The account used to send the fees */
     val AGORISE_ACCOUNT = UserAccount("1.2.390320", "agorise")
 
-    /** Core BTS token */
-    val BTS = Asset("1.3.0")
+    /** List of assets symbols that send fee to Agorise when sending a transaction (BTS and smartcoins only) */
+    val assetsWhichSendFeeToAgorise = setOf(
+        "1.3.0",    // BTS
+        "1.3.113",  // CNY
+        "1.3.121",  // USD
+        "1.3.1325", // RUBLE
+        "1.3.120",  // EUR
+        "1.3.103",  // BTC
+        "1.3.109",  // HKD
+        "1.3.119",  // JPY
+        "1.3.102",  // KRW
+        "1.3.106",  // GOLD
+        "1.3.105",  // SILVER
+        "1.3.118",  // GBP
+        "1.3.115",  // CAD
+        "1.3.1017", // ARS
+        "1.3.114",  // MXN
+        "1.3.111",  // SEK
+        "1.3.117",  // AUD
+        "1.3.116",  // CHF
+        "1.3.112",  // NZD
+        "1.3.110",  // RUB
+        "1.3.2650", // XCD
+        "1.3.107",  // TRY
+        "1.3.108"   // SGD
+    )
 
     /**
      * LTM accounts come with an expiration date expressed as this string.
