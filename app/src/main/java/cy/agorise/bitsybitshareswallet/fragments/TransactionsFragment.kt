@@ -44,6 +44,7 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
     private var filterFiatAmountAll = true
     private var filterFromFiatAmount = 0L
     private var filterToFiatAmount = 500L
+    private var filterAgoriseFees = true
 
     private var mDisposables = CompositeDisposable()
 
@@ -111,7 +112,7 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
                 val filterOptionsDialog = FilterOptionsDialog.newInstance(
                     filterTransactionsDirection, filterDateRangeAll, filterStartDate * 1000,
                     filterEndDate * 1000, filterAssetAll, filterAsset,
-                    filterFiatAmountAll, filterFromFiatAmount, filterToFiatAmount
+                    filterFiatAmountAll, filterFromFiatAmount, filterToFiatAmount, filterAgoriseFees
                 )
                 filterOptionsDialog.show(childFragmentManager, "filter-options-tag")
                 true
@@ -194,7 +195,8 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
         filterAsset: String,
         filterFiatAmountAll: Boolean,
         filterFromFiatAmount: Long,
-        filterToFiatAmount: Long
+        filterToFiatAmount: Long,
+        filterAgoriseFees: Boolean
     ) {
         this.filterTransactionsDirection = filterTransactionsDirection
         this.filterDateRangeAll = filterDateRangeAll
@@ -205,6 +207,7 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
         this.filterFiatAmountAll = filterFiatAmountAll
         this.filterFromFiatAmount = filterFromFiatAmount
         this.filterToFiatAmount = filterToFiatAmount
+        this.filterAgoriseFees = filterAgoriseFees
         applyFilterOptions(true)
     }
 

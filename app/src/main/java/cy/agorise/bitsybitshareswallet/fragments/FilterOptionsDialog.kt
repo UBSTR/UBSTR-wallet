@@ -38,8 +38,9 @@ class FilterOptionsDialog : DialogFragment() {
         const val KEY_FILTER_ASSET_ALL = "key_filter_asset_all"
         const val KEY_FILTER_ASSET = "key_filter_asset"
         const val KEY_FILTER_FIAT_AMOUNT_ALL = "key_filter_fiat_amount_all"
-        const val KEY_FILTER_FROM_FIAT_AMOUNT = "filter_from_fiat_amount"
-        const val KEY_FILTER_TO_FIAT_AMOUNT = "filter_to_fiat_amount"
+        const val KEY_FILTER_FROM_FIAT_AMOUNT = "key_filter_from_fiat_amount"
+        const val KEY_FILTER_TO_FIAT_AMOUNT = "key_filter_to_fiat_amount"
+        const val KEY_FILTER_AGORISE_FEES = "key_filter_agorise_fees"
 
         const val KEY_TIMESTAMP = "key_timestamp"
 
@@ -49,7 +50,7 @@ class FilterOptionsDialog : DialogFragment() {
         fun newInstance(filterTransactionsDirection: Int, filterDateRangeAll: Boolean,
                         filterStartDate: Long, filterEndDate: Long, filterAssetAll: Boolean,
                         filterAsset: String, filterFiatAmountAll: Boolean,
-                        filterFromFiatAmount: Long, filterToFiatAmount: Long): FilterOptionsDialog {
+                        filterFromFiatAmount: Long, filterToFiatAmount: Long, filterAgoriseFees: Boolean): FilterOptionsDialog {
             val frag = FilterOptionsDialog()
             val args = Bundle()
             args.putInt(KEY_FILTER_TRANSACTION_DIRECTION, filterTransactionsDirection)
@@ -61,6 +62,7 @@ class FilterOptionsDialog : DialogFragment() {
             args.putBoolean(KEY_FILTER_FIAT_AMOUNT_ALL, filterFiatAmountAll)
             args.putLong(KEY_FILTER_FROM_FIAT_AMOUNT, filterFromFiatAmount)
             args.putLong(KEY_FILTER_TO_FIAT_AMOUNT, filterToFiatAmount)
+            args.putBoolean(KEY_FILTER_AGORISE_FEES, filterAgoriseFees)
             frag.arguments = args
             return frag
         }
@@ -81,6 +83,7 @@ class FilterOptionsDialog : DialogFragment() {
     private lateinit var llFiatAmount: LinearLayout
 //    lateinit var etFromFiatAmount: CurrencyEditText
 //    lateinit var etToFiatAmount: CurrencyEditText
+    private lateinit var switchAgoriseFees: Switch
 
     private var mCallback: OnFilterOptionsSelectedListener? = null
 
@@ -154,7 +157,8 @@ class FilterOptionsDialog : DialogFragment() {
                                     filterAsset: String,
                                     filterFiatAmountAll: Boolean,
                                     filterFromFiatAmount: Long,
-                                    filterToFiatAmount: Long)
+                                    filterToFiatAmount: Long,
+                                    filterAgoriseFees: Boolean)
     }
 
 
@@ -247,6 +251,10 @@ class FilterOptionsDialog : DialogFragment() {
 //        val toFiatAmount = arguments!!.getLong(KEY_FILTER_TO_FIAT_AMOUNT, 0)
 //        etToFiatAmount.setText("$toFiatAmount", TextView.BufferType.EDITABLE)
 
+        // Initialize transaction network fees
+        switchAgoriseFees = view.findViewById(R.id.switchAgoriseFees)
+        switchAgoriseFees.isChecked = arguments!!.getBoolean(KEY_FILTER_AGORISE_FEES, true)
+
         builder.setView(view)
 
         return builder.create()
@@ -316,8 +324,10 @@ class FilterOptionsDialog : DialogFragment() {
 //                    Math.pow(10.0, mUserCurrency.defaultFractionDigits.toDouble()).toLong()
 //        }
 
+        val filterAgoriseFees = switchAgoriseFees.isChecked
+
         mCallback!!.onFilterOptionsSelected(filterTransactionsDirection, filterDateRangeAll,
             startDate, endDate, filterAssetAll, filterAsset, filterFiatAmountAll,
-            filterFromFiatAmount, filterToFiatAmount)
+            filterFromFiatAmount, filterToFiatAmount, filterAgoriseFees)
     }
 }

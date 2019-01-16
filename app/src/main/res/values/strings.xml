@@ -58,6 +58,7 @@
     <string name="text__received">Received</string>
     <string name="text__date_range">Date Range</string>
     <string name="text__fiat_amount">Fiat Amount</string>
+    <string name="msg__ignore_transaction_fees">Ignore transaction network fees</string>
     <string name="button__filter">Filter</string>
 
     <!-- Send Transaction -->
@@ -110,6 +111,7 @@
     <string name="title__general">General</string>
     <string name="msg__close_timer">Automatically close BiTSy after 3 minutes of inactivity</string>
     <string name="msg__night_mode">Night mode</string>
+    <string name="text__view_network_status">View Network Status</string>
     <string name="title__backup">Backup</string>
     <string name="msg__brainkey_description">BrainKey. Account recovery words that can be captured or copied, but not
         edited.
@@ -124,6 +126,5 @@
         https://github.com/Agorise
     </string>
     <string name="title__bitshares_nodes_dialog">Block: %1$s</string>
-    <string name="text__view_network_status">View Network Status</string>
 
 </resources>

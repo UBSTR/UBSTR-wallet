@@ -148,18 +148,19 @@
         app:layout_constraintTop_toBottomOf="@id/sAsset"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!--<LinearLayout-->
-        <!--android:id="@+id/llFiatAmount"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_margin="4dp"-->
-        <!--android:orientation="horizontal"-->
-        <!--app:layout_constraintTop_toBottomOf="@id/cbFiatAmount">-->
+    <LinearLayout
+        android:id="@+id/llFiatAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/cbFiatAmount">
 
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="@string/between"/>-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Between"/>
 
         <!--<faranjit.currency.edittext.CurrencyEditText-->
             <!--android:id="@+id/etFromFiatAmount"-->
@@ -170,10 +171,10 @@
             <!--android:textAlignment="center"-->
             <!--app:showSymbol="true"/>-->
 
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="@string/and"/>-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="and"/>
 
         <!--<faranjit.currency.edittext.CurrencyEditText-->
             <!--android:id="@+id/etToFiatAmount"-->
@@ -184,6 +185,16 @@
             <!--android:textAlignment="center"-->
             <!--app:showSymbol="true"/>-->
 
-    <!--</LinearLayout>-->
+    </LinearLayout>
+
+    <Switch
+        android:id="@+id/switchAgoriseFees"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_different_topic"
+        android:switchPadding="12dp"
+        android:text="@string/msg__ignore_transaction_fees"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/llFiatAmount"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
