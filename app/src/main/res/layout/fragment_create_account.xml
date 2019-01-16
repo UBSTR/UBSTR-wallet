@@ -9,39 +9,26 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin">
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:clickable="true">
 
-    <RelativeLayout
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilAccountName"
+        style="@style/Widget.Bitsy.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical">
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilAccountName"
-            style="@style/Widget.Bitsy.TextInputLayout"
+        android:hint="@string/text__bitshares_account_name">
+
+        <cy.agorise.bitsybitshareswallet.views.MyTextInputEditText
+            android:id="@+id/tietAccountName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/text__bitshares_account_name">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/tietAccountName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:digits="abcdefghijklmnopqrstuvwxyz0123456789-"
-                android:singleLine="true"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!--<com.github.ybq.android.spinkit.SpinKitView-->
-            <!--android:id="@+id/spin_kit"-->
-            <!--android:layout_width="20dp"-->
-            <!--android:layout_height="20dp"-->
-            <!--android:layout_marginEnd="15dp"-->
-            <!--android:layout_alignParentEnd="true"-->
-            <!--android:layout_centerVertical="true"-->
-            <!--android:visibility="invisible"-->
-            <!--app:SpinKit_Color="@color/colorAccent"-->
-            <!--style="@style/SpinKitView.Small.ThreeBounce" />-->
-    </RelativeLayout>
+            android:inputType="text"
+            android:digits="abcdefghijklmnopqrstuvwxyz0123456789-"
+            android:singleLine="true"/>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilPin"
@@ -52,7 +39,7 @@
         android:hint="@string/text_field__6_digit_pin"
         app:passwordToggleEnabled="true">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <cy.agorise.bitsybitshareswallet.views.MyTextInputEditText
             android:id="@+id/tietPin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -69,7 +56,7 @@
         android:hint="@string/text_field__confirm_pin"
         app:passwordToggleEnabled="true">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <cy.agorise.bitsybitshareswallet.views.MyTextInputEditText
             android:id="@+id/tietPinConfirmation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
