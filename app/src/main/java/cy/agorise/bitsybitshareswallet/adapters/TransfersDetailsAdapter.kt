@@ -128,7 +128,7 @@ class TransfersDetailsAdapter(private val context: Context) :
         val cryptoAmount = "${df.format(amount)} ${transferDetail.cryptoSymbol}"
         viewHolder.tvCryptoAmount.text = cryptoAmount
 
-        viewHolder.tvFiatEquivalent.text = "$4119.75"
+        viewHolder.tvFiatEquivalent.text = "-"
 
         viewHolder.ivDirectionArrow.setImageDrawable(context.getDrawable(
             if(transferDetail.direction) R.drawable.ic_arrow_receive else R.drawable.ic_arrow_send
