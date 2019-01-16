@@ -16,13 +16,10 @@
     <string name="button__import_existing_account">Import existing account</string>
     <string name="text__or">Or</string>
     <string name="button__create_new_account">Create new account</string>
-    <!-- TODO improve below error explanation -->
-    <string name="error__invalid_brainkey">Invalid account, please check your brainkey for typing errors</string>
+    <string name="error__invalid_brainkey">No accounts controlled by the given brainkey where found, please check your brainkey for typing errors</string>
     <string name="error__try_again">Please try again after 5 minutes</string>
     <string name="dialog__account_candidates_title">Please select an account</string>
-    <string name="dialog__account_candidates_content">The keys derived from this brainkey seem to be used to control
-        more than one account, please select which account you wish to import
-    </string>
+    <string name="dialog__account_candidates_content">The keys derived from this brainkey seem to be used to control more than one account, please select which account you wish to import</string>
 
     <!-- Create Account -->
     <string name="text__bitshares_account_name">BitShares account name</string>
@@ -74,26 +71,14 @@
     <string name="msg__transaction_not_sent">Unable to send transaction</string>
 
     <!-- Send Transaction info dialog -->
-    <string name="msg__to_explanation">Type in the Bitshares account name of the person you want to send funds
-        to.\nFor example: agorise-faucet
-    </string>
+    <string name="msg__to_explanation">Type in the Bitshares account name of the person you want to send funds to.\nFor example: agorise-faucet</string>
     <string name="text__asset_balance">Asset Balance</string>
-    <string name="msg__asset_balance_explanation">You can tap on the balance displayed to send all of that asset. Doing
-        so will fill in the Amount field for you.
-    </string>
-    <string name="msg__memo_explanation">Entering a Memo is not required, but taking notes on why you sent the funds is
-        nice for future reference. Memos are only visible to you and the person whom you sent funds to.
-    </string>
+    <string name="msg__asset_balance_explanation">You can tap on the balance displayed to send all of that asset. Doing so will fill in the Amount field for you.</string>
+    <string name="msg__memo_explanation">Entering a Memo is not required, but taking notes on why you sent the funds is nice for future reference. Memos are only visible to you and the person whom you sent funds to.</string>
     <string name="text__network_fee">Network Fee</string>
-    <string name="msg__network_fee_explanation">The Network fee is included in the amount that you want to send. For
-        example, if you want to send 50 BTS, BiTSy will actually send ~50.21 BTS. The added 0.21 in this example is the
-        Bitshares transaction fee plus 0.01% to the BiTSy Developer Team (typically ~1 cent).
-    </string>
+    <string name="msg__network_fee_explanation">The Network fee is included in the amount that you want to send. For example, if you want to send 50 BTS, BiTSy will actually send ~50.21 BTS. The added 0.21 in this example is the Bitshares transaction fee plus 0.01% to the BiTSy Developer Team (typically ~1 cent).</string>
     <string name="text__qr_code">QR Code</string>
-    <string name="msg__qr_code_explanation">You do not need to scan someone’s QR to send funds, but it does help you to
-        avoid mistakes. Once you send funds from your account, they are gone forever, so always make sure the account
-        name in the “To” field is correct.
-    </string>
+    <string name="msg__qr_code_explanation">You do not need to scan someone’s QR to send funds, but it does help you to avoid mistakes. Once you send funds from your account, they are gone forever, so always make sure the account name in the “To” field is correct.</string>
 
     <!-- Receive Transaction -->
     <string name="text__asset">Asset</string>
@@ -113,18 +98,12 @@
     <string name="msg__night_mode">Night mode</string>
     <string name="text__view_network_status">View Network Status</string>
     <string name="title__backup">Backup</string>
-    <string name="msg__brainkey_description">BrainKey. Account recovery words that can be captured or copied, but not
-        edited.
-    </string>
-    <string name="msg__brainkey_info">Write this down! Be sure you have 2 copies of this BrainKey in 2 secure locations
-        in case of fire or loss. Security First! Anyone with access to your BrainKey can access the funds in your account!
-    </string>
+    <string name="msg__brainkey_description">BrainKey. Account recovery words that can be captured or copied, but not edited.</string>
+    <string name="msg__brainkey_info">Write this down! Be sure you have 2 copies of this BrainKey in 2 secure locations in case of fire or loss. Security First! Anyone with access to your BrainKey can access the funds in your account!</string>
     <string name="button__copied">Copied</string>
     <string name="button__view_and_copy"><![CDATA[View & Copy]]></string>
     <string name="title__bugs_or_ideas">Bugs or Ideas?</string>
-    <string name="msg__bugs_or_ideas">Telegram chat: http://t.me/Agorise\nEmail: Agorise@protonmail.ch\nOpen Source:
-        https://github.com/Agorise
-    </string>
+    <string name="msg__bugs_or_ideas">Telegram: https://t.me/Agorise\nKeybase: https://keybase.io/team/Agorise</string>
     <string name="title__bitshares_nodes_dialog">Block: %1$s</string>
 
 </resources>

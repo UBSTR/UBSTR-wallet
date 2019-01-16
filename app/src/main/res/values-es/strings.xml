@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BiTSy</string>
+
+    <!-- License Activity -->
+    <string name="button__agree">Aceptar</string>
+    <string name="button__disagree">Cancelar</string>
+
+    <!-- Import Brainkey -->
+    <string name="text_field__6_digit_pin">PIN de 6+ dígitos</string>
+    <string name="error__pin_too_short">El PIN es muy corto</string>
+    <string name="text_field__confirm_pin">Confirmar PIN</string>
+    <string name="error__pin_mismatch">El PIN no concuerda</string>
+    <string name="text__brain_key">BrainKey</string>
+    <string name="error__enter_correct_brainkey">Por favor ingresa un brainkey correcto, debe de tener entre 12 y 16 palabras.</string>
+    <string name="button__import_existing_account">Importar cuenta existente</string>
+    <string name="text__or">O</string>
+    <string name="button__create_new_account">Crear cuenta nueva</string>
+    <string name="error__invalid_brainkey">No se encontraron cuentas controladas por el brainkey dado, por favor revisa tu brainkey por errores de escritura</string>
+    <string name="error__try_again">Por favor intenta nuevamente después de 5 minutos</string>
+    <string name="dialog__account_candidates_title">Por favor selecciona una cuenta</string>
+    <string name="dialog__account_candidates_content">Las claves derivadas de este brainkey son usadas para controlar más de una cuenta, por favor selecciona la cuenta que deseas importar</string>
+
+    <!-- Create Account -->
+    <string name="text__bitshares_account_name">Cuenta de BitShares</string>
+    <string name="error__read_dict_file">Error al leer el archivo de diccionario</string>
+    <string name="error__invalid_account_name">La cuenta debe de tener más de 8 caracteres, contener un número o no contener vocales. El guion bajo no es permitido. </string>
+    <string name="text__verifying_account_availability">Verificando disponibilidad de cuenta…</string>
+    <string name="error__account_not_available">Cuenta no disponible</string>
+    <string name="text__account_is_available">Cuenta disponible</string>
+    <string name="title_error">Error</string>
+    <string name="error__faucet">El servidor regresó un error. Puede ser causado por una limitación a propósito para rechazar peticiones frecuentes provenientes de la misma dirección IP en un periodo corto de tiempo. Por favor espera 5 minutos e intenta de nuevo, o cambia a una red diferente, por ejemplo de WiFi a celular.</string>
+    <string name="error__faucet_template">El faucet regresó un error. Msj: %1$s</string>
+    <string name="error__created_account_not_found">La aplicación no pudo obtener la información sobre la cuenta recién creada</string>
+    <string name="button__create">Crear</string>
+
+    <!-- Home -->
+    <string name="title_transactions">Transacciones</string>
+    <string name="title_merchants">Comerciantes</string>
+    <string name="title_receive">Recibir</string>
+    <string name="title_balances">Balances</string>
+    <string name="title_send">Enviar</string>
+    <string name="title_net_worth">Valor neto</string>
+    <string name="text__coming_soon">Próximamente</string>
+
+    <!-- Transactions -->
+    <string name="title_search">Buscar</string>
+    <string name="title_filter">Filtrar</string>
+    <string name="title_export">Exportar</string>
+
+    <!-- Transactions filter options -->
+    <string name="title_filter_options">Opciones de filtrado</string>
+    <string name="text__all">Todas</string>
+    <string name="text__sent">Enviadas</string>
+    <string name="text__received">Recibidas</string>
+    <string name="text__date_range">Rango de fechas</string>
+    <string name="text__fiat_amount">Monto fiat</string>
+    <string name="text__ignore_network_fees">Ignorar cuotas de red</string>
+    <string name="button__filter">Filtrar</string>
+
+    <!-- Send Transaction -->
+    <string name="title_info">Info</string>
+    <string name="text__to">A</string>
+    <string name="text__amount">Cantidad</string>
+    <string name="text__memo">Memo</string>
+    <string name="text__scan_qr">Escanear QR</string>
+    <string name="error__invalid_account">Cuenta inválida</string>
+    <string name="error__not_enough_funds">Sin fondos suficientes</string>
+    <string name="msg__camera_permission_necessary">El permiso de cámara es necesario para leer códigos QR.</string>
+    <string name="text__transaction_sent">¡Transacción enviada!</string>
+    <string name="msg__transaction_not_sent">No se pudo enviar la transacción</string>
+
+    <!-- Send Transaction info dialog -->
+    <string name="msg__to_explanation">Escribe la cuenta BitShares de la persona a la que le deseas enviar fondos.\nPor ejemplo: agorise-faucet</string>
+    <string name="text__asset_balance">Balance del activo</string>
+    <string name="msg__asset_balance_explanation">Puedes tocar en el balance mostrado para enviar todo lo disponible de ese activo. Al hacerlo el campo Cantidad se llenará automáticamente por ti.</string>
+    <string name="msg__memo_explanation">Agregar un Memo no es necesario, pero tomar notas sobre porqué enviaste fondos es útil como referencia. Los Memos solamente son visibles para la persona que envía y recibe los fondos.</string>
+    <string name="text__network_fee">Cuota de red</string>
+    <string name="msg__network_fee_explanation">La cuota de red está incluida en la cantidad que deseas enviar. Por ejemplo, si deseas enviar 50 BTS, BiTSy en realidad enviará ~50.21 BTS. El agregado 0.21 en este ejemplo es la cuota de transacción de Bitshares más 0.01% para el equipo de dessarrollo de BiTSy(típicamente ~1 centavo).</string>
+    <string name="text__qr_code">Código QR</string>
+    <string name="msg__qr_code_explanation">No es necesario que escanees un código QR para enviar fondos, pero ayuda para evitar cometer errores. Una vez que envías fondos desde tu cuenta, se han ido para siempre, así que siempre asegúrate de que la cuenta en el campo “A” es correcta.</string>
+
+    <!-- Receive Transaction -->
+    <string name="text__asset">Activo</string>
+    <string name="text__other">Otro…</string>
+    <string name="template__please_send">Por favor enviar: %1$s %2$s</string>
+    <string name="text__any_amount">Cualquier Cantidad</string>
+    <string name="template__to">To: %1$s</string>
+    <string name="msg__invoice_subject">Invoice BiTSy de %1$s</string>
+    <string name="title_share">Compartir</string>
+    <string name="text__share_with">Compartir con</string>
+    <string name="msg__storage__permission__necessary">El permiso de almacenamiento es necesario para compartir imágenes.</string>
+
+    <!-- Settings -->
+    <string name="title_settings">Ajustes</string>
+    <string name="title__general">General</string>
+    <string name="msg__close_timer">Cerrar BiTSy automáticamente después de 3 minutos de inactividad</string>
+    <string name="msg__night_mode">Modo nocturno</string>
+    <string name="text__view_network_status">Ver Estatus de Red</string>
+    <string name="title__backup">Respaldo</string>
+    <string name="msg__brainkey_description">BrainKey. Palabras para respaldar cuenta que pueden ser capturadas o copiadas, pero no editadas.</string>
+    <string name="msg__brainkey_info">¡Escribe esto! Asegúrate de tener 2 copias de este BrainKey en 2 lugares seguros en caso de incendio o pérdida. ¡La seguridad primero! ¡Cualquiera con acceso a tu BrainKey puede acceder a los fondos en tu cuenta!</string>
+    <string name="button__copied">Copiado</string>
+    <string name="button__view_and_copy">Ver y Copiar</string>
+    <string name="title__bugs_or_ideas">Errores o Ideas?</string>
+    <string name="msg__bugs_or_ideas">Telegram: https://t.me/Agorise\nKeybase: https://keybase.io/team/Agorise</string>
+    <string name="title__bitshares_nodes_dialog">Bloque: %1$s</string>
+
+</resources>
