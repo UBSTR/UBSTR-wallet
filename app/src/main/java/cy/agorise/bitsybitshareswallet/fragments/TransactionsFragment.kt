@@ -169,6 +169,10 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
 //            if (!filterFiatAmountAll && (transferDetail.fiatAmount < filterFromFiatAmount || transferDetail.fiatAmount > filterToFiatAmount))
 //                continue
 
+            // Filter transactions sent to agorise
+            if (filterAgoriseFees && transferDetail.to.equals("agorise"))
+                continue
+
             // Filter by search query
             val text = (transferDetail.from ?: "").toLowerCase() + (transferDetail.to ?: "").toLowerCase()
             if (text.contains(filterQuery, ignoreCase = true)) {
