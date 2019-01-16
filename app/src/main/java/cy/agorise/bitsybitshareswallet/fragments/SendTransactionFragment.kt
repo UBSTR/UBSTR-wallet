@@ -358,14 +358,18 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
             tietTo.setText(invoice.to)
 
-            for (i in 0 until mBalancesDetailsAdapter!!.count) {
-                if (mBalancesDetailsAdapter!!.getItem(i)!!.symbol == invoice.currency.toUpperCase()) {
+            // Try to select the invoice's Asset in the Assets spinner
+            for (i in 0 until (mBalancesDetailsAdapter?.count ?: 0)) {
+                if (mBalancesDetailsAdapter?.getItem(i)?.symbol == invoice.currency.toUpperCase() ||
+                    (invoice.currency.startsWith("bit", true) &&
+                            invoice.currency.replaceFirst("bit", "").toUpperCase() ==
+                            mBalancesDetailsAdapter?.getItem(i)?.symbol)) {
                     spAsset.setSelection(i)
                     break
                 }
             }
+            
             tietMemo.setText(invoice.memo)
-
 
             var amount = 0.0
             for (nextItem in invoice.lineItems) {
