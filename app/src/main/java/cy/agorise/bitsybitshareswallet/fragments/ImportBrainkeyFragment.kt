@@ -208,7 +208,7 @@ class ImportBrainkeyFragment : BaseAccountFragment() {
      */
     private fun verifyBrainKey(switchCase: Boolean) {
         //showDialog("", getString(R.string.importing_your_wallet))
-        val brainKey = tietBrainKey.text.toString()
+        val brainKey = tietBrainKey.text.toString().trim()
         // Should we switch the brainkey case?
         if (switchCase) {
             if (Character.isUpperCase(brainKey.toCharArray()[brainKey.length - 1])) {
@@ -262,13 +262,10 @@ class ImportBrainkeyFragment : BaseAccountFragment() {
      * specified BrainKey
      */
     private fun handleBrainKeyAccountReferences(result: Any?) {
-        if (result !is List<*>)
+        if (result !is List<*> || result[0] !is List<*>) {
+            context?.toast(getString(R.string.error__invalid_brainkey))
             return
-
-        val list = result[0] as? List<*> ?: return
-
-        if (list[0] !is UserAccount)
-            return
+        }
 
         val resp = result as List<List<UserAccount>>
         val accountList: List<UserAccount> = resp[0].distinct()
