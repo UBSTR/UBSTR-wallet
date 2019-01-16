@@ -368,7 +368,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
                     break
                 }
             }
-            
+
             tietMemo.setText(invoice.memo)
 
             var amount = 0.0
@@ -463,7 +463,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
             // Transfer operation to be sent as a fee to Agorise
             val feeOperation = getAgoriseFeeOperation(transferOperation)
-            if (feeOperation != null)
+            if (feeOperation != null && (feeOperation.assetAmount?.amount?.toLong() ?: 0L) > 0L)
                 operations.add(feeOperation)
 
             transaction = Transaction(privateKey, null, operations)
