@@ -127,12 +127,24 @@
         tools:listitem="@android:layout/simple_list_item_1"
         app:layout_constraintTop_toBottomOf="@id/cbAsset"/>
 
+    <!-- Ignore Agorise Fees -->
+
+    <Switch
+        android:id="@+id/switchAgoriseFees"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_same_topic"
+        android:switchPadding="12dp"
+        android:text="@string/text__ignore_network_fees"
+        android:textSize="16sp"
+        android:textColor="?android:textColorSecondary"
+        app:layout_constraintTop_toBottomOf="@id/sAsset"/>
+
     <!-- Fiat Amount -->
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
         android:text="@string/text__fiat_amount"
         android:textSize="16sp"
         app:layout_constraintTop_toTopOf="@id/cbFiatAmount"
@@ -142,10 +154,10 @@
         android:id="@+id/cbFiatAmount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_same_topic"
+        android:layout_marginTop="@dimen/spacing_different_topic"
         android:text="@string/text__all"
         android:enabled="false"
-        app:layout_constraintTop_toBottomOf="@id/sAsset"
+        app:layout_constraintTop_toBottomOf="@id/switchAgoriseFees"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <LinearLayout
@@ -186,15 +198,5 @@
             <!--app:showSymbol="true"/>-->
 
     </LinearLayout>
-
-    <Switch
-        android:id="@+id/switchAgoriseFees"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_different_topic"
-        android:switchPadding="12dp"
-        android:text="@string/msg__ignore_transaction_fees"
-        android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/llFiatAmount"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
