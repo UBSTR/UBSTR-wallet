@@ -1,15 +1,11 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
 import android.Manifest
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
-import android.os.IBinder
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.*
@@ -17,7 +13,6 @@ import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.common.primitives.UnsignedLong
@@ -36,12 +31,9 @@ import cy.agorise.bitsybitshareswallet.viewmodels.AssetViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import cy.agorise.graphenej.*
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
-import cy.agorise.graphenej.api.android.NetworkService
-import cy.agorise.graphenej.api.android.RxBus
 import cy.agorise.graphenej.api.calls.ListAssets
 import cy.agorise.graphenej.models.JsonRpcResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_receive_transaction.*
 import java.lang.Exception
 import java.math.RoundingMode
@@ -51,24 +43,25 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class ReceiveTransactionFragment : Fragment(), ServiceConnection {
-    private val TAG = this.javaClass.simpleName
+class ReceiveTransactionFragment : ConnectedFragment() {
 
-    private val RESPONSE_LIST_ASSETS = 1
-    private val REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION = 100
+    companion object {
+        private const val TAG = "ReceiveTransactionFrag"
 
-    /** Number of assets to request from the NetworkService to show as suggestions in the AutoCompleteTextView */
-    private val AUTO_SUGGEST_ASSET_LIMIT = 5
+        private const val RESPONSE_LIST_ASSETS = 1
+        private const val REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION = 100
 
-    private val OTHER_ASSET = "other_asset"
+        /** Number of assets to request from the NetworkService to show as suggestions in the AutoCompleteTextView */
+        private const val AUTO_SUGGEST_ASSET_LIMIT = 5
+
+        private const val OTHER_ASSET = "other_asset"
+    }
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
     private lateinit var mAssetViewModel: AssetViewModel
 
     /** Current user account */
     private var mUserAccount: UserAccount? = null
-
-    private var mDisposables = CompositeDisposable()
 
     private var mAsset: Asset? = null
 
@@ -85,12 +78,6 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
 
     // Map used to keep track of request and response id pairs
     private val responseMap = HashMap<Long, Int>()
-
-    /* Network service connection */
-    private var mNetworkService: NetworkService? = null
-
-    /** Flag used to keep track of the NetworkService binding state */
-    private var mShouldUnbindNetwork: Boolean = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -127,7 +114,7 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
         // Configure Assets spinner to show Assets already saved into the db
         mAssetViewModel = ViewModelProviders.of(this).get(AssetViewModel::class.java)
 
-        mAssetViewModel.getAll().observe(this,
+        mAssetViewModel.getAllNonZero().observe(this,
             Observer<List<cy.agorise.bitsybitshareswallet.database.entities.Asset>> { assets ->
                 mAssets.clear()
                 mAssets.addAll(assets)
@@ -211,50 +198,49 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
             selectedInAutoCompleteTextView = true
             updateQR()
         }
-
-        // Connect to the RxBus, which receives events from the NetworkService
-        mDisposables.add(
-            RxBus.getBusInstance()
-                .asFlowable()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { handleIncomingMessage(it) }
-        )
     }
 
-    private fun handleIncomingMessage(message: Any?) {
-        if (message is JsonRpcResponse<*>) {
-            if (responseMap.containsKey(message.id)) {
-                val responseType = responseMap[message.id]
-                when (responseType) {
-                    RESPONSE_LIST_ASSETS            -> handleListAssets(message.result as List<Asset>)
-                }
-                responseMap.remove(message.id)
+    override fun handleJsonRpcResponse(response: JsonRpcResponse<*>) {
+        if (responseMap.containsKey(response.id)) {
+            val responseType = responseMap[response.id]
+            when (responseType) {
+                RESPONSE_LIST_ASSETS    -> handleListAssets(response.result)
             }
-        } else if (message is ConnectionStatusUpdate) {
-            if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
-                // If we got a disconnection notification, we should clear our response map, since
-                // all its stored request ids will now be reset
-                responseMap.clear()
-            }
+            responseMap.remove(response.id)
         }
     }
 
-    private fun handleListAssets(assetList: List<Asset>) {
-        Log.d(TAG, "handleListAssets")
-        val assets = ArrayList<cy.agorise.bitsybitshareswallet.database.entities.Asset>()
-        for (_asset in assetList) {
-            val asset = cy.agorise.bitsybitshareswallet.database.entities.Asset(
-                _asset.objectId,
-                _asset.symbol,
-                _asset.precision,
-                _asset.description ?: "",
-                _asset.bitassetId ?: ""
-            )
-
-            assets.add(asset)
+    override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) {
+        if (connectionStatusUpdate.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
+            // If we got a disconnection notification, we should clear our response map, since
+            // all its stored request ids will now be reset
+            responseMap.clear()
         }
-        mAutoSuggestAssetAdapter.setData(assets)
-        mAutoSuggestAssetAdapter.notifyDataSetChanged()
+    }
+
+    /**
+     * Handles the list of assets returned from the node that correspond to what the user has typed in the Asset
+     * AutoCompleteTextView and adds them to its adapter to show as suggestions.
+     */
+    private fun handleListAssets(result: Any?) {
+        if (result is List<*> && result.isNotEmpty() && result[0] is Asset) {
+            val assetList = result as List<Asset>
+            Log.d(TAG, "handleListAssets")
+            val assets = ArrayList<cy.agorise.bitsybitshareswallet.database.entities.Asset>()
+            for (_asset in assetList) {
+                val asset = cy.agorise.bitsybitshareswallet.database.entities.Asset(
+                    _asset.objectId,
+                    _asset.symbol,
+                    _asset.precision,
+                    _asset.description ?: "",
+                    _asset.bitassetId ?: ""
+                )
+
+                assets.add(asset)
+            }
+            mAutoSuggestAssetAdapter.setData(assets)
+            mAutoSuggestAssetAdapter.notifyDataSetChanged()
+        }
     }
 
     private fun updateQR() {
@@ -421,40 +407,5 @@ class ReceiveTransactionFragment : Fragment(), ServiceConnection {
         shareIntent.putExtra(Intent.EXTRA_TEXT, content)
         shareIntent.type = "*/*"
         startActivity(Intent.createChooser(shareIntent, getString(R.string.text__share_with)))
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        val intent = Intent(context, NetworkService::class.java)
-        if (context?.bindService(intent, this, Context.BIND_AUTO_CREATE) == true) {
-            mShouldUnbindNetwork = true
-        } else {
-            Log.e(TAG, "Binding to the network service failed.")
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-
-        // Unbinding from network service
-        if (mShouldUnbindNetwork) {
-            context?.unbindService(this)
-            mShouldUnbindNetwork = false
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        if (!mDisposables.isDisposed) mDisposables.dispose()
-    }
-
-    override fun onServiceDisconnected(name: ComponentName?) { }
-
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        // We've bound to LocalService, cast the IBinder and get LocalService instance
-        val binder = service as NetworkService.LocalBinder
-        mNetworkService = binder.service
     }
 }
