@@ -16,8 +16,8 @@ class AssetRepository internal constructor(context: Context) {
         mAssetDao = db!!.assetDao()
     }
 
-    fun getAll(): LiveData<List<Asset>> {
-        return mAssetDao.getAll()
+    fun getAllNonZero(): LiveData<List<Asset>> {
+        return mAssetDao.getAllNonZero()
     }
 
     fun insertAll(assets: List<Asset>) {

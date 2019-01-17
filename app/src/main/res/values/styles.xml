@@ -17,7 +17,7 @@
     <style name="Theme.Bitsy.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
 
     <!-- Base application dark theme. -->
-    <style name="Theme.Bitsy.Dark" parent="Theme.MaterialComponents">
+    <style name="Theme.Bitsy.Dark" parent="Theme.MaterialComponents.Bridge">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>

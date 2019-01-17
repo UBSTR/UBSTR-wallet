@@ -1,5 +1,8 @@
 package cy.agorise.bitsybitshareswallet.utils
 
+import cy.agorise.graphenej.Asset
+import cy.agorise.graphenej.UserAccount
+
 object Constants {
 
     /** Key used to store the number of the last agreed License version */
@@ -8,17 +11,53 @@ object Constants {
     /** Version of the currently used license */
     const val CURRENT_LICENSE_VERSION = 1
 
-    /** Key used to store if the initial setup is already done or not */
-    const val KEY_INITIAL_SETUP_DONE = "key_initial_setup_done"
-
     /** Key used to store the id value of the currently active account in the shared preferences */
     const val KEY_CURRENT_ACCOUNT_ID = "key_current_account_id"
 
     /** The minimum required length for a PIN number */
     const val MIN_PIN_LENGTH = 6
 
+    /** Name of the account passed to the faucet as the referrer */
+    const val FAUCET_REFERRER = "agorise"
+
+    /** Faucet URL used to create new accounts */
+    const val FAUCET_URL = "https://faucet.palmpay.io"
+
     /** The user selected encrypted PIN */
     const val KEY_ENCRYPTED_PIN = "key_encrypted_pin"
+
+    /** The fee to send in every transfer (0.01%) */
+    const val FEE_PERCENTAGE = 0.0001
+
+    /** The account used to send the fees */
+    val AGORISE_ACCOUNT = UserAccount("1.2.390320", "agorise")
+
+    /** List of assets symbols that send fee to Agorise when sending a transaction (BTS and smartcoins only) */
+    val assetsWhichSendFeeToAgorise = setOf(
+        "1.3.0",    // BTS
+        "1.3.113",  // CNY
+        "1.3.121",  // USD
+        "1.3.1325", // RUBLE
+        "1.3.120",  // EUR
+        "1.3.103"   // BTC
+//        "1.3.109",  // HKD
+//        "1.3.119",  // JPY
+//        "1.3.102",  // KRW
+//        "1.3.106",  // GOLD
+//        "1.3.105",  // SILVER
+//        "1.3.118",  // GBP
+//        "1.3.115",  // CAD
+//        "1.3.1017", // ARS
+//        "1.3.114",  // MXN
+//        "1.3.111",  // SEK
+//        "1.3.117",  // AUD
+//        "1.3.116",  // CHF
+//        "1.3.112",  // NZD
+//        "1.3.110",  // RUB
+//        "1.3.2650", // XCD
+//        "1.3.107",  // TRY
+//        "1.3.108"   // SGD
+    )
 
     /**
      * LTM accounts come with an expiration date expressed as this string.

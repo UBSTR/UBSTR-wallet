@@ -14,7 +14,7 @@
         android:id="@+id/tvTransactionDirection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Transactions"
+        android:text="@string/title_transactions"
         android:textSize="16sp"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -31,21 +31,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="All"/>
+            android:text="@string/text__all"/>
 
         <RadioButton
             android:id="@+id/rbTransactionSent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Sent"/>
+            android:text="@string/text__sent"/>
 
         <RadioButton
             android:id="@+id/rbTransactionReceived"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Received"/>
+            android:text="@string/text__received"/>
 
     </RadioGroup>
 
@@ -55,7 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:text="Date Range"
+        android:text="@string/text__date_range"
         android:textSize="16sp"
         app:layout_constraintTop_toTopOf="@id/cbDateRange"
         app:layout_constraintStart_toStartOf="parent"/>
@@ -65,7 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_different_topic"
-        android:text="All"
+        android:text="@string/text__all"
         app:layout_constraintTop_toBottomOf="@id/rgTransactionDirection"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -100,40 +100,52 @@
 
     </LinearLayout>
 
-    <!-- Cryptocurrency -->
+    <!-- Asset -->
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:text="Cryptocurrency"
+        android:text="@string/text__asset"
         android:textSize="16sp"
-        app:layout_constraintTop_toTopOf="@id/cbCryptocurrency"
+        app:layout_constraintTop_toTopOf="@id/cbAsset"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <CheckBox
-        android:id="@+id/cbCryptocurrency"
+        android:id="@+id/cbAsset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_different_topic"
-        android:text="All"
+        android:text="@string/text__all"
         app:layout_constraintTop_toBottomOf="@+id/llDateRange"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <Spinner
-        android:id="@+id/sCryptocurrency"
+        android:id="@+id/sAsset"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:listitem="@android:layout/simple_list_item_1"
-        app:layout_constraintTop_toBottomOf="@id/cbCryptocurrency"/>
+        app:layout_constraintTop_toBottomOf="@id/cbAsset"/>
+
+    <!-- Ignore Agorise Fees -->
+
+    <Switch
+        android:id="@+id/switchAgoriseFees"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_same_topic"
+        android:switchPadding="12dp"
+        android:text="@string/text__ignore_network_fees"
+        android:textSize="16sp"
+        android:textColor="?android:textColorSecondary"
+        app:layout_constraintTop_toBottomOf="@id/sAsset"/>
 
     <!-- Fiat Amount -->
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:text="Fiat Amount"
+        android:text="@string/text__fiat_amount"
         android:textSize="16sp"
         app:layout_constraintTop_toTopOf="@id/cbFiatAmount"
         app:layout_constraintStart_toStartOf="parent"/>
@@ -142,24 +154,25 @@
         android:id="@+id/cbFiatAmount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_same_topic"
-        android:text="All"
+        android:layout_marginTop="@dimen/spacing_different_topic"
+        android:text="@string/text__all"
         android:enabled="false"
-        app:layout_constraintTop_toBottomOf="@id/sCryptocurrency"
+        app:layout_constraintTop_toBottomOf="@id/switchAgoriseFees"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!--<LinearLayout-->
-        <!--android:id="@+id/llFiatAmount"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_margin="4dp"-->
-        <!--android:orientation="horizontal"-->
-        <!--app:layout_constraintTop_toBottomOf="@id/cbFiatAmount">-->
+    <LinearLayout
+        android:id="@+id/llFiatAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/cbFiatAmount">
 
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="@string/between"/>-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Between"/>
 
         <!--<faranjit.currency.edittext.CurrencyEditText-->
             <!--android:id="@+id/etFromFiatAmount"-->
@@ -170,10 +183,10 @@
             <!--android:textAlignment="center"-->
             <!--app:showSymbol="true"/>-->
 
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="@string/and"/>-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="and"/>
 
         <!--<faranjit.currency.edittext.CurrencyEditText-->
             <!--android:id="@+id/etToFiatAmount"-->
@@ -184,6 +197,6 @@
             <!--android:textAlignment="center"-->
             <!--app:showSymbol="true"/>-->
 
-    <!--</LinearLayout>-->
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

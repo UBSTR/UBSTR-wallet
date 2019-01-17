@@ -3,9 +3,9 @@ package cy.agorise.bitsybitshareswallet.fragments
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.util.Log
 import android.view.*
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -23,14 +23,21 @@ class HomeFragment : Fragment() {
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
 
+        val nightMode = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean(Constants.KEY_NIGHT_MODE_ACTIVATED, false)
+
+        // Sets the toolbar background color to primaryColor and forces shows the Bitsy icon to the left
         val toolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
         toolbar?.navigationIcon = resources.getDrawable(R.drawable.ic_bitsy_logo_2, null)
+        toolbar?.setBackgroundResource(if (!nightMode) R.color.colorPrimary else R.color.colorToolbarDark)
+
+        // Sets the status bar background color to a primaryColorDark
+        val window = activity?.window
+        window?.statusBarColor = ContextCompat.getColor(context!!,
+            if (!nightMode) R.color.colorPrimaryDark else R.color.colorStatusBarDark)
 
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
@@ -38,14 +45,23 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Get version number of the last agreed license version
+        val agreedLicenseVersion = PreferenceManager.getDefaultSharedPreferences(context)
+            .getInt(Constants.KEY_LAST_AGREED_LICENSE_VERSION, 0)
+
+        val userId = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "") ?: ""
+
+        if (agreedLicenseVersion != Constants.CURRENT_LICENSE_VERSION || userId == "") {
+            findNavController().navigate(R.id.license_action)
+            return
+        }
+
         // Configure UserAccountViewModel to show the current account
         mUserAccountViewModel = ViewModelProviders.of(this).get(UserAccountViewModel::class.java)
 
-        val userId = PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "")
-
-        mUserAccountViewModel.getUserAccount(userId!!).observe(this, Observer<UserAccount>{ user ->
-            tvAccountName.text = user.name
+        mUserAccountViewModel.getUserAccount(userId).observe(this, Observer<UserAccount>{ user ->
+            tvAccountName.text = user?.name ?: ""
         })
 
         // Navigate to the Receive Transaction Fragment
@@ -61,7 +77,7 @@ class HomeFragment : Fragment() {
         // Navigate to the Send Transaction Fragment using Navigation's SafeArgs to activate the camera
         fabSendTransactionCamera.setOnClickListener {
             val action = HomeFragmentDirections.sendActionCamera()
-            action.setOpenCamera(true)
+            action.openCamera = true
             findNavController().navigate(action)
         }
 

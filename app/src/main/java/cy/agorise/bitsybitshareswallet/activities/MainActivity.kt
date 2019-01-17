@@ -12,12 +12,13 @@ import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.utils.Constants
-import cy.agorise.graphenej.api.ConnectionStatusUpdate
-import cy.agorise.graphenej.models.JsonRpcResponse
 import kotlinx.android.synthetic.main.activity_main.*
 
+/**
+ * Uses the AAC Navigation Component with a NavHostFragment which is the place where all Fragments are shown,
+ * following the philosophy of using a single Activity.
+ */
 class MainActivity : ConnectedActivity() {
-    private val TAG = this.javaClass.simpleName
 
     private lateinit var appBarConfiguration : AppBarConfiguration
 
@@ -100,15 +101,12 @@ class MainActivity : ConnectedActivity() {
         return findNavController(R.id.navHostFragment).navigateUp(appBarConfiguration)
     }
 
-    override fun handleJsonRpcResponse(response: JsonRpcResponse<*>) {
-
-    }
-
-    /**
-     * Private method called whenever there's an update to the connection status
-     * @param connectionStatusUpdate  Connection status update.
-     */
-    override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) {
-
+    override fun onBackPressed() {
+        // Trick used to avoid crashes when the user is in the License or ImportBrainkey and presses the back button
+        val currentDestination=NavHostFragment.findNavController(navHostFragment).currentDestination
+        when(currentDestination?.id) {
+            R.id.license_dest, R.id.import_brainkey_dest -> finish()
+            else -> super.onBackPressed()
+        }
     }
 }

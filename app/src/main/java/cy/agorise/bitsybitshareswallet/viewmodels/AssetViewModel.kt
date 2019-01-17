@@ -9,7 +9,7 @@ import cy.agorise.bitsybitshareswallet.repositories.AssetRepository
 class AssetViewModel(application: Application) : AndroidViewModel(application) {
     private var mRepository = AssetRepository(application)
 
-    internal fun getAll(): LiveData<List<Asset>> {
-        return mRepository.getAll()
+    internal fun getAllNonZero(): LiveData<List<Asset>> {
+        return mRepository.getAllNonZero()
     }
 }

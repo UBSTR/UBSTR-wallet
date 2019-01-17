@@ -5,6 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:clickable="true"
     tools:context=".fragments.ReceiveTransactionFragment">
 
     <androidx.constraintlayout.widget.Guideline
@@ -27,7 +30,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/centeredVerticalGuideline">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <cy.agorise.bitsybitshareswallet.views.MyTextInputEditText
             android:id="@+id/tietAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

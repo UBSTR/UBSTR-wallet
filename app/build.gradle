@@ -13,13 +13,14 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
-        versionName "0.1"
+        versionName "0.8.0-beta"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            // TODO Fix minify issues and enable again
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
@@ -34,6 +35,11 @@ android {
         exclude 'lib/x86_64/freebsd/libscrypt.so'
         exclude 'lib/x86_64/linux/libscrypt.so'
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -47,7 +53,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     // AndroidX
     implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
     // Google
     implementation 'com.google.zxing:core:3.3.1'
     implementation 'com.google.code.gson:gson:2.8.5'
@@ -67,18 +73,21 @@ dependencies {
     implementation "com.jakewharton.rxbinding3:rxbinding:$rx_bindings_version"
     implementation "com.jakewharton.rxbinding3:rxbinding-material:$rx_bindings_version" // Material Components widgets
     implementation "com.jakewharton.rxbinding3:rxbinding-appcompat:$rx_bindings_version" // AndroidX appcompat widgets
-    // Retrofit
+    // Retrofit & OkHttp
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.5.0'
     //Firebase
     implementation 'com.google.firebase:firebase-core:16.0.6'
     implementation 'com.google.firebase:firebase-crash:16.2.1'
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.7'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.8'
     // Others
     implementation 'org.bitcoinj:bitcoinj-core:0.14.3'
     implementation 'com.moldedbits.r2d2:r2d2:1.0.1'
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
-    implementation 'com.afollestad.material-dialogs:core:2.0.0-rc3'
+    implementation 'com.afollestad.material-dialogs:core:2.0.0-rc7'
     // Android Debug Database
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
 

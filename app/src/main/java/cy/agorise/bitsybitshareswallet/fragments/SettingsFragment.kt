@@ -1,7 +1,6 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
 import android.content.*
-import android.content.Context.CLIPBOARD_SERVICE
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
@@ -10,9 +9,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.customListAdapter
 import cy.agorise.bitsybitshareswallet.BuildConfig
@@ -37,7 +36,10 @@ import kotlinx.android.synthetic.main.fragment_settings.*
 import java.text.NumberFormat
 
 class SettingsFragment : Fragment(), ServiceConnection {
-    private val TAG = this.javaClass.simpleName
+
+    companion object {
+        private const val TAG = "SettingsFragment"
+    }
 
     private var mDisposables = CompositeDisposable()
 
@@ -79,15 +81,14 @@ class SettingsFragment : Fragment(), ServiceConnection {
                 val fullNodes = mNetworkService!!.nodes
 
                 nodesAdapter = FullNodesAdapter(v.context)
-                nodesAdapter!!.add(fullNodes)
+                nodesAdapter?.add(fullNodes)
 
                 mNodesDialog = MaterialDialog(v.context)
                     .title(text = String.format("%s v%s", getString(R.string.app_name), BuildConfig.VERSION_NAME))
                     .message(text = getString(R.string.title__bitshares_nodes_dialog, "-------"))
                     .customListAdapter(nodesAdapter as FullNodesAdapter)
-                    .negativeButton(android.R.string.ok) {
-                        mHandler.removeCallbacks(mRequestDynamicGlobalPropertiesTask)
-                    }
+                    .negativeButton(android.R.string.ok)
+                    .onDismiss { mHandler.removeCallbacks(mRequestDynamicGlobalPropertiesTask) }
 
                 mNodesDialog?.show()
 
@@ -228,13 +229,7 @@ class SettingsFragment : Fragment(), ServiceConnection {
             message(text = brainKey.brainKey)
             customView(R.layout.dialog_copy_brainkey)
             cancelable(false)
-            positiveButton(android.R.string.copy) {
-                Toast.makeText(it.context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
-                val clipboard = it.context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText("label", brainKey.brainKey)
-                clipboard.primaryClip = clip
-                it.dismiss()
-            }
+            positiveButton(R.string.button__copied) { it.dismiss() }
         }
     }
 

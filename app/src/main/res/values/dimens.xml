@@ -12,6 +12,9 @@
     <dimen name="spacing_different_topic">24dp</dimen>
     <dimen name="spacing_different_section">40dp</dimen>
 
+    <!-- Home -->
+    <dimen name="fab_elevation">16dp</dimen>
+
     <!-- Initial setup -->
     <dimen name="logo_size">180dp</dimen>
 

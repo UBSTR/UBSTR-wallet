@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/activity_horizontal_margin"
+    android:layout_marginEnd="@dimen/activity_horizontal_margin">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/text__to"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/msg__to_explanation"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body2"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_same_topic"
+        android:text="@string/text__asset_balance"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/msg__asset_balance_explanation"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body2"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_same_topic"
+        android:text="@string/text__memo"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/msg__memo_explanation"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body2"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_same_topic"
+        android:text="@string/text__network_fee"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/msg__network_fee_explanation"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body2"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_same_topic"
+        android:text="@string/text__qr_code"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/msg__qr_code_explanation"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body2"/>
+
+</LinearLayout>

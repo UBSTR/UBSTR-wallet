@@ -55,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_same_topic"
                 android:layout_marginEnd="2dp"
-                android:text="View Network Status"
+                android:text="@string/text__view_network_status"
                 android:gravity="center_vertical"
                 android:textAppearance="@style/TextAppearance.Bitsy.Body1"
                 android:drawableEnd="@drawable/ic_disconnected"/>
@@ -83,7 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_same_topic"
-                android:text="@string/btn__view_and_copy"/>
+                android:text="@string/button__view_and_copy"/>
 
             <!-- Bugs or Ideas -->
 

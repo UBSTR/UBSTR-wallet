@@ -9,7 +9,9 @@ import android.widget.TextView
 import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
 
 
-
+/**
+ * Adapter used to populate a Spinner with a list of [BalanceDetail] items.
+ */
 class BalancesDetailsAdapter(context: Context, resource: Int, data: List<BalanceDetail>) :
     ArrayAdapter<BalanceDetail>(context, resource, data) {
 

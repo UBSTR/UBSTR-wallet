@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.crashlytics.android.Crashlytics
 import cy.agorise.bitsybitshareswallet.database.entities.Balance
 import cy.agorise.bitsybitshareswallet.processors.TransfersLoader
 import cy.agorise.bitsybitshareswallet.repositories.AssetRepository
@@ -40,16 +41,21 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 /**
- * Class in charge of managing the connection to graphenej's NetworkService
+ * The app uses the single Activity methodology, but this activity was created so that MainActivity can extend from it.
+ * This class manages everything related to keeping the information in the database updated using graphenej's
+ * NetworkService, leaving to MainActivity only the Navigation work and some other UI features.
  */
 abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
-    private val TAG = this.javaClass.simpleName
 
-    private val RESPONSE_GET_FULL_ACCOUNTS = 1
-    private val RESPONSE_GET_ACCOUNTS = 2
-    private val RESPONSE_GET_ACCOUNT_BALANCES = 3
-    private val RESPONSE_GET_ASSETS = 4
-    private val RESPONSE_GET_BLOCK_HEADER = 5
+    companion object {
+        private const val TAG = "ConnectedActivity"
+
+        private const val RESPONSE_GET_FULL_ACCOUNTS = 1
+        private const val RESPONSE_GET_ACCOUNTS = 2
+        private const val RESPONSE_GET_ACCOUNT_BALANCES = 3
+        private const val RESPONSE_GET_ASSETS = 4
+        private const val RESPONSE_GET_BLOCK_HEADER = 5
+    }
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
     private lateinit var mBalanceViewModel: BalanceViewModel
@@ -89,10 +95,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val userId = PreferenceManager.getDefaultSharedPreferences(this)
-            .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "")
-        if (userId != "")
-            mCurrentAccount = UserAccount(userId)
+        getUserAccount()
 
         mAssetRepository = AssetRepository(this)
 
@@ -139,10 +142,19 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
             .subscribe { handleIncomingMessage(it) }
     }
 
+    /**
+     * Obtains the userId from the shared preferences and creates a [UserAccount] instance.
+     * Created as a public function, so that it can be called from its Fragments.
+     */
+    fun getUserAccount() {
+        val userId = PreferenceManager.getDefaultSharedPreferences(this)
+            .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "") ?: ""
+        if (userId != "")
+            mCurrentAccount = UserAccount(userId)
+    }
+
     private fun handleIncomingMessage(message: Any?) {
         if (message is JsonRpcResponse<*>) {
-            // Generic processing taken care by subclasses
-            handleJsonRpcResponse(message)
 
             if (message.error == null) {
                 if (responseMap.containsKey(message.id)) {
@@ -178,8 +190,11 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                 ).show()
             }
         } else if (message is ConnectionStatusUpdate) {
-            handleConnectionStatusUpdate(message)
-            if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
+            if (message.updateCode == ConnectionStatusUpdate.CONNECTED) {
+                // Make sure the Crashlytics report contains the currently selected node
+                val selectedNode = mNetworkService?.selectedNode
+                Crashlytics.log(selectedNode?.url)
+            } else if (message.updateCode == ConnectionStatusUpdate.DISCONNECTED) {
                 // If we got a disconnection notification, we should clear our response map, since
                 // all its stored request ids will now be reset
                 responseMap.clear()
@@ -198,7 +213,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         if (latestOpCount == 0L) {
             Log.d(TAG, "The node returned 0 total_ops for current account and may not have installed the history plugin. " +
                     "\nAsk the NetworkService to remove the node from the list and connect to another one.")
-            mNetworkService!!.removeCurrentNodeAndReconnect()
+            mNetworkService?.removeCurrentNodeAndReconnect()
         } else if (storedOpCount == -1L) {
             // Initial case when the app starts
             storedOpCount = latestOpCount
@@ -291,7 +306,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun updateBalances() {
-        if (mNetworkService!!.isConnected) {
+        if (mNetworkService?.isConnected == true) {
             val id = mNetworkService!!.sendMessage(GetAccountBalances(mCurrentAccount, ArrayList()),
                 GetAccountBalances.REQUIRED_API)
 
@@ -304,7 +319,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
      */
     private val mRequestMissingUserAccountsTask = object : Runnable {
         override fun run() {
-            if (mNetworkService!!.isConnected) {
+            if (mNetworkService?.isConnected == true) {
                 val id = mNetworkService!!.sendMessage(GetAccounts(missingUserAccounts), GetAccounts.REQUIRED_API)
 
                 responseMap[id] = RESPONSE_GET_ACCOUNTS
@@ -319,7 +334,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
      */
     private val mRequestMissingAssetsTask = object : Runnable {
         override fun run() {
-            if (mNetworkService!!.isConnected) {
+            if (mNetworkService?.isConnected == true) {
                 val id = mNetworkService!!.sendMessage(GetAssets(missingAssets), GetAssets.REQUIRED_API)
 
                 responseMap[id] = RESPONSE_GET_ASSETS
@@ -334,7 +349,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
      */
     private val mCheckMissingPaymentsTask = object : Runnable {
         override fun run() {
-            if (mNetworkService != null && mNetworkService!!.isConnected) {
+            if (mNetworkService?.isConnected == true) {
                 if (mCurrentAccount != null) {
                     val userAccounts = ArrayList<String>()
                     userAccounts.add(mCurrentAccount!!.objectId)
@@ -357,7 +372,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private val mRequestBlockMissingTimeTask = object : Runnable {
         override fun run() {
 
-            if (mNetworkService != null && mNetworkService!!.isConnected) {
+            if (mNetworkService?.isConnected == true) {
                 val id = mNetworkService!!.sendMessage(GetBlockHeader(blockNumberWithMissingTime),
                     GetBlockHeader.REQUIRED_API)
 
@@ -387,6 +402,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         mHandler.removeCallbacks(mCheckMissingPaymentsTask)
         mHandler.removeCallbacks(mRequestMissingUserAccountsTask)
         mHandler.removeCallbacks(mRequestMissingAssetsTask)
+        mHandler.removeCallbacks(mRequestBlockMissingTimeTask)
     }
 
     override fun onResume() {
@@ -405,16 +421,4 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         super.onDestroy()
         if (!mDisposable!!.isDisposed) mDisposable!!.dispose()
     }
-
-    /**
-     * Method to be implemented by all subclasses in order to be notified of JSON-RPC responses.
-     * @param response
-     */
-    internal abstract fun handleJsonRpcResponse(response: JsonRpcResponse<*>)
-
-    /**
-     * Method to be implemented by all subclasses in order to be notified of connection status updates
-     * @param connectionStatusUpdate
-     */
-    internal abstract fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate)
 }
