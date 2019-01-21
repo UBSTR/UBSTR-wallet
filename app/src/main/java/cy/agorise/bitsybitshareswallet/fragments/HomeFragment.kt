@@ -60,8 +60,18 @@ class HomeFragment : Fragment() {
         // Configure UserAccountViewModel to show the current account
         mUserAccountViewModel = ViewModelProviders.of(this).get(UserAccountViewModel::class.java)
 
-        mUserAccountViewModel.getUserAccount(userId).observe(this, Observer<UserAccount>{ user ->
-            tvAccountName.text = user?.name ?: ""
+        mUserAccountViewModel.getUserAccount(userId).observe(this, Observer<UserAccount>{ userAccount ->
+            if (userAccount != null) {
+                tvAccountName.text = userAccount.name
+                if (userAccount.isLtm) {
+                    // Add the lightning bolt to the start of the account name if it is LTM
+                    tvAccountName.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        resources.getDrawable(R.drawable.ic_ltm_account, null), null, null, null
+                    )
+                    // Add some padding so that the lightning bolt icon is not too close to the account name text
+                    tvAccountName.compoundDrawablePadding = 4
+                }
+            }
         })
 
         // Navigate to the Receive Transaction Fragment
