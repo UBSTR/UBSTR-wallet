@@ -17,6 +17,7 @@
     <style name="Theme.Bitsy.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
 
     <!-- Base application dark theme. -->
+    <!-- Bridge is still used cause there is an issue with the Transactions' FilterOptionsDialog Calendar -->
     <style name="Theme.Bitsy.Dark" parent="Theme.MaterialComponents.Bridge">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
