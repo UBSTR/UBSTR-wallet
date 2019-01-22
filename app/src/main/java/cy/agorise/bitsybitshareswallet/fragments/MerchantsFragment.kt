@@ -15,8 +15,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.gson.GsonBuilder
 
 import cy.agorise.bitsybitshareswallet.R
-import cy.agorise.bitsybitshareswallet.models.Merchant
-import cy.agorise.bitsybitshareswallet.network.AmbassadorService
+import cy.agorise.bitsybitshareswallet.network.MerchantsWebservice
 import cy.agorise.bitsybitshareswallet.network.FeathersResponse
 import retrofit2.Call
 import retrofit2.Response
@@ -27,6 +26,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import com.google.android.gms.maps.model.BitmapDescriptor
+import cy.agorise.bitsybitshareswallet.database.entities.Merchant
 import cy.agorise.bitsybitshareswallet.utils.Constants
 
 
@@ -53,8 +53,6 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
         mapFragment.getMapAsync(this)
 
         merchantIcon = getMarkerIconFromDrawable(resources.getDrawable(R.drawable.ic_pin_merchants, null))
-
-        // TODO https://github.com/Agorise/bitsy-wallet/blob/feat_merchants/app/src/main/java/cy/agorise/bitsybitshareswallet/fragments/MapFragment.kt
     }
 
     /**
@@ -77,8 +75,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
 
-        val ambassadorService = retrofit.create<AmbassadorService>(AmbassadorService::class.java)
-        val call = ambassadorService.allMerchants
+        val ambassadorService = retrofit.create<MerchantsWebservice>(MerchantsWebservice::class.java)
+        val call = ambassadorService.getMerchants(0)
         call.enqueue(this)
     }
 
