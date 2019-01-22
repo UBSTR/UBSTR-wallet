@@ -17,7 +17,8 @@ import cy.agorise.bitsybitshareswallet.database.joins.TransferDetailDao
         Transfer::class,
         UserAccount::class
     ],
-    version = 1, exportSchema = false)
+    version = 1,
+    exportSchema = true)
 abstract class BitsyDatabase : RoomDatabase() {
 
     abstract fun assetDao(): AssetDao
@@ -28,6 +29,9 @@ abstract class BitsyDatabase : RoomDatabase() {
     abstract fun userAccountDao(): UserAccountDao
     abstract fun balanceDetailDao(): BalanceDetailDao
     abstract fun transferDetailDao(): TransferDetailDao
+    // version 2
+//    abstract fun merchantDao(): MerchantDao
+//    abstract fun tellerDao(): TellerDao
 
     companion object {
 
