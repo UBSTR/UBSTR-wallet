@@ -6,6 +6,7 @@ import android.preference.PreferenceManager
 import android.view.*
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -18,6 +19,10 @@ import cy.agorise.bitsybitshareswallet.database.entities.UserAccount
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
+import android.os.Build
+import android.content.res.ColorStateList
+
+
 
 class HomeFragment : Fragment() {
 
@@ -97,6 +102,18 @@ class HomeFragment : Fragment() {
         tabLayout.setupWithViewPager(viewPager)
         // Set the pie chart icon for the third tab
         tabLayout.getTabAt(2)?.setIcon(R.drawable.ic_pie_chart)
+
+        var icon = tabLayout.getTabAt(2)?.icon
+        if (icon != null) {
+            val colors: ColorStateList = if (Build.VERSION.SDK_INT >= 23) {
+                resources.getColorStateList(R.color.tab_icon_selector, context?.theme)
+            } else {
+                resources.getColorStateList(R.color.tab_icon_selector)
+            }
+
+            icon = DrawableCompat.wrap(icon)
+            DrawableCompat.setTintList(icon, colors)
+        }
     }
 
     /**

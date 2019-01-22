@@ -158,6 +158,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="@color/semiTransparent"
+                app:tabTextColor="?android:colorControlNormal"
                 app:tabSelectedTextColor="?android:textColorPrimary"
                 app:tabIndicatorColor="?attr/themedColorBackgroundFloating"
                 app:tabIndicatorHeight="50dp"
