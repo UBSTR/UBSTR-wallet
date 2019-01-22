@@ -12,9 +12,6 @@ import android.view.ViewGroup
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.gson.GsonBuilder
 
 import cy.agorise.bitsybitshareswallet.R
@@ -28,8 +25,9 @@ import java.io.IOException
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
+import android.preference.PreferenceManager
 import androidx.core.content.ContextCompat
-import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.*
 import cy.agorise.bitsybitshareswallet.database.entities.Merchant
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.toast
@@ -105,6 +103,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        applyMapTheme()
+
         verifyLocationPermission()
 
         val gson = GsonBuilder()
@@ -118,6 +118,25 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
         val ambassadorService = retrofit.create<MerchantsWebservice>(MerchantsWebservice::class.java)
         val call = ambassadorService.getMerchants(0)
         call.enqueue(this)
+    }
+
+    private fun applyMapTheme() {
+        val nightMode = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean(Constants.KEY_NIGHT_MODE_ACTIVATED, false)
+
+        if (nightMode) {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            val success = mMap.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    context, R.raw.map_style_night
+                )
+            )
+
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.")
+            }
+        }
     }
 
     override fun onResponse(call: Call<FeathersResponse<Merchant>>, response: Response<FeathersResponse<Merchant>>) {
