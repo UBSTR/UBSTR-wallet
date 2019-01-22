@@ -21,19 +21,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/firstVerticalGuideline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.45"/>
 
             <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/secondVerticalGuideline"
+                android:id="@+id/centeredVerticalGuideline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.55"/>
+                app:layout_constraintGuide_percent="0.5"/>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabReceiveTransaction"
@@ -47,9 +41,10 @@
                 app:borderWidth="0dp"
                 android:backgroundTint="@color/colorReceive"
                 android:src="@drawable/ic_receive"
+                app:layout_constraintHorizontal_bias="0.6"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/firstVerticalGuideline"
+                app:layout_constraintEnd_toStartOf="@id/centeredVerticalGuideline"
                 app:layout_constraintBottom_toTopOf="@+id/tvReceiveTransaction"
                 app:layout_constraintVertical_chainStyle="packed"/>
 
@@ -68,21 +63,6 @@
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fabSendTransactionCamera"
-                style="@style/Widget.MaterialComponents.FloatingActionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:fabSize="mini"
-                android:src="@drawable/ic_camera"
-                app:elevation="@dimen/fab_elevation"
-                app:borderWidth="0dp"
-                android:backgroundTint="@color/colorSend"
-                app:layout_constraintTop_toTopOf="@id/fabSendTransaction"
-                app:layout_constraintBottom_toBottomOf="@id/fabSendTransaction"
-                app:layout_constraintStart_toEndOf="@id/firstVerticalGuideline"
-                app:layout_constraintEnd_toStartOf="@id/secondVerticalGuideline"/>
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabSendTransaction"
                 style="@style/Widget.MaterialComponents.FloatingActionButton"
                 android:layout_width="wrap_content"
@@ -94,11 +74,32 @@
                 app:borderWidth="0dp"
                 android:backgroundTint="@color/colorSend"
                 android:src="@drawable/ic_send"
+                app:layout_constraintHorizontal_bias="0.4"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@id/secondVerticalGuideline"
+                app:layout_constraintStart_toEndOf="@id/centeredVerticalGuideline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/tvSendTransaction"
                 app:layout_constraintVertical_chainStyle="packed"/>
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabSendTransactionCamera"
+                style="@style/Widget.MaterialComponents.FloatingActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="52dp"
+                android:layout_marginEnd="76dp"
+                app:fabSize="auto"
+                app:fabCustomSize="64dp"
+                app:maxImageSize="40dp"
+                app:backgroundTint="?attr/themedColorBackgroundFloating"
+                android:src="@drawable/ic_camera"
+                app:elevation="@dimen/fab_elevation"
+                app:borderWidth="2dp"
+                android:backgroundTint="@color/colorSend"
+                app:layout_constraintTop_toTopOf="@id/fabSendTransaction"
+                app:layout_constraintBottom_toBottomOf="@id/fabSendTransaction"
+                app:layout_constraintEnd_toEndOf="@id/fabSendTransaction"/>
 
             <TextView
                 android:id="@+id/tvSendTransaction"
@@ -113,15 +114,6 @@
                 app:layout_constraintStart_toStartOf="@id/fabSendTransaction"
                 app:layout_constraintEnd_toEndOf="@id/fabSendTransaction"
                 app:layout_constraintBottom_toBottomOf="parent"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:background="@color/colorSend"
-                app:layout_constraintTop_toTopOf="@id/fabSendTransactionCamera"
-                app:layout_constraintBottom_toBottomOf="@id/fabSendTransactionCamera"
-                app:layout_constraintStart_toEndOf="@id/fabSendTransactionCamera"
-                app:layout_constraintEnd_toStartOf="@id/fabSendTransaction"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
