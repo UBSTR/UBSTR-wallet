@@ -261,7 +261,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
         val total = AssetAmount(UnsignedLong.valueOf(amount), mAsset!!)
         val totalInDouble = Util.fromBase(total)
         val items = arrayOf(LineItem("transfer", 1, totalInDouble))
-        val invoice = Invoice(mUserAccount!!.name, "", "#bitsy", mAsset!!.symbol, items, "", "")
+        val invoice = Invoice(mUserAccount!!.name, "", "", mAsset!!.symbol, items, "", "")
         Log.d(TAG, "invoice: " + invoice.toJsonString())
         try {
             val bitmap = encodeAsBitmap(Invoice.toQrCode(invoice), "#139657") // PalmPay green
