@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import cy.agorise.bitsybitshareswallet.database.daos.*
 import cy.agorise.bitsybitshareswallet.database.entities.*
 import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetailDao
@@ -15,9 +17,11 @@ import cy.agorise.bitsybitshareswallet.database.joins.TransferDetailDao
         Balance::class,
         EquivalentValue::class,
         Transfer::class,
-        UserAccount::class
+        UserAccount::class,
+        Merchant::class,
+        Teller::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true)
 abstract class BitsyDatabase : RoomDatabase() {
 
@@ -29,9 +33,8 @@ abstract class BitsyDatabase : RoomDatabase() {
     abstract fun userAccountDao(): UserAccountDao
     abstract fun balanceDetailDao(): BalanceDetailDao
     abstract fun transferDetailDao(): TransferDetailDao
-    // version 2
-//    abstract fun merchantDao(): MerchantDao
-//    abstract fun tellerDao(): TellerDao
+    abstract fun merchantDao(): MerchantDao
+    abstract fun tellerDao(): TellerDao
 
     companion object {
 
@@ -45,12 +48,18 @@ abstract class BitsyDatabase : RoomDatabase() {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
                         BitsyDatabase::class.java, "BiTSyWallet.db"
-                    )
-                        .build()
+                    ).addMigrations(MIGRATION_1_2).build()
                 }
             }
 
             return INSTANCE
+        }
+
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS 'merchants' ('id' TEXT NOT NULL PRIMARY KEY, 'name' TEXT NOT NULL, 'address' TEXT, 'lat' REAL NOT NULL, 'lon' REAL NOT NULL, 'phone' TEXT, 'telegram' TEXT, 'website' TEXT)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS 'tellers' ('id' TEXT NOT NULL PRIMARY KEY, 'name' TEXT NOT NULL, 'address' TEXT, 'lat' REAL NOT NULL, 'lon' REAL NOT NULL, 'phone' TEXT, 'telegram' TEXT, 'website' TEXT)")
+            }
         }
     }
 }
