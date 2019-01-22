@@ -58,6 +58,9 @@
     <string name="text__ignore_network_fees">Ignore Network fees</string>
     <string name="button__filter">Filter</string>
 
+    <!-- Merchants & Tellers -->
+    <string name="msg__location_permission_necessary">Location permission is necessary to show your current location on the map.</string>
+
     <!-- Send Transaction -->
     <string name="title_info">Info</string>
     <string name="text__to">To</string>

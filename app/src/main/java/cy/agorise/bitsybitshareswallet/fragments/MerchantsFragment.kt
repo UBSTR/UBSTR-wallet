@@ -1,5 +1,8 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -25,12 +28,21 @@ import java.io.IOException
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
+import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.model.BitmapDescriptor
 import cy.agorise.bitsybitshareswallet.database.entities.Merchant
 import cy.agorise.bitsybitshareswallet.utils.Constants
+import cy.agorise.bitsybitshareswallet.utils.toast
 
 
 class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<FeathersResponse<Merchant>> {
+
+    companion object {
+        private const val TAG = "MerchantsFragment"
+
+        // Camera Permission
+        private const val REQUEST_LOCATION_PERMISSION = 1
+    }
 
     private lateinit var mMap: GoogleMap
 
@@ -55,6 +67,32 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
         merchantIcon = getMarkerIconFromDrawable(resources.getDrawable(R.drawable.ic_pin_merchants, null))
     }
 
+    private fun verifyLocationPermission() {
+        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not already granted
+            requestPermissions(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION)
+        } else {
+            // Permission is already granted
+            mMap.isMyLocationEnabled = true
+        }
+    }
+
+    /** Handles the result from the location permission request */
+    @SuppressLint("MissingPermission")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                mMap.isMyLocationEnabled = true
+            } else {
+                context?.toast(getString(R.string.msg__location_permission_necessary))
+            }
+            return
+        }
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -66,6 +104,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
+        verifyLocationPermission()
 
         val gson = GsonBuilder()
             .setLenient()
