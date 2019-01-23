@@ -12,17 +12,12 @@ import android.view.ViewGroup
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.gson.GsonBuilder
 
 import cy.agorise.bitsybitshareswallet.R
-import cy.agorise.bitsybitshareswallet.network.MerchantsWebservice
-import cy.agorise.bitsybitshareswallet.network.FeathersResponse
-import retrofit2.Call
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import android.preference.PreferenceManager
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.clustering.Cluster
@@ -31,10 +26,11 @@ import cy.agorise.bitsybitshareswallet.database.entities.Merchant
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.MerchantMarkerRenderer
 import cy.agorise.bitsybitshareswallet.utils.toast
+import cy.agorise.bitsybitshareswallet.viewmodels.MerchantViewModel
 import java.lang.Exception
 
 
-class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<FeathersResponse<Merchant>>,
+class MerchantsFragment : Fragment(), OnMapReadyCallback,
             ClusterManager.OnClusterClickListener<Merchant>,
             ClusterManager.OnClusterItemClickListener<Merchant>,
             ClusterManager.OnClusterItemInfoWindowClickListener<Merchant>{
@@ -47,6 +43,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
     }
 
     private lateinit var mMap: GoogleMap
+
+    private lateinit var mMerchantViewModel: MerchantViewModel
 
     private var mClusterManager: ClusterManager<Merchant>? = null
 
@@ -63,6 +61,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        mMerchantViewModel = ViewModelProviders.of(this).get(MerchantViewModel::class.java)
     }
 
     private fun verifyLocationPermission() {
@@ -123,17 +123,11 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
         mClusterManager?.setOnClusterItemClickListener(this)
         mClusterManager?.setOnClusterItemInfoWindowClickListener(this)
 
-        val gson = GsonBuilder()
-            .setLenient()
-            .create()
-        val retrofit = Retrofit.Builder()
-            .baseUrl(Constants.MERCHANTS_WEBSERVICE_URL)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
-
-        val ambassadorService = retrofit.create<MerchantsWebservice>(MerchantsWebservice::class.java)
-        val call = ambassadorService.getMerchants(0)
-        call.enqueue(this)
+        mMerchantViewModel.getAllMerchants().observe(this, Observer<List<Merchant>> {merchants ->
+            mClusterManager?.clearItems()
+            mClusterManager?.addItems(merchants)
+            mClusterManager?.cluster()
+        })
     }
 
     private fun applyMapTheme() {
@@ -154,19 +148,6 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
             }
         }
     }
-
-    override fun onResponse(call: Call<FeathersResponse<Merchant>>, response: Response<FeathersResponse<Merchant>>) {
-        if (response.isSuccessful) {
-            val res: FeathersResponse<Merchant>? = response.body()
-            val merchants = res?.data ?: return
-            mClusterManager?.addItems(merchants)
-            mClusterManager?.cluster()
-        } else {
-            Log.e("error_bitsy", response.errorBody()?.string())
-        }
-    }
-
-    override fun onFailure(call: Call<FeathersResponse<Merchant>>, t: Throwable) { /* Do nothing */ }
 
     /**
      * Animates the camera update to focus on an area that shows all the items from the cluster that was tapped.
