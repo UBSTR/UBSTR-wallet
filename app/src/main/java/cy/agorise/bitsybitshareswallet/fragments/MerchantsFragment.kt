@@ -21,13 +21,13 @@ import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.IOException
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.preference.PreferenceManager
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.model.*
+import com.google.maps.android.clustering.ClusterManager
 import cy.agorise.bitsybitshareswallet.database.entities.Merchant
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.toast
@@ -44,7 +44,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
 
     private lateinit var mMap: GoogleMap
 
-    private var merchants: List<Merchant>? = null
+    private var mClusterManager: ClusterManager<Merchant>? = null
 
     private lateinit var merchantIcon: BitmapDescriptor
 
@@ -107,6 +107,13 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
 
         verifyLocationPermission()
 
+        // Setup clusters to group markers when possible
+        mClusterManager = ClusterManager(context, mMap)
+
+        // Point the map's listeners at the listeners implemented by the cluster manager.
+        mMap.setOnCameraIdleListener(mClusterManager)
+        mMap.setOnMarkerClickListener(mClusterManager)
+
         val gson = GsonBuilder()
             .setLenient()
             .create()
@@ -142,26 +149,14 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
     override fun onResponse(call: Call<FeathersResponse<Merchant>>, response: Response<FeathersResponse<Merchant>>) {
         if (response.isSuccessful) {
             val res: FeathersResponse<Merchant>? = response.body()
-            merchants = res!!.data
-            for (mer in merchants!!) {
-                val location = LatLng(mer.lat.toDouble(), mer.lon.toDouble())
-                mMap.addMarker(
-                    MarkerOptions().position(location).title(mer.name).snippet(mer.address).icon(merchantIcon)
-                )
-            }
+            val merchants = res?.data ?: return
+            mClusterManager?.addItems(merchants)
         } else {
-            try {
-                Log.e("error_bitsy", response.errorBody()?.string())
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-
+            Log.e("error_bitsy", response.errorBody()?.string())
         }
     }
 
-    override fun onFailure(call: Call<FeathersResponse<Merchant>>, t: Throwable) {
-
-    }
+    override fun onFailure(call: Call<FeathersResponse<Merchant>>, t: Throwable) { /* Do nothing */ }
 
     private fun getMarkerIconFromDrawable(drawable: Drawable): BitmapDescriptor {
         val canvas = Canvas()
