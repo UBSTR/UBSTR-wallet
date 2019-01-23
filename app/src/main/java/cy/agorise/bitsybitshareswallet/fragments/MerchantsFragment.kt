@@ -23,15 +23,21 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import android.preference.PreferenceManager
 import androidx.core.content.ContextCompat
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.*
+import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import cy.agorise.bitsybitshareswallet.database.entities.Merchant
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.MerchantMarkerRenderer
 import cy.agorise.bitsybitshareswallet.utils.toast
+import java.lang.Exception
 
 
-class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<FeathersResponse<Merchant>> {
+class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<FeathersResponse<Merchant>>,
+            ClusterManager.OnClusterClickListener<Merchant>,
+            ClusterManager.OnClusterItemClickListener<Merchant>,
+            ClusterManager.OnClusterItemInfoWindowClickListener<Merchant>{
 
     companion object {
         private const val TAG = "MerchantsFragment"
@@ -110,6 +116,13 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
         mMap.setOnCameraIdleListener(mClusterManager)
         mMap.setOnMarkerClickListener(mClusterManager)
 
+        mMap.setOnMarkerClickListener(mClusterManager)
+        mMap.setInfoWindowAdapter(mClusterManager?.markerManager)
+        mMap.setOnInfoWindowClickListener(mClusterManager)
+        mClusterManager?.setOnClusterClickListener(this)
+        mClusterManager?.setOnClusterItemClickListener(this)
+        mClusterManager?.setOnClusterItemInfoWindowClickListener(this)
+
         val gson = GsonBuilder()
             .setLenient()
             .create()
@@ -154,4 +167,36 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
     }
 
     override fun onFailure(call: Call<FeathersResponse<Merchant>>, t: Throwable) { /* Do nothing */ }
+
+    /**
+     * Animates the camera update to focus on an area that shows all the items from the cluster that was tapped.
+     */
+    override fun onClusterClick(cluster: Cluster<Merchant>?): Boolean {
+        val builder = LatLngBounds.builder()
+        val merchantMarkers = cluster?.items
+
+        if (merchantMarkers != null) {
+            for (item in merchantMarkers) {
+                val merchantPosition = item.position
+                builder.include(merchantPosition)
+            }
+
+            val bounds = builder.build()
+
+            try {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+            } catch (e: Exception) {
+                Log.d(TAG, e.message)
+            }
+        }
+
+        return true
+    }
+
+    override fun onClusterItemClick(p0: Merchant?): Boolean {
+        return false
+    }
+
+    override fun onClusterItemInfoWindowClick(p0: Merchant?) {
+    }
 }
