@@ -21,15 +21,13 @@ import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.Drawable
 import android.preference.PreferenceManager
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.clustering.ClusterManager
 import cy.agorise.bitsybitshareswallet.database.entities.Merchant
 import cy.agorise.bitsybitshareswallet.utils.Constants
+import cy.agorise.bitsybitshareswallet.utils.MerchantMarkerRenderer
 import cy.agorise.bitsybitshareswallet.utils.toast
 
 
@@ -46,8 +44,6 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
 
     private var mClusterManager: ClusterManager<Merchant>? = null
 
-    private lateinit var merchantIcon: BitmapDescriptor
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -61,8 +57,6 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
-        merchantIcon = getMarkerIconFromDrawable(resources.getDrawable(R.drawable.ic_pin_merchants, null))
     }
 
     private fun verifyLocationPermission() {
@@ -109,6 +103,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
 
         // Setup clusters to group markers when possible
         mClusterManager = ClusterManager(context, mMap)
+        val renderer = MerchantMarkerRenderer(context, mMap, mClusterManager)
+        mClusterManager?.renderer = renderer
 
         // Point the map's listeners at the listeners implemented by the cluster manager.
         mMap.setOnCameraIdleListener(mClusterManager)
@@ -151,19 +147,11 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, retrofit2.Callback<Fea
             val res: FeathersResponse<Merchant>? = response.body()
             val merchants = res?.data ?: return
             mClusterManager?.addItems(merchants)
+            mClusterManager?.cluster()
         } else {
             Log.e("error_bitsy", response.errorBody()?.string())
         }
     }
 
     override fun onFailure(call: Call<FeathersResponse<Merchant>>, t: Throwable) { /* Do nothing */ }
-
-    private fun getMarkerIconFromDrawable(drawable: Drawable): BitmapDescriptor {
-        val canvas = Canvas()
-        val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
-        canvas.setBitmap(bitmap)
-        drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-        drawable.draw(canvas)
-        return BitmapDescriptorFactory.fromBitmap(bitmap)
-    }
 }
