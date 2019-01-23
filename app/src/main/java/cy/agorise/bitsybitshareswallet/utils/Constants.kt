@@ -87,4 +87,12 @@ object Constants {
     const val KEY_NIGHT_MODE_ACTIVATED = "key_night_mode_activated"
 
     const val MERCHANTS_WEBSERVICE_URL = "https://websvc.palmpay.io/"
+
+    /** Key used to store the last time in millis that the merchants info was refreshed */
+    const val KEY_MERCHANTS_LAST_UPDATE = "key_merchants_last_update"
+
+    /** Key used to store the last time in millis that the tellers info was refreshed */
+    const val KEY_TELLERS_LAST_UPDATE = "key_tellers_last_update"
+
+    const val MERCHANTS_UPDATE_PERIOD = 1000L * 60 * 60 + 24 // 1 day
 }

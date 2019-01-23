@@ -17,4 +17,7 @@ interface MerchantDao {
 
     @Query("SELECT * FROM merchants")
     fun getAll(): LiveData<List<Merchant>>
+
+    @Query("DELETE FROM merchants")
+    fun deleteAll()
 }

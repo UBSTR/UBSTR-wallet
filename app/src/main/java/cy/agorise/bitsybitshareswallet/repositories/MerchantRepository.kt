@@ -2,6 +2,7 @@ package cy.agorise.bitsybitshareswallet.repositories
 
 import android.content.Context
 import android.os.AsyncTask
+import android.preference.PreferenceManager
 import androidx.lifecycle.LiveData
 import cy.agorise.bitsybitshareswallet.database.BitsyDatabase
 import cy.agorise.bitsybitshareswallet.database.daos.MerchantDao
@@ -14,7 +15,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class MerchantRepository internal constructor(context: Context) : retrofit2.Callback<FeathersResponse<Merchant>> {
+class MerchantRepository internal constructor(val context: Context) : retrofit2.Callback<FeathersResponse<Merchant>> {
 
     private val mMerchantDao: MerchantDao
 
@@ -23,23 +24,29 @@ class MerchantRepository internal constructor(context: Context) : retrofit2.Call
         mMerchantDao = db!!.merchantDao()
     }
 
-    /**
-     * Returns a LiveData object directly from the database while the response from the WebService is obtained.
-     */
+    /** Returns a LiveData object directly from the database while the response from the WebService is obtained. */
     fun getAll(): LiveData<List<Merchant>> {
         refreshMerchants()
         return mMerchantDao.getAll()
     }
 
+    /** Refreshes the merchants information only if the MERCHANT_UPDATE_PERIOD has passed, otherwise it does nothing */
     private fun refreshMerchants() {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(Constants.MERCHANTS_WEBSERVICE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        val lastMerchantUpdate = PreferenceManager.getDefaultSharedPreferences(context)
+            .getLong(Constants.KEY_MERCHANTS_LAST_UPDATE, 0)
 
-        val ambassadorService = retrofit.create<MerchantsWebservice>(MerchantsWebservice::class.java)
-        val call = ambassadorService.getMerchants(0)
-        call.enqueue(this)
+        val now = System.currentTimeMillis()
+
+        if (lastMerchantUpdate + Constants.MERCHANTS_UPDATE_PERIOD < now) {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(Constants.MERCHANTS_WEBSERVICE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            val ambassadorService = retrofit.create<MerchantsWebservice>(MerchantsWebservice::class.java)
+            val call = ambassadorService.getMerchants(0)
+            call.enqueue(this)
+        }
     }
 
     override fun onResponse(call: Call<FeathersResponse<Merchant>>, response: Response<FeathersResponse<Merchant>>) {
@@ -47,6 +54,10 @@ class MerchantRepository internal constructor(context: Context) : retrofit2.Call
             val res: FeathersResponse<Merchant>? = response.body()
             val merchants = res?.data ?: return
             insertAllAsyncTask(mMerchantDao).execute(merchants)
+
+            val now = System.currentTimeMillis()
+            PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putLong(Constants.KEY_MERCHANTS_LAST_UPDATE, now).apply()
         }
     }
 
@@ -56,7 +67,7 @@ class MerchantRepository internal constructor(context: Context) : retrofit2.Call
         AsyncTask<List<Merchant>, Void, Void>() {
 
         override fun doInBackground(vararg merchants: List<Merchant>): Void? {
-            // TODO Delete all first
+            mAsyncTaskDao.deleteAll()
             mAsyncTaskDao.insertAll(merchants[0])
             return null
         }
