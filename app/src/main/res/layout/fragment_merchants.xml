@@ -9,7 +9,7 @@
     android:id="@+id/map"
     map:uiZoomControls="true"
     map:uiCompass="true"
-    map:cameraTargetLat="7.8207323"
-    map:cameraTargetLng="-82.7504461"
-    map:cameraZoom="6"
+    map:cameraTargetLat="9.933058"
+    map:cameraTargetLng="-84.230800"
+    map:cameraZoom="3.5"
     tools:context=".fragments.MerchantsFragment"/>
