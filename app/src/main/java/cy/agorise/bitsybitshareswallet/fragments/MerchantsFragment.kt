@@ -20,22 +20,21 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.*
+import com.google.maps.android.MarkerManager
 import com.google.maps.android.clustering.Cluster
+import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.clustering.ClusterManager
 import cy.agorise.bitsybitshareswallet.database.entities.Merchant
 import cy.agorise.bitsybitshareswallet.database.entities.Teller
 import cy.agorise.bitsybitshareswallet.utils.Constants
-import cy.agorise.bitsybitshareswallet.utils.MerchantMarkerRenderer
-import cy.agorise.bitsybitshareswallet.utils.TellerMarkerRenderer
+import cy.agorise.bitsybitshareswallet.utils.MerchantClusterRenderer
+import cy.agorise.bitsybitshareswallet.utils.TellerClusterRenderer
 import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.bitsybitshareswallet.viewmodels.MerchantViewModel
 import java.lang.Exception
 
 
-class MerchantsFragment : Fragment(), OnMapReadyCallback,
-            ClusterManager.OnClusterClickListener<Merchant>,
-            ClusterManager.OnClusterItemClickListener<Merchant>,
-            ClusterManager.OnClusterItemInfoWindowClickListener<Merchant>{
+class MerchantsFragment : Fragment(), OnMapReadyCallback {
 
     companion object {
         private const val TAG = "MerchantsFragment"
@@ -48,13 +47,12 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback,
 
     private lateinit var mMerchantViewModel: MerchantViewModel
 
+    private var mMarkerManager: MarkerManager? = null
+
     private var mMerchantClusterManager: ClusterManager<Merchant>? = null
     private var mTellerClusterManager: ClusterManager<Teller>? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_merchants, container, false)
     }
 
@@ -66,17 +64,6 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback,
         mapFragment.getMapAsync(this)
 
         mMerchantViewModel = ViewModelProviders.of(this).get(MerchantViewModel::class.java)
-    }
-
-    private fun verifyLocationPermission() {
-        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not already granted
-            requestPermissions(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION)
-        } else {
-            // Permission is already granted
-            mMap.isMyLocationEnabled = true
-        }
     }
 
     /** Handles the result from the location permission request */
@@ -110,9 +97,19 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback,
 
         verifyLocationPermission()
 
+        mMarkerManager = MarkerManager(mMap)
+
         initMerchantsCluster()
 
         initTellersCluster()
+
+        // Point the map's listeners at the listeners implemented by the cluster manager.
+        mMap.setOnMarkerClickListener(mMarkerManager)
+
+        mMap.setOnCameraIdleListener {
+            mMerchantClusterManager?.onCameraIdle()
+            mTellerClusterManager?.onCameraIdle()
+        }
     }
 
     private fun applyMapTheme() {
@@ -134,22 +131,25 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback,
         }
     }
 
+    private fun verifyLocationPermission() {
+        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not already granted
+            requestPermissions(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION)
+        } else {
+            // Permission is already granted
+            mMap.isMyLocationEnabled = true
+        }
+    }
+
     private fun initMerchantsCluster() {
         // Setup clusters to group markers when possible
-        mMerchantClusterManager = ClusterManager(context, mMap)
-        val merchantRenderer = MerchantMarkerRenderer(context, mMap, mMerchantClusterManager)
+        mMerchantClusterManager = ClusterManager(context, mMap, mMarkerManager)
+        val merchantRenderer = MerchantClusterRenderer(context, mMap, mMerchantClusterManager)
         mMerchantClusterManager?.renderer = merchantRenderer
 
-        // Point the map's listeners at the listeners implemented by the cluster manager.
-        mMap.setOnCameraIdleListener(mMerchantClusterManager)
-        mMap.setOnMarkerClickListener(mMerchantClusterManager)
-
-        mMap.setOnMarkerClickListener(mMerchantClusterManager)
-        mMap.setInfoWindowAdapter(mMerchantClusterManager?.markerManager)
-        mMap.setOnInfoWindowClickListener(mMerchantClusterManager)
-        mMerchantClusterManager?.setOnClusterClickListener(this)
-        mMerchantClusterManager?.setOnClusterItemClickListener(this)
-        mMerchantClusterManager?.setOnClusterItemInfoWindowClickListener(this)
+        mMerchantClusterManager?.setOnClusterClickListener { onClusterClick(it as Cluster<ClusterItem>) }
+        mMerchantClusterManager?.setOnClusterItemClickListener { false }
 
         mMerchantViewModel.getAllMerchants().observe(this, Observer<List<Merchant>> {merchants ->
             mMerchantClusterManager?.clearItems()
@@ -160,9 +160,12 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback,
 
     private fun initTellersCluster() {
         // Setup clusters to group markers when possible
-        mTellerClusterManager = ClusterManager(context, mMap)
-        val tellerRenderer = TellerMarkerRenderer(context, mMap, mTellerClusterManager)
+        mTellerClusterManager = ClusterManager(context, mMap, mMarkerManager)
+        val tellerRenderer = TellerClusterRenderer(context, mMap, mTellerClusterManager)
         mTellerClusterManager?.renderer = tellerRenderer
+
+        mTellerClusterManager?.setOnClusterClickListener { onClusterClick(it as Cluster<ClusterItem>) }
+        mTellerClusterManager?.setOnClusterItemClickListener { false }
 
         mMerchantViewModel.getAllTellers().observe(this, Observer<List<Teller>> {tellers ->
             mTellerClusterManager?.clearItems()
@@ -172,14 +175,14 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback,
     }
 
     /** Animates the camera update to focus on an area that shows all the items from the cluster that was tapped. */
-    override fun onClusterClick(cluster: Cluster<Merchant>?): Boolean {
+    private fun onClusterClick(cluster: Cluster<ClusterItem>?): Boolean {
         val builder = LatLngBounds.builder()
-        val merchantMarkers = cluster?.items
+        val items = cluster?.items
 
-        if (merchantMarkers != null) {
-            for (item in merchantMarkers) {
-                val merchantPosition = item.position
-                builder.include(merchantPosition)
+        if (items != null) {
+            for (item in items) {
+                val position = item.position
+                builder.include(position)
             }
 
             val bounds = builder.build()
@@ -190,14 +193,6 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback,
                 Log.d(TAG, e.message)
             }
         }
-
         return true
-    }
-
-    override fun onClusterItemClick(p0: Merchant?): Boolean {
-        return false
-    }
-
-    override fun onClusterItemInfoWindowClick(p0: Merchant?) {
     }
 }

@@ -3,6 +3,7 @@ package cy.agorise.bitsybitshareswallet.repositories
 import android.content.Context
 import android.os.AsyncTask
 import android.preference.PreferenceManager
+import android.util.Log
 import androidx.lifecycle.LiveData
 import cy.agorise.bitsybitshareswallet.database.BitsyDatabase
 import cy.agorise.bitsybitshareswallet.database.daos.TellerDao
@@ -16,6 +17,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class TellerRepository internal constructor(val context: Context) : retrofit2.Callback<FeathersResponse<Teller>> {
+
+    companion object {
+        private const val TAG = "TellerRepository"
+    }
 
     private val mTellerDao: TellerDao
 
@@ -38,6 +43,8 @@ class TellerRepository internal constructor(val context: Context) : retrofit2.Ca
         val now = System.currentTimeMillis()
 
         if (lastTellerUpdate + Constants.MERCHANTS_UPDATE_PERIOD < now) {
+            Log.d(TAG, "Updating tellers from webservice")
+            // TODO make sure it works when there are more tellers than those sent back in the first response
             val retrofit = Retrofit.Builder()
                 .baseUrl(Constants.MERCHANTS_WEBSERVICE_URL)
                 .addConverterFactory(GsonConverterFactory.create())

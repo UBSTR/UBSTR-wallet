@@ -16,16 +16,16 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import com.google.maps.android.ui.IconGenerator
 import com.google.maps.android.ui.SquareTextView
 import cy.agorise.bitsybitshareswallet.R
-import cy.agorise.bitsybitshareswallet.database.entities.Merchant
+import cy.agorise.bitsybitshareswallet.database.entities.Teller
 
 /**
  * This class is used to create custom merchant and merchant cluster icons to show on the map.
  */
-class MerchantMarkerRenderer(val context: Context?, map: GoogleMap?, clusterManager: ClusterManager<Merchant>?) :
-    DefaultClusterRenderer<Merchant>(context, map, clusterManager) {
+class TellerClusterRenderer(val context: Context?, map: GoogleMap?, clusterManager: ClusterManager<Teller>?) :
+    DefaultClusterRenderer<Teller>(context, map, clusterManager) {
 
     // Icons used to display merchants and merchants' clusters on the map
-    private var merchantIcon: BitmapDescriptor
+    private var tellerIcon: BitmapDescriptor
 
     private val mIcons = SparseArray<BitmapDescriptor>()
 
@@ -33,21 +33,21 @@ class MerchantMarkerRenderer(val context: Context?, map: GoogleMap?, clusterMana
     private val mIconGenerator = IconGenerator(context)
 
     init {
-        merchantIcon = getMarkerIconFromDrawable(
-            context?.resources?.getDrawable(R.drawable.ic_merchant_pin, null))
+        tellerIcon = getMarkerIconFromDrawable(
+            context?.resources?.getDrawable(R.drawable.ic_teller_pin, null))
 
         mDensity = context?.resources?.displayMetrics?.density ?: 2.0F
 
         this.mIconGenerator.setContentView(this.makeSquareTextView(context))
         this.mIconGenerator.setTextAppearance(com.google.maps.android.R.style.amu_ClusterIcon_TextAppearance)
-        this.mIconGenerator.setBackground(context?.resources?.getDrawable(R.drawable.ic_merchant_cluster, null))
+        this.mIconGenerator.setBackground(context?.resources?.getDrawable(R.drawable.ic_teller_cluster, null))
     }
 
-    override fun onBeforeClusterItemRendered(item: Merchant?, markerOptions: MarkerOptions?) {
-        markerOptions?.icon(merchantIcon)
+    override fun onBeforeClusterItemRendered(item: Teller?, markerOptions: MarkerOptions?) {
+        markerOptions?.icon(tellerIcon)
     }
 
-    override fun onBeforeClusterRendered(cluster: Cluster<Merchant>?, markerOptions: MarkerOptions?) {
+    override fun onBeforeClusterRendered(cluster: Cluster<Teller>?, markerOptions: MarkerOptions?) {
         val bucket = getBucket(cluster)
         var descriptor: BitmapDescriptor? = mIcons.get(bucket)
         if (descriptor == null) {
@@ -57,7 +57,7 @@ class MerchantMarkerRenderer(val context: Context?, map: GoogleMap?, clusterMana
         markerOptions?.icon(descriptor)
     }
 
-    override fun shouldRenderAsCluster(cluster: Cluster<Merchant>?): Boolean {
+    override fun shouldRenderAsCluster(cluster: Cluster<Teller>?): Boolean {
         return (cluster?.size ?: 0) > 1
     }
 
