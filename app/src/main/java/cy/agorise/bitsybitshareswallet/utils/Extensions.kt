@@ -29,7 +29,7 @@ fun FloatingActionButton.disable(colorResource: Int) {
 /**
  * Easily create a toast message with less boilerplate code
  */
-fun Context.toast(message: CharSequence, duration: Int = Toast.LENGTH_LONG) {
+fun Context.toast(message: CharSequence, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(this, message, duration).show()
 }
 

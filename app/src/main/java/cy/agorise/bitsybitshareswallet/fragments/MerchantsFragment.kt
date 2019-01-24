@@ -210,7 +210,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
 
         override fun getInfoWindow(marker: Marker?): View {
             val infoWindowLayout: View = LayoutInflater.from(context).inflate(
-                R.layout.map_pin_info_dialog, null)
+                R.layout.marker_info_window, null)
             val tvName      = infoWindowLayout.findViewById<TextView>(R.id.tvName)
             val tvAddress   = infoWindowLayout.findViewById<TextView>(R.id.tvAddress)
             val tvPhone     = infoWindowLayout.findViewById<TextView>(R.id.tvPhone)
@@ -230,9 +230,10 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
                 else
                     tvPhone.visibility = View.GONE
 
-                if (selectedMerchant?.telegram != null)
-                    tvTelegram.text = selectedMerchant?.telegram
-                else
+                if (selectedMerchant?.telegram != null) {
+                    val telegram = "Telegram: ${selectedMerchant?.telegram}"
+                    tvTelegram.text = telegram
+                } else
                     tvTelegram.visibility = View.GONE
 
                 if (selectedMerchant?.website != null)
