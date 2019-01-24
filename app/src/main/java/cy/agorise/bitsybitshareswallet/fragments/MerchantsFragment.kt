@@ -15,6 +15,7 @@ import com.google.android.gms.maps.SupportMapFragment
 
 import cy.agorise.bitsybitshareswallet.R
 import android.preference.PreferenceManager
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -51,6 +52,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
 
     private var mMerchantClusterManager: ClusterManager<Merchant>? = null
     private var mTellerClusterManager: ClusterManager<Teller>? = null
+
+    private var selectedMerchant: Merchant? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_merchants, container, false)
@@ -110,6 +113,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
             mMerchantClusterManager?.onCameraIdle()
             mTellerClusterManager?.onCameraIdle()
         }
+
+        mMap.setInfoWindowAdapter(mMarkerManager)
     }
 
     private fun applyMapTheme() {
@@ -149,7 +154,12 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         mMerchantClusterManager?.renderer = merchantRenderer
 
         mMerchantClusterManager?.setOnClusterClickListener { onClusterClick(it as Cluster<ClusterItem>) }
-        mMerchantClusterManager?.setOnClusterItemClickListener { false }
+        mMerchantClusterManager?.setOnClusterItemClickListener { merchant ->
+            selectedMerchant = merchant
+            false
+        }
+
+        mMerchantClusterManager?.markerCollection?.setOnInfoWindowAdapter(MerchantInfoWindowAdapter())
 
         mMerchantViewModel.getAllMerchants().observe(this, Observer<List<Merchant>> {merchants ->
             mMerchantClusterManager?.clearItems()
@@ -195,4 +205,51 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         }
         return true
     }
+
+    inner class MerchantInfoWindowAdapter : GoogleMap.InfoWindowAdapter {
+
+        override fun getInfoWindow(marker: Marker?): View {
+            val infoWindowLayout: View = LayoutInflater.from(context).inflate(
+                R.layout.map_pin_info_dialog, null)
+            val tvName      = infoWindowLayout.findViewById<TextView>(R.id.tvName)
+            val tvAddress   = infoWindowLayout.findViewById<TextView>(R.id.tvAddress)
+            val tvPhone     = infoWindowLayout.findViewById<TextView>(R.id.tvPhone)
+            val tvTelegram  = infoWindowLayout.findViewById<TextView>(R.id.tvTelegram)
+            val tvWebsite   = infoWindowLayout.findViewById<TextView>(R.id.tvWebsite)
+
+            if (selectedMerchant != null) {
+                tvName.text = selectedMerchant?.name
+
+                if (selectedMerchant?.name != null)
+                    tvAddress.text = selectedMerchant?.address
+                else
+                    tvAddress.visibility = View.GONE
+
+                if (selectedMerchant?.phone != null)
+                    tvPhone.text = selectedMerchant?.phone
+                else
+                    tvPhone.visibility = View.GONE
+
+                if (selectedMerchant?.telegram != null)
+                    tvTelegram.text = selectedMerchant?.telegram
+                else
+                    tvTelegram.visibility = View.GONE
+
+                if (selectedMerchant?.website != null)
+                    tvWebsite.text = selectedMerchant?.website
+                        ?.removePrefix("http://")?.removePrefix("https://")
+                else
+                    tvWebsite.visibility = View.GONE
+
+            }
+
+            return infoWindowLayout
+        }
+
+        override fun getInfoContents(marker: Marker?): View? {
+            return null
+        }
+    }
+
+
 }
