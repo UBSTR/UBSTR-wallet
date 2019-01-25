@@ -50,10 +50,13 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
 
     private var mMarkerManager: MarkerManager? = null
 
+    // Cluster managers to create custom merchants and tellers clusters with a custom behavior too
     private var mMerchantClusterManager: ClusterManager<Merchant>? = null
     private var mTellerClusterManager: ClusterManager<Teller>? = null
 
+    // Variables to keep track of the currently selected merchant and teller
     private var selectedMerchant: Merchant? = null
+    private var selectedTeller: Teller? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_merchants, container, false)
@@ -100,13 +103,14 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
 
         verifyLocationPermission()
 
+        // User MarkerManager to be able to use Map events in more than one ClusterManager
         mMarkerManager = MarkerManager(mMap)
 
         initMerchantsCluster()
 
         initTellersCluster()
 
-        // Point the map's listeners at the listeners implemented by the cluster manager.
+        // Point the map's listeners at the listeners implemented by the marker manager.
         mMap.setOnMarkerClickListener(mMarkerManager)
 
         mMap.setOnCameraIdleListener {
@@ -148,7 +152,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun initMerchantsCluster() {
-        // Setup clusters to group markers when possible
+        // Setup clusters to group markers when possible using a custom renderer
         mMerchantClusterManager = ClusterManager(context, mMap, mMarkerManager)
         val merchantRenderer = MerchantClusterRenderer(context, mMap, mMerchantClusterManager)
         mMerchantClusterManager?.renderer = merchantRenderer
@@ -159,6 +163,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
             false
         }
 
+        // Force marker to use a custom info window
         mMerchantClusterManager?.markerCollection?.setOnInfoWindowAdapter(MerchantInfoWindowAdapter())
 
         mMerchantViewModel.getAllMerchants().observe(this, Observer<List<Merchant>> {merchants ->
@@ -169,13 +174,19 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun initTellersCluster() {
-        // Setup clusters to group markers when possible
+        // Setup clusters to group markers when possible using a custom renderer
         mTellerClusterManager = ClusterManager(context, mMap, mMarkerManager)
         val tellerRenderer = TellerClusterRenderer(context, mMap, mTellerClusterManager)
         mTellerClusterManager?.renderer = tellerRenderer
 
         mTellerClusterManager?.setOnClusterClickListener { onClusterClick(it as Cluster<ClusterItem>) }
-        mTellerClusterManager?.setOnClusterItemClickListener { false }
+        mTellerClusterManager?.setOnClusterItemClickListener { teller ->
+            selectedTeller = teller
+            false
+        }
+
+        // Force marker to use a custom info window
+        mTellerClusterManager?.markerCollection?.setOnInfoWindowAdapter(TellerInfoWindowAdapter())
 
         mMerchantViewModel.getAllTellers().observe(this, Observer<List<Teller>> {tellers ->
             mTellerClusterManager?.clearItems()
@@ -206,6 +217,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         return true
     }
 
+    /** Creates a custom view for the Merchant's Info Window, when a merchant marker is selected */
     inner class MerchantInfoWindowAdapter : GoogleMap.InfoWindowAdapter {
 
         override fun getInfoWindow(marker: Marker?): View {
@@ -220,7 +232,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
             if (selectedMerchant != null) {
                 tvName.text = selectedMerchant?.name
 
-                if (selectedMerchant?.name != null)
+                if (selectedMerchant?.address != null)
                     tvAddress.text = selectedMerchant?.address
                 else
                     tvAddress.visibility = View.GONE
@@ -241,9 +253,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
                         ?.removePrefix("http://")?.removePrefix("https://")
                 else
                     tvWebsite.visibility = View.GONE
-
             }
-
             return infoWindowLayout
         }
 
@@ -252,5 +262,48 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    /** Creates a custom view for the Teller's Info Window, when a teller marker is selected */
+    inner class TellerInfoWindowAdapter : GoogleMap.InfoWindowAdapter {
 
+        override fun getInfoWindow(marker: Marker?): View {
+            val infoWindowLayout: View = LayoutInflater.from(context).inflate(
+                R.layout.marker_info_window, null)
+            val tvName      = infoWindowLayout.findViewById<TextView>(R.id.tvName)
+            val tvAddress   = infoWindowLayout.findViewById<TextView>(R.id.tvAddress)
+            val tvPhone     = infoWindowLayout.findViewById<TextView>(R.id.tvPhone)
+            val tvTelegram  = infoWindowLayout.findViewById<TextView>(R.id.tvTelegram)
+            val tvWebsite   = infoWindowLayout.findViewById<TextView>(R.id.tvWebsite)
+
+            if (selectedTeller != null) {
+                tvName.text = selectedTeller?.gt_name
+
+                if (selectedTeller?.address != null)
+                    tvAddress.text = selectedTeller?.address
+                else
+                    tvAddress.visibility = View.GONE
+
+                if (selectedTeller?.phone != null)
+                    tvPhone.text = selectedTeller?.phone
+                else
+                    tvPhone.visibility = View.GONE
+
+                if (selectedTeller?.telegram != null) {
+                    val telegram = "Telegram: ${selectedTeller?.telegram}"
+                    tvTelegram.text = telegram
+                } else
+                    tvTelegram.visibility = View.GONE
+
+                if (selectedTeller?.url != null)
+                    tvWebsite.text = selectedTeller?.url
+                        ?.removePrefix("http://")?.removePrefix("https://")
+                else
+                    tvWebsite.visibility = View.GONE
+            }
+            return infoWindowLayout
+        }
+
+        override fun getInfoContents(marker: Marker?): View? {
+            return null
+        }
+    }
 }
