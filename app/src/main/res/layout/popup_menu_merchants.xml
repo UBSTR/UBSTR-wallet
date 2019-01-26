@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:background="@drawable/popup_menu_merchants_background">
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchMerchants"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:switchPadding="48dp"
+        android:text="@string/title_merchants"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+        android:textColor="?android:textColorPrimary"/>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchTellers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:switchPadding="48dp"
+        android:text="@string/title_tellers"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+        android:textColor="?android:textColorPrimary"/>
+
+    <TextView
+        android:id="@+id/tvInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="About"
+        android:clickable="true"
+        android:focusable="true"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
+</LinearLayout>

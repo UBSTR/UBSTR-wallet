@@ -36,7 +36,7 @@
 
     <!-- Home -->
     <string name="title_transactions">Transacciones</string>
-    <string name="title_merchants">Comerciantes</string>
+    <string name="title_merchants_and_tellers">Comerciantes</string>
     <string name="title_receive">Recibir</string>
     <string name="title_balances">Balances</string>
     <string name="title_send">Enviar</string>
@@ -59,6 +59,8 @@
     <string name="button__filter">Filtrar</string>
 
     <!-- Merchants & Tellers -->
+    <string name="title_merchants">Comerciantes</string>
+    <string name="title_tellers">Tellers</string>
     <string name="msg__location_permission_necessary">El permiso de localización es necesario para mostrar tu ubicación actual en el mapa.</string>
 
     <!-- Send Transaction -->

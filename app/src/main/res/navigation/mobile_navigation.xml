@@ -45,7 +45,7 @@
     <fragment
         android:id="@+id/merchants_dest"
         android:name="cy.agorise.bitsybitshareswallet.fragments.MerchantsFragment"
-        android:label="@string/title_merchants"
+        android:label="@string/title_merchants_and_tellers"
         tools:layout="@layout/fragment_merchants"/>
 
     <fragment

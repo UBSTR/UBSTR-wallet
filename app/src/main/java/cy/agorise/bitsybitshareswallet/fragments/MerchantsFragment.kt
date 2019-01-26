@@ -2,20 +2,21 @@ package cy.agorise.bitsybitshareswallet.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 
 import cy.agorise.bitsybitshareswallet.R
 import android.preference.PreferenceManager
+import android.view.*
+import android.widget.PopupWindow
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -58,7 +59,16 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
     private var selectedMerchant: Merchant? = null
     private var selectedTeller: Teller? = null
 
+    private var mPopupWindow: PopupWindow? = null
+    private var mToolbar: Toolbar? = null
+    private var screenWidth: Int = 0
+    private var popupWindowWidth: Int = 0
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        setHasOptionsMenu(true)
+
+        mToolbar = activity?.findViewById(R.id.toolbar)
+
         return inflater.inflate(R.layout.fragment_merchants, container, false)
     }
 
@@ -70,6 +80,36 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         mMerchantViewModel = ViewModelProviders.of(this).get(MerchantViewModel::class.java)
+
+        setupPopupWindow()
+
+        // Gets the screen width to correctly place the merchants and tellers popup menu
+        val display = activity?.windowManager?.defaultDisplay
+        screenWidth = display?.width ?: screenWidth
+    }
+
+    private fun setupPopupWindow() {
+        val popupView = layoutInflater?.inflate(R.layout.popup_menu_merchants, null)
+
+        // TODO get references to the popup menu items
+
+        mPopupWindow = PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        popupWindowWidth = mPopupWindow?.width ?: popupWindowWidth
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_merchants, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item?.itemId == R.id.menu_filter) {
+            if (mPopupWindow?.isShowing == false)
+                mPopupWindow?.showAsDropDown(mToolbar, screenWidth - popupWindowWidth, 0)
+            else
+                mPopupWindow?.dismiss()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     /** Handles the result from the location permission request */
