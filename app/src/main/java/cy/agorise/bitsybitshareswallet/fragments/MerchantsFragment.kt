@@ -15,6 +15,7 @@ import android.preference.PreferenceManager
 import android.view.*
 import android.widget.PopupWindow
 import android.widget.TextView
+import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -64,6 +65,12 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
     private var mToolbar: Toolbar? = null
     private var screenWidth: Int = 0
 
+    // Variables used to decide whether or not to display the merchants and tellers markers on the map
+    private var merchants = ArrayList<Merchant>()
+    private var tellers = ArrayList<Teller>()
+    private var showMerchantsMarkers = true
+    private var showTellerMarkers = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
 
@@ -92,7 +99,19 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
     private fun setupPopupWindow() {
         val popupView = layoutInflater?.inflate(R.layout.popup_menu_merchants, null)
 
-        // TODO get references to the popup menu items
+        val switchMerchants = popupView?.findViewById<SwitchCompat>(R.id.switchMerchants)
+        switchMerchants?.isChecked = showMerchantsMarkers
+        switchMerchants?.setOnCheckedChangeListener { _, isChecked ->
+            showMerchantsMarkers = isChecked
+            showHideMerchantsMarkers()
+        }
+
+        val switchTellers = popupView?.findViewById<SwitchCompat>(R.id.switchTellers)
+        switchTellers?.isChecked = showTellerMarkers
+        switchTellers?.setOnCheckedChangeListener { _, isChecked ->
+            showTellerMarkers = isChecked
+            showHideTellersMarkers()
+        }
 
         val tvAbout = popupView?.findViewById<TextView>(R.id.tvAbout)
         tvAbout?.setOnClickListener {
@@ -225,9 +244,9 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         mMerchantClusterManager?.markerCollection?.setOnInfoWindowAdapter(MerchantInfoWindowAdapter())
 
         mMerchantViewModel.getAllMerchants().observe(this, Observer<List<Merchant>> {merchants ->
-            mMerchantClusterManager?.clearItems()
-            mMerchantClusterManager?.addItems(merchants)
-            mMerchantClusterManager?.cluster()
+            this.merchants.clear()
+            this.merchants.addAll(merchants)
+            showHideMerchantsMarkers()
         })
     }
 
@@ -251,10 +270,28 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         mTellerClusterManager?.markerCollection?.setOnInfoWindowAdapter(TellerInfoWindowAdapter())
 
         mMerchantViewModel.getAllTellers().observe(this, Observer<List<Teller>> {tellers ->
-            mTellerClusterManager?.clearItems()
+            this.tellers.clear()
+            this.tellers.addAll(tellers)
+            showHideTellersMarkers()
+        })
+    }
+
+    private fun showHideMerchantsMarkers() {
+        mMerchantClusterManager?.clearItems()
+        mMerchantClusterManager?.cluster()
+        if (showMerchantsMarkers) {
+            mMerchantClusterManager?.addItems(merchants)
+            mMerchantClusterManager?.cluster()
+        }
+    }
+
+    private fun showHideTellersMarkers() {
+        mTellerClusterManager?.clearItems()
+        mTellerClusterManager?.cluster()
+        if (showTellerMarkers) {
             mTellerClusterManager?.addItems(tellers)
             mTellerClusterManager?.cluster()
-        })
+        }
     }
 
     /** Animates the camera update to focus on an area that shows all the items from the cluster that was tapped. */
