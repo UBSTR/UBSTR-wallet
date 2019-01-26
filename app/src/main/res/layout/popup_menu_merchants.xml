@@ -31,7 +31,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="About"
+        android:layout_marginEnd="8dp"
+        android:text="@string/title_about"
+        android:drawableEnd="@drawable/ic_info_merchants"
         android:clickable="true"
         android:focusable="true"
         android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>

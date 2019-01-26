@@ -61,6 +61,7 @@
     <!-- Merchants & Tellers -->
     <string name="title_merchants">Comerciantes</string>
     <string name="title_tellers">Tellers</string>
+    <string name="title_about">Acerca de</string>
     <string name="msg__location_permission_necessary">El permiso de localización es necesario para mostrar tu ubicación actual en el mapa.</string>
 
     <!-- Send Transaction -->

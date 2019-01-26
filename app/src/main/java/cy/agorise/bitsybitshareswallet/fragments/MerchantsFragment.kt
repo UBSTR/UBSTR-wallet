@@ -2,7 +2,6 @@ package cy.agorise.bitsybitshareswallet.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -62,7 +61,6 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
     private var mPopupWindow: PopupWindow? = null
     private var mToolbar: Toolbar? = null
     private var screenWidth: Int = 0
-    private var popupWindowWidth: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -94,7 +92,6 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         // TODO get references to the popup menu items
 
         mPopupWindow = PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        popupWindowWidth = mPopupWindow?.width ?: popupWindowWidth
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -104,7 +101,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == R.id.menu_filter) {
             if (mPopupWindow?.isShowing == false)
-                mPopupWindow?.showAsDropDown(mToolbar, screenWidth - popupWindowWidth, 0)
+                mPopupWindow?.showAsDropDown(mToolbar, screenWidth, -20)
             else
                 mPopupWindow?.dismiss()
             return true
@@ -345,5 +342,12 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         override fun getInfoContents(marker: Marker?): View? {
             return null
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        if (mPopupWindow?.isShowing == true)
+            mPopupWindow?.dismiss()
     }
 }
