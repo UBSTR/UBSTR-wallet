@@ -19,6 +19,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.MarkerManager
@@ -58,6 +59,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
     private var selectedMerchant: Merchant? = null
     private var selectedTeller: Teller? = null
 
+    // Variables used to create a custom popup menu to show the merchants and tellers switches
     private var mPopupWindow: PopupWindow? = null
     private var mToolbar: Toolbar? = null
     private var screenWidth: Int = 0
@@ -65,6 +67,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
 
+        // Get a reference to the toolbar, to correctly place the merchants and tellers popup menu
         mToolbar = activity?.findViewById(R.id.toolbar)
 
         return inflater.inflate(R.layout.fragment_merchants, container, false)
@@ -91,6 +94,14 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
 
         // TODO get references to the popup menu items
 
+        val tvAbout = popupView?.findViewById<TextView>(R.id.tvAbout)
+        tvAbout?.setOnClickListener {
+            val context = context ?: return@setOnClickListener
+            MaterialDialog(context)
+                .message(text = "Anything")
+                .show()
+        }
+
         mPopupWindow = PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
@@ -100,6 +111,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == R.id.menu_filter) {
+            // Try to show or dismiss the custom popup window with the merchants and tellers switches
             if (mPopupWindow?.isShowing == false)
                 mPopupWindow?.showAsDropDown(mToolbar, screenWidth, -20)
             else
@@ -156,6 +168,11 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         }
 
         mMap.setInfoWindowAdapter(mMarkerManager)
+
+        // Try to dismiss the
+        mMap.setOnMapClickListener {
+            dismissPopupWindow()
+        }
     }
 
     private fun applyMapTheme() {
@@ -194,8 +211,12 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         val merchantRenderer = MerchantClusterRenderer(context, mMap, mMerchantClusterManager)
         mMerchantClusterManager?.renderer = merchantRenderer
 
-        mMerchantClusterManager?.setOnClusterClickListener { onClusterClick(it as Cluster<ClusterItem>) }
+        mMerchantClusterManager?.setOnClusterClickListener {
+            dismissPopupWindow()
+            onClusterClick(it as Cluster<ClusterItem>)
+        }
         mMerchantClusterManager?.setOnClusterItemClickListener { merchant ->
+            dismissPopupWindow()
             selectedMerchant = merchant
             false
         }
@@ -216,8 +237,12 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         val tellerRenderer = TellerClusterRenderer(context, mMap, mTellerClusterManager)
         mTellerClusterManager?.renderer = tellerRenderer
 
-        mTellerClusterManager?.setOnClusterClickListener { onClusterClick(it as Cluster<ClusterItem>) }
+        mTellerClusterManager?.setOnClusterClickListener {
+            dismissPopupWindow()
+            onClusterClick(it as Cluster<ClusterItem>)
+        }
         mTellerClusterManager?.setOnClusterItemClickListener { teller ->
+            dismissPopupWindow()
             selectedTeller = teller
             false
         }
@@ -344,10 +369,14 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun dismissPopupWindow() {
+        if (mPopupWindow?.isShowing == true)
+            mPopupWindow?.dismiss()
+    }
+
     override fun onPause() {
         super.onPause()
 
-        if (mPopupWindow?.isShowing == true)
-            mPopupWindow?.dismiss()
+        dismissPopupWindow()
     }
 }

@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:switchPadding="48dp"
+        android:checked="true"
         android:text="@string/title_merchants"
         android:textAppearance="@style/TextAppearance.Bitsy.Body1"
         android:textColor="?android:textColorPrimary"/>
@@ -22,12 +23,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         app:switchPadding="48dp"
+        android:checked="true"
         android:text="@string/title_tellers"
         android:textAppearance="@style/TextAppearance.Bitsy.Body1"
         android:textColor="?android:textColorPrimary"/>
 
     <TextView
-        android:id="@+id/tvInfo"
+        android:id="@+id/tvAbout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
