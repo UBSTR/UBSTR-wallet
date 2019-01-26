@@ -62,6 +62,8 @@
     <string name="title_merchants">Comerciantes</string>
     <string name="title_tellers">Tellers</string>
     <string name="title_about">Acerca de</string>
+    <string name="msg__merchants_description">Los comerciantes PalmPay son la columna vertebral de la nueva economía Cripto. Si estás buscando por negocios que acepten Criptomonedas, entonces sólo usa la función de búsqueda o el mapa de abajo. Más comerciantes serán agregados aquí conforme los Embajadores PalmPay nos informen.</string>
+    <string name="msg__tellers_description">Los Tellers son personas que intercambian tu dinero en moneda fiduciaria a criptomonedas, y viceversa. Ellos también apoyan a los Comerciantes a cambiar sus Criptomonedas a moneda fiduciaria.</string>
     <string name="msg__location_permission_necessary">El permiso de localización es necesario para mostrar tu ubicación actual en el mapa.</string>
 
     <!-- Send Transaction -->

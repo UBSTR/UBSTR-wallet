@@ -62,6 +62,8 @@
     <string name="title_merchants">Merchants</string>
     <string name="title_tellers">Tellers</string>
     <string name="title_about">About</string>
+    <string name="msg__merchants_description">PalmPay merchants are the backbone of the new Crypto Economy. If you are looking for businesses that will accept your Cryptocurrency, then just use the Search and Map data below. More merchants will be added here as the PalmPay Ambassadors inform us.</string>
+    <string name="msg__tellers_description">Tellers are people who will exchange your fiat currencies with cryptocurrencies, and vice versa. They also assist Merchants with fiat settlement.</string>
     <string name="msg__location_permission_necessary">Location permission is necessary to show your current location on the map.</string>
 
     <!-- Send Transaction -->

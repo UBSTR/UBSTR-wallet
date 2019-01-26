@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.MarkerManager
@@ -69,7 +70,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
     private var merchants = ArrayList<Merchant>()
     private var tellers = ArrayList<Teller>()
     private var showMerchantsMarkers = true
-    private var showTellerMarkers = false
+    private var showTellerMarkers = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -116,9 +117,10 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         val tvAbout = popupView?.findViewById<TextView>(R.id.tvAbout)
         tvAbout?.setOnClickListener {
             val context = context ?: return@setOnClickListener
-            MaterialDialog(context)
-                .message(text = "Anything")
-                .show()
+            MaterialDialog(context).show {
+                customView(R.layout.dialog_merchants_tellers_info, scrollable = true)
+                positiveButton(android.R.string.ok) { dismiss() }
+            }
         }
 
         mPopupWindow = PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
