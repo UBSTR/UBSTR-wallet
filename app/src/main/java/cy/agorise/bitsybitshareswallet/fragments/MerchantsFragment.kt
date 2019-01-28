@@ -59,6 +59,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
         private const val SUGGEST_COLUMN_NAME = "suggest_name"
         private const val SUGGEST_COLUMN_ADDRESS = "suggest_address"
         private const val SUGGEST_COLUMN_IS_MERCHANT = "suggest_is_merchant"
+        private const val SUGGEST_COLUMN_IMAGE_RESOURCE = "suggest_image_resource"
     }
 
     private lateinit var mMap: GoogleMap
@@ -152,7 +153,9 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
         val searchItem = menu.findItem(R.id.menu_search)
         mSearchView = searchItem.actionView as SearchView
         mSearchView?.suggestionsAdapter = SimpleCursorAdapter(context, R.layout.item_merchant_suggestion, null,
-            arrayOf(SUGGEST_COLUMN_NAME, SUGGEST_COLUMN_ADDRESS), intArrayOf(R.id.tvName, R.id.tvAddress))
+            arrayOf(SUGGEST_COLUMN_NAME, SUGGEST_COLUMN_ADDRESS, SUGGEST_COLUMN_IMAGE_RESOURCE),
+            intArrayOf(R.id.tvName, R.id.tvAddress, R.id.ivMarkerPin)
+        )
 
         // Add listener to changes in the SearchView's text to update the suggestions
         mSearchView?.queryTextChangeEvents()
@@ -174,13 +177,13 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
 
         // Create a cursor out of an Array
         val cursor = MatrixCursor(arrayOf(SUGGEST_COLUMN_ID, SUGGEST_COLUMN_NAME,
-            SUGGEST_COLUMN_ADDRESS, SUGGEST_COLUMN_IS_MERCHANT))
+            SUGGEST_COLUMN_ADDRESS, SUGGEST_COLUMN_IS_MERCHANT, SUGGEST_COLUMN_IMAGE_RESOURCE))
 
         for (i in 1..3) {
             if (i%2 == 1)
-                cursor.addRow(arrayOf(i.toString(), "Merchant $i", "Address $i", 1))
+                cursor.addRow(arrayOf(i.toString(), "Merchant $i", "Address $i", 1, R.drawable.ic_merchant_pin))
             else
-                cursor.addRow(arrayOf(i.toString(), "Teller $i", "Address $i", 0))
+                cursor.addRow(arrayOf(i.toString(), "Teller $i", "Address $i", 0, R.drawable.ic_teller_pin))
         }
 
         mSearchView?.suggestionsAdapter?.changeCursor(cursor)
