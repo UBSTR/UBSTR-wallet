@@ -2,7 +2,6 @@ package cy.agorise.bitsybitshareswallet.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.SearchManager
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.database.MatrixCursor
@@ -14,7 +13,6 @@ import com.google.android.gms.maps.SupportMapFragment
 
 import cy.agorise.bitsybitshareswallet.R
 import android.preference.PreferenceManager
-import android.provider.BaseColumns
 import android.view.*
 import android.widget.PopupWindow
 import android.widget.TextView
@@ -55,6 +53,12 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
 
         // Camera Permission
         private const val REQUEST_LOCATION_PERMISSION = 1
+
+        // SearchView suggestions
+        private const val SUGGEST_COLUMN_ID = "_id"
+        private const val SUGGEST_COLUMN_NAME = "suggest_name"
+        private const val SUGGEST_COLUMN_ADDRESS = "suggest_address"
+        private const val SUGGEST_COLUMN_IS_MERCHANT = "suggest_is_merchant"
     }
 
     private lateinit var mMap: GoogleMap
@@ -147,8 +151,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
         // Adds listener for the SearchView
         val searchItem = menu.findItem(R.id.menu_search)
         mSearchView = searchItem.actionView as SearchView
-        mSearchView?.suggestionsAdapter = SimpleCursorAdapter(context, android.R.layout.simple_list_item_1, null,
-            arrayOf(SearchManager.SUGGEST_COLUMN_TEXT_1), intArrayOf(android.R.id.text1))
+        mSearchView?.suggestionsAdapter = SimpleCursorAdapter(context, R.layout.item_merchant_suggestion, null,
+            arrayOf(SUGGEST_COLUMN_NAME, SUGGEST_COLUMN_ADDRESS), intArrayOf(R.id.tvName, R.id.tvAddress))
 
         // Add listener to changes in the SearchView's text to update the suggestions
         mSearchView?.queryTextChangeEvents()
@@ -167,10 +171,16 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
 
     private fun updateSearchViewSuggestions(query: String) {
         // TODO make call to the db to obtain the list of merchants/tellers
-        val cursor = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
+
+        // Create a cursor out of an Array
+        val cursor = MatrixCursor(arrayOf(SUGGEST_COLUMN_ID, SUGGEST_COLUMN_NAME,
+            SUGGEST_COLUMN_ADDRESS, SUGGEST_COLUMN_IS_MERCHANT))
 
         for (i in 1..3) {
-            cursor.addRow(arrayOf(i.toString(), "Merchant $i"))
+            if (i%2 == 1)
+                cursor.addRow(arrayOf(i.toString(), "Merchant $i", "Address $i", 1))
+            else
+                cursor.addRow(arrayOf(i.toString(), "Teller $i", "Address $i", 0))
         }
 
         mSearchView?.suggestionsAdapter?.changeCursor(cursor)
@@ -182,10 +192,18 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
 
     override fun onSuggestionClick(position: Int): Boolean {
         val cursor = mSearchView?.suggestionsAdapter?.getItem(position) as Cursor?
-        val name = cursor?.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)) ?: ""
+        val id = cursor?.getString(cursor.getColumnIndex(SUGGEST_COLUMN_ID))
+        val name = cursor?.getString(cursor.getColumnIndex(SUGGEST_COLUMN_NAME)) ?: ""
+        val isMerchant = cursor?.getInt(cursor.getColumnIndex(SUGGEST_COLUMN_IS_MERCHANT))
         cursor?.close()
 
-        context?.toast(name)
+        if (isMerchant == 1) {
+            // Search and show merchant marker
+            context?.toast("Merchant: $name")
+        } else {
+            // Search and show teller marker
+            context?.toast("Teller: $name")
+        }
 
         return true
     }

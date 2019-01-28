@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:background="?android:colorBackground">
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Bambuddha Holistic Center"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+    <TextView
+        android:id="@+id/tvAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        tools:text="Carretera, Barra Vieja Km 37, 39936 Acapulco, Gro."
+        android:textAppearance="@style/TextAppearance.Bitsy.Body2"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+</LinearLayout>
