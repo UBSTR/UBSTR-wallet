@@ -11,6 +11,7 @@ import cy.agorise.bitsybitshareswallet.database.entities.Merchant
 import cy.agorise.bitsybitshareswallet.network.FeathersResponse
 import cy.agorise.bitsybitshareswallet.network.MerchantsWebservice
 import cy.agorise.bitsybitshareswallet.utils.Constants
+import io.reactivex.Single
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -78,5 +79,9 @@ class MerchantRepository internal constructor(val context: Context) : retrofit2.
             mAsyncTaskDao.insertAll(merchants[0])
             return null
         }
+    }
+
+    fun findMerchantsByWord(query: String): Single<List<Merchant>> {
+        return mMerchantDao.findMerchantsByWord("%$query%")
     }
 }

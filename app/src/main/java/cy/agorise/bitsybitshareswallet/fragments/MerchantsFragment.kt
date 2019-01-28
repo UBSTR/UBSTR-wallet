@@ -6,13 +6,8 @@ import android.content.pm.PackageManager
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
-import android.util.Log
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-
-import cy.agorise.bitsybitshareswallet.R
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.*
 import android.widget.PopupWindow
 import android.widget.TextView
@@ -27,12 +22,18 @@ import androidx.lifecycle.ViewModelProviders
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.MarkerManager
 import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.clustering.ClusterManager
 import com.jakewharton.rxbinding3.appcompat.queryTextChangeEvents
+import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.database.entities.Merchant
 import cy.agorise.bitsybitshareswallet.database.entities.Teller
 import cy.agorise.bitsybitshareswallet.utils.Constants
@@ -42,7 +43,9 @@ import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.bitsybitshareswallet.viewmodels.MerchantViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import java.lang.Exception
+import io.reactivex.schedulers.Schedulers
+import java.math.BigInteger
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -173,20 +176,34 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
     }
 
     private fun updateSearchViewSuggestions(query: String) {
-        // TODO make call to the db to obtain the list of merchants/tellers
+        val merchObs = mMerchantViewModel.queryMerchants(query)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
 
-        // Create a cursor out of an Array
-        val cursor = MatrixCursor(arrayOf(SUGGEST_COLUMN_ID, SUGGEST_COLUMN_NAME,
-            SUGGEST_COLUMN_ADDRESS, SUGGEST_COLUMN_IS_MERCHANT, SUGGEST_COLUMN_IMAGE_RESOURCE))
+        val tellerObs = mMerchantViewModel.queryTellers(query)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
 
-        for (i in 1..3) {
-            if (i%2 == 1)
-                cursor.addRow(arrayOf(i.toString(), "Merchant $i", "Address $i", 1, R.drawable.ic_merchant_pin))
-            else
-                cursor.addRow(arrayOf(i.toString(), "Teller $i", "Address $i", 0, R.drawable.ic_teller_pin))
-        }
+        //TODO: Combine the results of both the merchants and teller queries
+//        val combined: Observable<List<Any>> = Observable.combineLatest<List<Merchant>, List<Teller>, List<Any>>(merchObs, tellerObs, BiFunction { t1: List<Merchant>, t2:List<Teller> ->  Arrays.asList(t1, t2)})
 
-        mSearchView?.suggestionsAdapter?.changeCursor(cursor)
+        merchObs.subscribe({list ->
+            run {
+                Log.d(TAG, "list with ${list.size} elements")
+                val cursor = MatrixCursor(
+                    arrayOf(
+                        SUGGEST_COLUMN_ID, SUGGEST_COLUMN_NAME,
+                        SUGGEST_COLUMN_ADDRESS, SUGGEST_COLUMN_IS_MERCHANT, SUGGEST_COLUMN_IMAGE_RESOURCE
+                    )
+                )
+                for (item in list) {
+                    cursor.addRow(arrayOf(BigInteger(item._id, 16).toLong(), item.name, item.address, 1, R.drawable.ic_merchant_pin))
+                }
+                mSearchView?.suggestionsAdapter?.changeCursor(cursor)
+            }
+        },
+        {error -> Log.e(TAG, "Error while retrieving autocomplete suggestions. Msg: ${error}")})
+
     }
 
     override fun onSuggestionSelect(position: Int): Boolean {
