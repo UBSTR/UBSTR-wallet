@@ -2,22 +2,28 @@ package cy.agorise.bitsybitshareswallet.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.SearchManager
 import android.content.pm.PackageManager
+import android.database.Cursor
+import android.database.MatrixCursor
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 
 import cy.agorise.bitsybitshareswallet.R
 import android.preference.PreferenceManager
+import android.provider.BaseColumns
 import android.view.*
 import android.widget.PopupWindow
 import android.widget.TextView
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.cursoradapter.widget.SimpleCursorAdapter
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.afollestad.materialdialogs.MaterialDialog
@@ -28,6 +34,7 @@ import com.google.maps.android.MarkerManager
 import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.clustering.ClusterManager
+import com.jakewharton.rxbinding3.appcompat.queryTextChangeEvents
 import cy.agorise.bitsybitshareswallet.database.entities.Merchant
 import cy.agorise.bitsybitshareswallet.database.entities.Teller
 import cy.agorise.bitsybitshareswallet.utils.Constants
@@ -35,10 +42,13 @@ import cy.agorise.bitsybitshareswallet.utils.MerchantClusterRenderer
 import cy.agorise.bitsybitshareswallet.utils.TellerClusterRenderer
 import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.bitsybitshareswallet.viewmodels.MerchantViewModel
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import java.lang.Exception
+import java.util.concurrent.TimeUnit
 
 
-class MerchantsFragment : Fragment(), OnMapReadyCallback {
+class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestionListener {
 
     companion object {
         private const val TAG = "MerchantsFragment"
@@ -52,6 +62,11 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
     private lateinit var mMerchantViewModel: MerchantViewModel
 
     private var mMarkerManager: MarkerManager? = null
+
+    /** Keeps track of all RxJava disposables, to make sure they are all disposed when the fragment is destroyed */
+    private var mDisposables = CompositeDisposable()
+
+    private var mSearchView: SearchView? = null
 
     // Cluster managers to create custom merchants and tellers clusters with a custom behavior too
     private var mMerchantClusterManager: ClusterManager<Merchant>? = null
@@ -128,6 +143,51 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_merchants, menu)
+
+        // Adds listener for the SearchView
+        val searchItem = menu.findItem(R.id.menu_search)
+        mSearchView = searchItem.actionView as SearchView
+        mSearchView?.suggestionsAdapter = SimpleCursorAdapter(context, android.R.layout.simple_list_item_1, null,
+            arrayOf(SearchManager.SUGGEST_COLUMN_TEXT_1), intArrayOf(android.R.id.text1))
+
+        // Add listener to changes in the SearchView's text to update the suggestions
+        mSearchView?.queryTextChangeEvents()
+            ?.skipInitialValue()
+            ?.debounce(500, TimeUnit.MILLISECONDS)
+            ?.map { it.queryText.toString().toLowerCase() }
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe {
+                updateSearchViewSuggestions(it)
+            }?.let {
+                mDisposables.add(it)
+            }
+
+        mSearchView?.setOnSuggestionListener(this)
+    }
+
+    private fun updateSearchViewSuggestions(query: String) {
+        // TODO make call to the db to obtain the list of merchants/tellers
+        val cursor = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
+
+        for (i in 1..3) {
+            cursor.addRow(arrayOf(i.toString(), "Merchant $i"))
+        }
+
+        mSearchView?.suggestionsAdapter?.changeCursor(cursor)
+    }
+
+    override fun onSuggestionSelect(position: Int): Boolean {
+        return onSuggestionClick(position)
+    }
+
+    override fun onSuggestionClick(position: Int): Boolean {
+        val cursor = mSearchView?.suggestionsAdapter?.getItem(position) as Cursor?
+        val name = cursor?.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)) ?: ""
+        cursor?.close()
+
+        context?.toast(name)
+
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -417,5 +477,11 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback {
         super.onPause()
 
         dismissPopupWindow()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (!mDisposables.isDisposed) mDisposables.dispose()
     }
 }
