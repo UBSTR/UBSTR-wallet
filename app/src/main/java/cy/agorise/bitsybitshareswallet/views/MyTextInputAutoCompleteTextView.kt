@@ -1,15 +1,18 @@
 package cy.agorise.bitsybitshareswallet.views
 
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
 import com.google.android.material.textfield.TextInputLayout
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView
+import cy.agorise.bitsybitshareswallet.utils.hideKeyboard
 
 /**
  * Custom AutoCompleteTextView to be used inside a TextInputLayout, so that they can share their hint
  * From https://stackoverflow.com/a/41864063/5428997
+ * And also hides the keyboard when it loses focus.
  */
 class MyTextInputAutoCompleteTextView : AppCompatAutoCompleteTextView {
 
@@ -41,5 +44,10 @@ class MyTextInputAutoCompleteTextView : AppCompatAutoCompleteTextView {
             outAttrs.imeOptions = outAttrs.imeOptions and EditorInfo.IME_FLAG_NO_ENTER_ACTION.inv()
         }
         return ic
+    }
+
+    override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+        super.onFocusChanged(focused, direction, previouslyFocusedRect)
+        if (!focused) this.hideKeyboard()
     }
 }

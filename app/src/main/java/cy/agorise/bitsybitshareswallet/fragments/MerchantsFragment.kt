@@ -182,6 +182,9 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
             }
 
         mSearchView?.setOnSuggestionListener(this)
+
+        // Adjust SearchView width to avoid pushing other menu items out of the screen
+        mSearchView?.maxWidth = screenWidth * 7 / 10
     }
 
     private fun updateSearchViewSuggestions(query: String) {
