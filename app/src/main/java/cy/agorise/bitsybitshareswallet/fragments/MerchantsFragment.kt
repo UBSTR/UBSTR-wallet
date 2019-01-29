@@ -25,6 +25,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
@@ -62,6 +63,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
 
         // SearchView suggestions
         private const val SUGGEST_COLUMN_ID = "_id"
+        private const val SUGGEST_COLUMN_LAT = "suggest_lat"
+        private const val SUGGEST_COLUMN_LON = "suggest_lon"
         private const val SUGGEST_COLUMN_NAME = "suggest_name"
         private const val SUGGEST_COLUMN_ADDRESS = "suggest_address"
         private const val SUGGEST_COLUMN_IS_MERCHANT = "suggest_is_merchant"
@@ -199,6 +202,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
                 for (merchant in t1) {
                     val mapObject = MapObject(
                         merchant._id,
+                        merchant.lat,
+                        merchant.lon,
                         merchant.name,
                         merchant.address,
                         1
@@ -209,6 +214,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
                 for (teller in t2) {
                     val mapObject = MapObject(
                         teller._id,
+                        teller.lat,
+                        teller.lon,
                         teller.gt_name,
                         teller.address,
                         0
@@ -223,13 +230,14 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
                 Log.d(TAG, "list with ${mapObjects.size} elements")
                 val cursor = MatrixCursor(
                     arrayOf(
-                        SUGGEST_COLUMN_ID, SUGGEST_COLUMN_NAME,
+                        SUGGEST_COLUMN_ID, SUGGEST_COLUMN_LAT, SUGGEST_COLUMN_LON, SUGGEST_COLUMN_NAME,
                         SUGGEST_COLUMN_ADDRESS, SUGGEST_COLUMN_IS_MERCHANT, SUGGEST_COLUMN_IMAGE_RESOURCE
                     )
                 )
                 for (mapObject in mapObjects) {
-                    cursor.addRow(arrayOf(BigInteger(mapObject._id, 16).toLong(), mapObject.name, mapObject.address,
-                        mapObject.isMerchant, if (mapObject.isMerchant == 1) R.drawable.ic_merchant_pin else R.drawable.ic_teller_pin))
+                    cursor.addRow(arrayOf(BigInteger(mapObject._id, 16).toLong(), mapObject.lat, mapObject.lon,
+                        mapObject.name, mapObject.address, mapObject.isMerchant,
+                        if (mapObject.isMerchant == 1) R.drawable.ic_merchant_pin else R.drawable.ic_teller_pin))
                 }
                 mSearchView?.suggestionsAdapter?.changeCursor(cursor)
             }
@@ -245,17 +253,26 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
     override fun onSuggestionClick(position: Int): Boolean {
         val cursor = mSearchView?.suggestionsAdapter?.getItem(position) as Cursor?
         val id = cursor?.getString(cursor.getColumnIndex(SUGGEST_COLUMN_ID))
+        val lat = cursor?.getString(cursor.getColumnIndex(SUGGEST_COLUMN_LAT))?.toDoubleOrNull()
+        val lon = cursor?.getString(cursor.getColumnIndex(SUGGEST_COLUMN_LON))?.toDoubleOrNull()
         val name = cursor?.getString(cursor.getColumnIndex(SUGGEST_COLUMN_NAME)) ?: ""
         val isMerchant = cursor?.getInt(cursor.getColumnIndex(SUGGEST_COLUMN_IS_MERCHANT))
         cursor?.close()
 
-        if (isMerchant == 1) {
-            // Search and show merchant marker
-            context?.toast("Merchant: $name")
-        } else {
-            // Search and show teller marker
-            context?.toast("Teller: $name")
+        if (lat != null && lon != null) {
+            val builder = LatLngBounds.builder()
+            builder.include(LatLng(lat, lon))
+
+            val bounds = builder.build()
+
+            try {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+            } catch (e: Exception) {
+                Log.d(TAG, e.message)
+            }
         }
+
+        mSearchView?.clearFocus()
 
         return true
     }
