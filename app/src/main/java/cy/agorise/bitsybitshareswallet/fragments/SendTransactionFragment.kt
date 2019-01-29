@@ -3,6 +3,7 @@ package cy.agorise.bitsybitshareswallet.fragments
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.*
@@ -130,8 +131,12 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
         // Use Navigation SafeArgs to decide if we should activate or not the camera feed
         val safeArgs = SendTransactionFragmentArgs.fromBundle(arguments!!)
-        if (safeArgs.openCamera)
-            verifyCameraPermission()
+        if (safeArgs.openCamera) {
+            // Delay the camera action to avoid flicker in the fragment transition
+            Handler().postDelayed({
+                run { verifyCameraPermission() }
+            }, 500)
+        }
 
         fabOpenCamera.setOnClickListener { if (isCameraPreviewVisible) stopCameraPreview() else verifyCameraPermission() }
 
