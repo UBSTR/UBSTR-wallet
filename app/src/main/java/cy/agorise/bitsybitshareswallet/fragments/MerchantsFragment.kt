@@ -127,7 +127,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
     }
 
     private fun setupPopupWindow() {
-        val popupView = layoutInflater?.inflate(R.layout.popup_menu_merchants, null)
+        val popupView = layoutInflater?.inflate(R.layout.popup_menu_merchants, null, false)
 
         val switchMerchants = popupView?.findViewById<SwitchCompat>(R.id.switchMerchants)
         switchMerchants?.isChecked = showMerchantsMarkers
@@ -199,28 +199,35 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
         mDisposables.add(Observable.zip(merchantsObs, tellerObs,
             BiFunction<List<Merchant>, List<Teller>, List<MapObject>> { t1, t2 ->
                 val mapObjects = ArrayList<MapObject>()
-                for (merchant in t1) {
-                    val mapObject = MapObject(
-                        merchant._id,
-                        merchant.lat,
-                        merchant.lon,
-                        merchant.name,
-                        merchant.address,
-                        1
-                    )
-                    mapObjects.add(mapObject)
+
+                // Show merchant suggestions only if merchants are enabled
+                if (showMerchantsMarkers) {
+                    for (merchant in t1) {
+                        val mapObject = MapObject(
+                            merchant._id,
+                            merchant.lat,
+                            merchant.lon,
+                            merchant.name,
+                            merchant.address,
+                            1
+                        )
+                        mapObjects.add(mapObject)
+                    }
                 }
 
-                for (teller in t2) {
-                    val mapObject = MapObject(
-                        teller._id,
-                        teller.lat,
-                        teller.lon,
-                        teller.gt_name,
-                        teller.address,
-                        0
-                    )
-                    mapObjects.add(mapObject)
+                // Show teller suggestions only if tellers are enabled
+                if (showTellerMarkers) {
+                    for (teller in t2) {
+                        val mapObject = MapObject(
+                            teller._id,
+                            teller.lat,
+                            teller.lon,
+                            teller.gt_name,
+                            teller.address,
+                            0
+                        )
+                        mapObjects.add(mapObject)
+                    }
                 }
 
                 mapObjects
