@@ -26,6 +26,7 @@ release/
 */bin/
 */gen/
 */build/
+*/debug/
 */release/
 
 # proguard stuff		
@@ -48,16 +49,6 @@ build.xml
 *.iml
 *.ipr
 *.iws
-*.log/app/src/main/res/cryptowallpapertwo.png
-/app/src/main/res/drawable-hdpi/cryptowallpaperone.png
-/app/src/main/res/drawable-hdpi/cryptowallpapertwo.png
-/app/src/main/res/drawable-mdpi/cryptowallpaperone.png
-/app/src/main/res/drawable-mdpi/cryptowallpapertwo.png
-/app/src/main/res/drawable-xxhdpi/cryptowallpaperone.png
-/app/src/main/res/drawable-xxhdpi/cryptowallpapertwo.png
-/app/src/main/res/drawable-xxxhdpi/cryptowallpaperone.png
-/app/src/main/res/drawable-xxxhdpi/cryptowallpapertwo.png
-/captures/de.bitsharesmunich.blockpos_2016.09.02_15.23.txt
 
 # Fabric plugin
 app/fabric.properties

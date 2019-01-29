@@ -51,7 +51,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Bitsy.NoActionBar"
             android:windowSoftInputMode="adjustPan"/>
-        <!-- Used to share QR code on QRCodeActivity -->
+        <!-- Used to share Images like the QR code and the eReceipt -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="cy.agorise.bitsybitshareswallet.FileProvider"
