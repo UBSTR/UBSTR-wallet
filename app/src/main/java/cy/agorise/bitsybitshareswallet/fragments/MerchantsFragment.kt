@@ -36,17 +36,20 @@ import com.jakewharton.rxbinding3.appcompat.queryTextChangeEvents
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.database.entities.Merchant
 import cy.agorise.bitsybitshareswallet.database.entities.Teller
+import cy.agorise.bitsybitshareswallet.models.MapObject
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.MerchantClusterRenderer
 import cy.agorise.bitsybitshareswallet.utils.TellerClusterRenderer
 import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.bitsybitshareswallet.viewmodels.MerchantViewModel
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import java.math.BigInteger
-import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 
 class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestionListener {
@@ -176,34 +179,60 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
     }
 
     private fun updateSearchViewSuggestions(query: String) {
-        val merchObs = mMerchantViewModel.queryMerchants(query)
+        // Obtain observable of the list of merchants matching the query
+        val merchantsObs = mMerchantViewModel.queryMerchants(query)
             .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread()).toObservable()
 
+        // Obtain observable of the list of tellers matching the query
         val tellerObs = mMerchantViewModel.queryTellers(query)
             .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread()).toObservable()
 
-        //TODO: Combine the results of both the merchants and teller queries
-//        val combined: Observable<List<Any>> = Observable.combineLatest<List<Merchant>, List<Teller>, List<Any>>(merchObs, tellerObs, BiFunction { t1: List<Merchant>, t2:List<Teller> ->  Arrays.asList(t1, t2)})
+        //Combine the results of both the merchants and teller queries
+        mDisposables.add(Observable.zip(merchantsObs, tellerObs,
+            BiFunction<List<Merchant>, List<Teller>, List<MapObject>> { t1, t2 ->
+                val mapObjects = ArrayList<MapObject>()
+                for (merchant in t1) {
+                    val mapObject = MapObject(
+                        merchant._id,
+                        merchant.name,
+                        merchant.address,
+                        1
+                    )
+                    mapObjects.add(mapObject)
+                }
 
-        merchObs.subscribe({list ->
+                for (teller in t2) {
+                    val mapObject = MapObject(
+                        teller._id,
+                        teller.gt_name,
+                        teller.address,
+                        0
+                    )
+                    mapObjects.add(mapObject)
+                }
+
+                mapObjects
+            }
+        ).subscribe({mapObjects ->
             run {
-                Log.d(TAG, "list with ${list.size} elements")
+                Log.d(TAG, "list with ${mapObjects.size} elements")
                 val cursor = MatrixCursor(
                     arrayOf(
                         SUGGEST_COLUMN_ID, SUGGEST_COLUMN_NAME,
                         SUGGEST_COLUMN_ADDRESS, SUGGEST_COLUMN_IS_MERCHANT, SUGGEST_COLUMN_IMAGE_RESOURCE
                     )
                 )
-                for (item in list) {
-                    cursor.addRow(arrayOf(BigInteger(item._id, 16).toLong(), item.name, item.address, 1, R.drawable.ic_merchant_pin))
+                for (mapObject in mapObjects) {
+                    cursor.addRow(arrayOf(BigInteger(mapObject._id, 16).toLong(), mapObject.name, mapObject.address,
+                        mapObject.isMerchant, if (mapObject.isMerchant == 1) R.drawable.ic_merchant_pin else R.drawable.ic_teller_pin))
                 }
                 mSearchView?.suggestionsAdapter?.changeCursor(cursor)
             }
         },
-        {error -> Log.e(TAG, "Error while retrieving autocomplete suggestions. Msg: ${error}")})
-
+            {error -> Log.e(TAG, "Error while retrieving autocomplete suggestions. Msg: $error")})
+        )
     }
 
     override fun onSuggestionSelect(position: Int): Boolean {
