@@ -374,7 +374,10 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
                 }
             }
 
-            tietMemo.setText(invoice.memo)
+            if (invoice.memo != null) {
+                tietMemo.setText(invoice.memo)
+                tietMemo.isEnabled = false
+            }
 
             var amount = 0.0
             for (nextItem in invoice.lineItems) {
