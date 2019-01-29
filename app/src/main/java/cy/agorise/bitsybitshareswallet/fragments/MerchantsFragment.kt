@@ -166,11 +166,14 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
         // Add listener to changes in the SearchView's text to update the suggestions
         mSearchView?.queryTextChangeEvents()
             ?.skipInitialValue()
-            ?.debounce(500, TimeUnit.MILLISECONDS)
+            ?.debounce(200, TimeUnit.MILLISECONDS)
             ?.map { it.queryText.toString().toLowerCase() }
             ?.observeOn(AndroidSchedulers.mainThread())
             ?.subscribe {
-                updateSearchViewSuggestions(it)
+                if (it.length < 2)
+                    mSearchView?.suggestionsAdapter?.changeCursor(null)
+                else
+                    updateSearchViewSuggestions(it)
             }?.let {
                 mDisposables.add(it)
             }
