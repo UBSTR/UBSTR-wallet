@@ -38,9 +38,13 @@ class HomeFragment : Fragment() {
         val toolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
         toolbar?.navigationIcon = resources.getDrawable(R.drawable.ic_bitsy_logo_2, null)
         toolbar?.setBackgroundResource(if (!nightMode) R.color.colorPrimary else R.color.colorToolbarDark)
+        toolbar?.visibility = View.VISIBLE
 
-        // Sets the status bar background color to a primaryColorDark
+        // Makes sure the Navigation and Status bar are not translucent after returning from the MerchantsFragment
         val window = activity?.window
+        window?.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+        window?.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+        // Sets the status bar background color to a primaryColorDark
         window?.statusBarColor = ContextCompat.getColor(context!!,
             if (!nightMode) R.color.colorPrimaryDark else R.color.colorStatusBarDark)
 

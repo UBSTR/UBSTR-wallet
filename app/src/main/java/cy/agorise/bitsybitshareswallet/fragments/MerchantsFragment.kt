@@ -106,6 +106,12 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
 
         // Get a reference to the toolbar, to correctly place the merchants and tellers popup menu
         mToolbar = activity?.findViewById(R.id.toolbar)
+        mToolbar?.visibility = View.GONE
+
+        // Sets the Navigation and Status bars translucent so that the map can be viewed through them
+        val window = activity?.window
+        window?.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+        window?.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
 
         return inflater.inflate(R.layout.fragment_merchants, container, false)
     }
@@ -325,6 +331,10 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
+        // Add padding to move the controls out of the toolbar/status bar and navigation bar.
+        // TODO might be necessary to convert dp to pixels
+        mMap.setPadding(0, 200, 0, 100)
 
         applyMapTheme()
 

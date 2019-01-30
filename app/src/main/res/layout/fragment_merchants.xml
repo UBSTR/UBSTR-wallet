@@ -1,15 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/map"
-    map:uiZoomControls="true"
-    map:uiCompass="true"
-    map:cameraTargetLat="9.933058"
-    map:cameraTargetLng="-84.230800"
-    map:cameraZoom="3.5"
-    tools:context=".fragments.MerchantsFragment"/>
+    android:orientation="vertical"
+    tools:context=".activities.MainActivity">
+
+    <!-- TODO get the height of the status bar dynamically instead of hardcoding the 24dp-->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_marginTop="24dp"
+        android:background="@color/semiTransparent"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.MaterialComponents" />
+
+    <fragment
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/map"
+        map:uiZoomControls="true"
+        map:uiCompass="true"
+        map:cameraTargetLat="9.933058"
+        map:cameraTargetLng="-84.230800"
+        map:cameraZoom="3.5"
+        tools:context=".fragments.MerchantsFragment"/>
+
+</RelativeLayout>
