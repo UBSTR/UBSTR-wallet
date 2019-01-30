@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.*
 import android.widget.PopupWindow
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
@@ -48,6 +49,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.fragment_merchants.*
 import java.math.BigInteger
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -92,7 +94,6 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
 
     // Variables used to create a custom popup menu to show the merchants and tellers switches
     private var mPopupWindow: PopupWindow? = null
-    private var mToolbar: Toolbar? = null
     private var screenWidth: Int = 0
 
     // Variables used to decide whether or not to display the merchants and tellers markers on the map
@@ -102,11 +103,9 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
     private var showTellerMarkers = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        setHasOptionsMenu(true)
-
-        // Get a reference to the toolbar, to correctly place the merchants and tellers popup menu
-        mToolbar = activity?.findViewById(R.id.toolbar)
-        mToolbar?.visibility = View.GONE
+        // Hide the activity's Toolbar so that we can make the trick of the translucent navigation and status bars
+        val activityToolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
+        activityToolbar?.visibility = View.GONE
 
         // Sets the Navigation and Status bars translucent so that the map can be viewed through them
         val window = activity?.window
@@ -118,6 +117,11 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Set the fragment's toolbar as the activity toolbar just for this fragment
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        setHasOptionsMenu(true)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -297,7 +301,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
         if (item?.itemId == R.id.menu_filter) {
             // Try to show or dismiss the custom popup window with the merchants and tellers switches
             if (mPopupWindow?.isShowing == false)
-                mPopupWindow?.showAsDropDown(mToolbar, screenWidth, -20)
+                mPopupWindow?.showAsDropDown(toolbar, screenWidth, -20)
             else
                 mPopupWindow?.dismiss()
             return true

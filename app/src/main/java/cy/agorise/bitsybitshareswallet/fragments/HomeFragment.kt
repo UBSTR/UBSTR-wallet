@@ -21,7 +21,7 @@ import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
 import android.os.Build
 import android.content.res.ColorStateList
-
+import androidx.appcompat.app.AppCompatActivity
 
 
 class HomeFragment : Fragment() {
@@ -34,11 +34,15 @@ class HomeFragment : Fragment() {
         val nightMode = PreferenceManager.getDefaultSharedPreferences(context)
             .getBoolean(Constants.KEY_NIGHT_MODE_ACTIVATED, false)
 
-        // Sets the toolbar background color to primaryColor and forces shows the Bitsy icon to the left
+        // Forces to show the Bitsy icon to the left of the toolbar and also fix the toolbar color and visibility after
+        // returning from other fragments that change those properties, such as SendTransactionFragment (color) and
+        // MerchantsFragment (visibility)
         val toolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
         toolbar?.navigationIcon = resources.getDrawable(R.drawable.ic_bitsy_logo_2, null)
         toolbar?.setBackgroundResource(if (!nightMode) R.color.colorPrimary else R.color.colorToolbarDark)
         toolbar?.visibility = View.VISIBLE
+        toolbar?.title = getString(R.string.app_name)
 
         // Makes sure the Navigation and Status bar are not translucent after returning from the MerchantsFragment
         val window = activity?.window
