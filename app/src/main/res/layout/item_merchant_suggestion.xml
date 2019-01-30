@@ -32,17 +32,21 @@
         app:layout_constraintStart_toEndOf="@id/ivMarkerPin"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <TextView
+    <cy.agorise.bitsybitshareswallet.views.AutoScrollingTextView
         android:id="@+id/tvAddress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
         tools:text="Carretera, Barra Vieja Km 37, 39936 Acapulco, Gro."
         android:textAppearance="@style/TextAppearance.Bitsy.Body2"
-        android:maxLines="1"
-        android:ellipsize="end"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
         app:layout_constraintTop_toBottomOf="@id/tvName"
-        app:layout_constraintStart_toEndOf="@id/ivMarkerPin"/>
+        app:layout_constraintStart_toEndOf="@id/ivMarkerPin"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
