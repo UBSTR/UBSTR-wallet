@@ -123,6 +123,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setHasOptionsMenu(true)
 
+        toolbar?.setOnClickListener { dismissPopupWindow() }
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -192,6 +194,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
             }
 
         mSearchView?.setOnSuggestionListener(this)
+
+        mSearchView?.setOnSearchClickListener { dismissPopupWindow() }
 
         // Adjust SearchView width to avoid pushing other menu items out of the screen
         mSearchView?.maxWidth = screenWidth * 7 / 10
