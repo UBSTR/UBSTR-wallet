@@ -20,5 +20,6 @@
     <color name="colorSend">#D32F2F</color>
     <color name="colorSendDark">#B71C1C</color>
     <color name="semiTransparent">#2888</color>
-    <color name="colorMapToolbar">#338888aa</color>
+    <color name="colorMapToolbar">#3999</color>
+    <color name="colorMapPopup">#6999</color>
 </resources>

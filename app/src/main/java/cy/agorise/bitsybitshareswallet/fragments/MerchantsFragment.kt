@@ -300,10 +300,12 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == R.id.menu_filter) {
             // Try to show or dismiss the custom popup window with the merchants and tellers switches
-            if (mPopupWindow?.isShowing == false)
-                mPopupWindow?.showAsDropDown(toolbar, screenWidth, -20)
-            else
-                mPopupWindow?.dismiss()
+            if (mPopupWindow?.isShowing == false) {
+                mPopupWindow?.showAsDropDown(toolbar, screenWidth, 8)
+                if (mMap.isMyLocationEnabled)
+                    mMap.uiSettings?.isMyLocationButtonEnabled = false
+            } else
+                dismissPopupWindow()
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -580,8 +582,11 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
     }
 
     private fun dismissPopupWindow() {
-        if (mPopupWindow?.isShowing == true)
+        if (mPopupWindow?.isShowing == true) {
             mPopupWindow?.dismiss()
+            if (mMap.isMyLocationEnabled)
+                mMap.uiSettings?.isMyLocationButtonEnabled = true
+        }
     }
 
     override fun onPause() {

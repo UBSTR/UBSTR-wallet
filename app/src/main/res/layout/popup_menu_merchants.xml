@@ -10,6 +10,7 @@
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switchMerchants"
+        android:theme="@style/Widget.Bitsy.Switch.Merchants"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:switchPadding="48dp"
@@ -20,6 +21,7 @@
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switchTellers"
+        android:theme="@style/Widget.Bitsy.Switch.Tellers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"

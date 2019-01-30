@@ -48,6 +48,16 @@
         <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 
+    <style name="Widget.Bitsy.Switch.Merchants" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="colorAccent">#0E9257</item>
+        <item name="colorControlActivated">#0E9257</item>
+    </style>
+
+    <style name="Widget.Bitsy.Switch.Tellers" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="colorAccent">#FCCF0E</item>
+        <item name="colorControlActivated">#FCCF0E</item>
+    </style>
+
     <!-- Text styles -->
     <style name="TextAppearance.Bitsy.Headline5" parent="TextAppearance.MaterialComponents.Headline5" />
     <style name="TextAppearance.Bitsy.Headline6" parent="TextAppearance.MaterialComponents.Headline6" />
