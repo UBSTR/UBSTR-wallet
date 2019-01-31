@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.crashlytics.android.Crashlytics
+import cy.agorise.bitsybitshareswallet.BuildConfig
 import cy.agorise.bitsybitshareswallet.database.entities.Balance
 import cy.agorise.bitsybitshareswallet.processors.TransfersLoader
 import cy.agorise.bitsybitshareswallet.repositories.AssetRepository
@@ -32,6 +33,7 @@ import cy.agorise.graphenej.models.AccountProperties
 import cy.agorise.graphenej.models.BlockHeader
 import cy.agorise.graphenej.models.FullAccountDetails
 import cy.agorise.graphenej.models.JsonRpcResponse
+import io.fabric.sdk.android.Fabric
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import java.text.ParseException
@@ -94,6 +96,11 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (BuildConfig.USE_CRASHLYTICS) {
+            // Enabling crashlytics reports on release builds only
+            Fabric.with(this, Crashlytics())
+        }
 
         getUserAccount()
 
