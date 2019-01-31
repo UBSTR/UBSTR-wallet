@@ -24,10 +24,10 @@ import cy.agorise.graphenej.models.OperationHistory
 import cy.agorise.graphenej.operations.TransferOperation
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
+import java.lang.IllegalArgumentException
 import java.util.*
 import javax.crypto.AEADBadTagException
 
@@ -35,27 +35,22 @@ import javax.crypto.AEADBadTagException
  * This class is responsible for loading the local database with all past transfer operations of the
  * currently selected account.
  *
- * The procedure used to load the database in 3 steps:
- *
- * 1- Load all transfer operations
- * 2- Load all missing times
- * 3- Load all missing equivalent times
- *
  * Since the 'get_relative_account_history' will not provide either timestamps nor equivalent values
- * for every transfer, we must first load all historical transfer operations, and then proceed to
- * handle those missing columns.
+ * for every transfer, that has to be handled in other part.
  */
-class TransfersLoader(private var mContext: Context?): ServiceConnection {
+class TransfersLoader(private var mContext: Context?) {
 
-    private val TAG = this.javaClass.simpleName
+    companion object {
+        private const val TAG = "TransfersLoader"
 
-    /** Constant that specifies if we are on debug mode */
-    private val DEBUG = false
+        /** Constant that specifies if we are on debug mode */
+        private const val DEBUG = false
 
-    /* Constant used to fix the number of historical transfers to fetch from the network in one batch */
-    private val HISTORICAL_TRANSFER_BATCH_SIZE = 100
+        /* Constant used to fix the number of historical transfers to fetch from the network in one batch */
+        private const val HISTORICAL_TRANSFER_BATCH_SIZE = 100
 
-    private val RESPONSE_GET_RELATIVE_ACCOUNT_HISTORY = 0
+        private const val RESPONSE_GET_RELATIVE_ACCOUNT_HISTORY = 1
+    }
 
     private var mDisposables = CompositeDisposable()
 
@@ -77,28 +72,26 @@ class TransfersLoader(private var mContext: Context?): ServiceConnection {
     /* Counter used to keep track of the transfer history batch count */
     private var historicalTransferCount = 0
 
-    // Used to keep track of the current state TODO this may not be needed
-    private var mState = State.IDLE
-
-    /**
-     * Flag used to keep track of the NetworkService binding state
-     */
-    private var mShouldUnbindNetwork: Boolean = false
-
-    private var lastId: Long = 0
+    /** Flag used to keep track of the NetworkService binding state */
+    private var mBound: Boolean = false
 
     // Map used to keep track of request and response id pairs
     private val responseMap = HashMap<Long, Int>()
 
-    /**
-     * Enum class used to keep track of the current state of the loader
-     */
-    private enum class State {
-        IDLE,
-        LOADING_MISSING_TIMES,
-        LOADING_EQ_VALUES,
-        CANCELLED,
-        FINISHED
+    private val mConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            val binder = service as NetworkService.LocalBinder
+            mNetworkService = binder.service
+            mBound = true
+
+            // Start the transfers update
+            startTransfersUpdateProcedure()
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            mBound = false
+        }
     }
 
     init {
@@ -106,10 +99,11 @@ class TransfersLoader(private var mContext: Context?): ServiceConnection {
         authorityRepository = AuthorityRepository(mContext!!)
 
         val pref = PreferenceManager.getDefaultSharedPreferences(mContext)
-        val userId = pref.getString(Constants.KEY_CURRENT_ACCOUNT_ID, "")
+        val userId = pref.getString(Constants.KEY_CURRENT_ACCOUNT_ID, "") ?: ""
         if (userId != "") {
             mCurrentAccount = UserAccount(userId)
-            mDisposables.add(authorityRepository!!.getWIF(userId!!, AuthorityType.MEMO.ordinal)
+            mDisposables.add(
+                authorityRepository!!.getWIF(userId, AuthorityType.MEMO.ordinal)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { encryptedWIF ->
@@ -124,8 +118,7 @@ class TransfersLoader(private var mContext: Context?): ServiceConnection {
             mDisposables.add(RxBus.getBusInstance()
                 .asFlowable()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Consumer { message ->
-                    if (mState == State.FINISHED) return@Consumer
+                .subscribe { message ->
                     if (message is JsonRpcResponse<*>) {
                         if (message.result is List<*>) {
                             if (responseMap.containsKey(message.id)) {
@@ -143,37 +136,17 @@ class TransfersLoader(private var mContext: Context?): ServiceConnection {
                             responseMap.clear()
                         }
                     }
-                })
+                }
             )
-        } else {
-            // If there is no current user, we should not do anything
-            mState = State.CANCELLED
+
+            onStart()
         }
-
-        onStart()
-    }
-
-    override fun onServiceDisconnected(name: ComponentName?) {
-        mShouldUnbindNetwork = false
-    }
-
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        // We've bound to LocalService, cast the IBinder and get LocalService instance
-        val binder = service as NetworkService.LocalBinder
-        mNetworkService = binder.service
-
-        // Start the transfers update
-        startTransfersUpdateProcedure()
     }
 
     private fun onStart() {
-        if (mState != State.CANCELLED) {
-            val intent = Intent(mContext, NetworkService::class.java)
-            if (mContext!!.bindService(intent, this, Context.BIND_AUTO_CREATE)) {
-                mShouldUnbindNetwork = true
-            } else {
-                Log.e(TAG, "Binding to the network service failed.")
-            }
+        // Bind to LocalService
+        Intent(mContext, NetworkService::class.java).also { intent ->
+            mContext?.bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
         }
     }
 
@@ -183,7 +156,7 @@ class TransfersLoader(private var mContext: Context?): ServiceConnection {
     private fun startTransfersUpdateProcedure() {
         if (DEBUG) {
             // If we are in debug mode, we first erase all entries in the 'transfer' table
-            transferRepository!!.deleteAll()
+            transferRepository?.deleteAll()
         }
         mDisposables.add(
             transferRepository!!.getCount()
@@ -213,7 +186,7 @@ class TransfersLoader(private var mContext: Context?): ServiceConnection {
     private fun handleOperationList(operationHistoryList: List<OperationHistory>) {
         historicalTransferCount++
 
-        val insertedCount = transferRepository!!.insertAll(processOperationList(operationHistoryList))
+        val insertedCount = transferRepository?.insertAll(processOperationList(operationHistoryList))
         // TODO return number of inserted rows
 //        Log.d(TAG, String.format("Inserted count: %d, list size: %d", insertedCount, operationHistoryList.size))
         if (/* insertedCount == 0 && */ operationHistoryList.isEmpty()) {
@@ -234,7 +207,7 @@ class TransfersLoader(private var mContext: Context?): ServiceConnection {
     private fun loadNextOperationsBatch() {
         val stop = historicalTransferCount * HISTORICAL_TRANSFER_BATCH_SIZE
         val start = stop + HISTORICAL_TRANSFER_BATCH_SIZE
-        lastId = mNetworkService!!.sendMessage(
+        val id = mNetworkService?.sendMessage(
             GetRelativeAccountHistory(
                 mCurrentAccount,
                 stop,
@@ -242,7 +215,7 @@ class TransfersLoader(private var mContext: Context?): ServiceConnection {
                 start
             ), GetRelativeAccountHistory.REQUIRED_API
         )
-        responseMap[lastId] = RESPONSE_GET_RELATIVE_ACCOUNT_HISTORY
+        if (id != null) responseMap[id] = RESPONSE_GET_RELATIVE_ACCOUNT_HISTORY
     }
 
     /**
@@ -321,10 +294,15 @@ class TransfersLoader(private var mContext: Context?): ServiceConnection {
     private fun onDestroy() {
         Log.d(TAG, "Destroying TransfersLoader")
         if (!mDisposables.isDisposed) mDisposables.dispose()
-        if (mShouldUnbindNetwork) {
-            mContext!!.unbindService(this)
-            mShouldUnbindNetwork = false
+
+        try {
+            if (mBound && mNetworkService != null)
+                mContext?.unbindService(mConnection)
+        } catch (e: IllegalArgumentException) {
+            Log.d(TAG, "Avoid crash related to Service not registered: ${e.message}")
         }
+        mBound = false
         mContext = null
+        mNetworkService = null
     }
 }
