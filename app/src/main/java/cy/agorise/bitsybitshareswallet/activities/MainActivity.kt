@@ -3,6 +3,7 @@ package cy.agorise.bitsybitshareswallet.activities
 import android.os.Bundle
 import android.os.Handler
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.MenuItem
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -55,9 +56,10 @@ class MainActivity : ConnectedActivity() {
         // closes the app, if not then it just restarts the Handler (timer)
         mRunnable = Runnable {
             if (PreferenceManager.getDefaultSharedPreferences(this)
-                    .getBoolean(Constants.KEY_AUTO_CLOSE_ACTIVATED, true))
+                    .getBoolean(Constants.KEY_AUTO_CLOSE_ACTIVATED, true)) {
                 finish()
-            else
+                android.os.Process.killProcess(android.os.Process.myPid())
+            } else
                 restartHandler()
         }
         startHandler()
@@ -68,6 +70,8 @@ class MainActivity : ConnectedActivity() {
      */
     override fun onUserInteraction() {
         super.onUserInteraction()
+
+        Log.d("MainActivity", "onUserInteraction")
         restartHandler()
     }
 
@@ -84,7 +88,7 @@ class MainActivity : ConnectedActivity() {
     }
 
     private fun startHandler() {
-        mHandler.postDelayed(mRunnable, 3 * 60 * 1000) //for 3 minutes
+        mHandler.postDelayed(mRunnable, 30 * 1000) //for 3 minutes
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
