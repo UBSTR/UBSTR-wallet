@@ -21,7 +21,7 @@ import cy.agorise.bitsybitshareswallet.database.joins.TransferDetailDao
         Merchant::class,
         Teller::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true)
 abstract class BitsyDatabase : RoomDatabase() {
 
@@ -48,17 +48,26 @@ abstract class BitsyDatabase : RoomDatabase() {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
                         BitsyDatabase::class.java, "BiTSyWallet.db"
-                    ).addMigrations(MIGRATION_1_2).build()
+                    ).addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_2_3)
+                    .build()
                 }
             }
 
             return INSTANCE
         }
 
-        private val MIGRATION_1_2 = object : Migration(1, 2) {
+        val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS 'merchants' ('id' TEXT NOT NULL PRIMARY KEY, 'name' TEXT NOT NULL, 'address' TEXT, 'lat' REAL NOT NULL, 'lon' REAL NOT NULL, 'phone' TEXT, 'telegram' TEXT, 'website' TEXT)")
                 database.execSQL("CREATE TABLE IF NOT EXISTS 'tellers' ('id' TEXT NOT NULL PRIMARY KEY, 'name' TEXT NOT NULL, 'address' TEXT, 'lat' REAL NOT NULL, 'lon' REAL NOT NULL, 'phone' TEXT, 'telegram' TEXT, 'website' TEXT)")
+            }
+        }
+
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE 'equivalent_values'")
+                database.execSQL("CREATE TABLE IF NOT EXISTS 'equivalent_values' ('transfer_id' TEXT NOT NULL, 'value' INTEGER NOT NULL, 'symbol' TEXT NOT NULL, PRIMARY KEY(transfer_id, symbol), FOREIGN KEY (transfer_id) REFERENCES transfers(id))")
             }
         }
     }

@@ -140,7 +140,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
             if (blockNumber != null && blockNumber != blockNumberWithMissingTime) {
                 blockNumberWithMissingTime = blockNumber
                 Log.d(TAG, "Block number: $blockNumber, Time: ${System.currentTimeMillis()}")
-                mHandler.postDelayed(mRequestBlockMissingTimeTask, 10)
+                mHandler.post(mRequestBlockMissingTimeTask)
             }
         })
 
