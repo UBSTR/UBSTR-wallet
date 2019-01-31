@@ -519,23 +519,23 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
             if (selectedMerchant != null) {
                 tvName.text = selectedMerchant?.name
 
-                if (selectedMerchant?.address != null)
+                if (!selectedMerchant?.address.equals(""))
                     tvAddress.text = selectedMerchant?.address
                 else
                     tvAddress.visibility = View.GONE
 
-                if (selectedMerchant?.phone != null)
+                if (!selectedMerchant?.phone.equals(""))
                     tvPhone.text = selectedMerchant?.phone
                 else
                     tvPhone.visibility = View.GONE
 
-                if (selectedMerchant?.telegram != null) {
+                if (!selectedMerchant?.telegram.equals("")) {
                     val telegram = "Telegram: ${selectedMerchant?.telegram}"
                     tvTelegram.text = telegram
                 } else
                     tvTelegram.visibility = View.GONE
 
-                if (selectedMerchant?.website != null)
+                if (!selectedMerchant?.website.equals(""))
                     tvWebsite.text = selectedMerchant?.website
                         ?.removePrefix("http://")?.removePrefix("https://")
                 else
@@ -564,23 +564,23 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
             if (selectedTeller != null) {
                 tvName.text = selectedTeller?.gt_name
 
-                if (selectedTeller?.address != null)
+                if (!selectedTeller?.address.equals(""))
                     tvAddress.text = selectedTeller?.address
                 else
                     tvAddress.visibility = View.GONE
 
-                if (selectedTeller?.phone != null)
+                if (!selectedTeller?.phone.equals(""))
                     tvPhone.text = selectedTeller?.phone
                 else
                     tvPhone.visibility = View.GONE
 
-                if (selectedTeller?.telegram != null) {
+                if (!selectedTeller?.telegram.equals("")) {
                     val telegram = "Telegram: ${selectedTeller?.telegram}"
                     tvTelegram.text = telegram
                 } else
                     tvTelegram.visibility = View.GONE
 
-                if (selectedTeller?.url != null)
+                if (!selectedTeller?.url.equals(""))
                     tvWebsite.text = selectedTeller?.url
                         ?.removePrefix("http://")?.removePrefix("https://")
                 else
