@@ -376,7 +376,8 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
             if (invoice.memo != null) {
                 tietMemo.setText(invoice.memo)
-                tietMemo.isEnabled = false
+                if (invoice.memo.startsWith("PP"))
+                    tietMemo.isEnabled = false
             }
 
             var amount = 0.0
