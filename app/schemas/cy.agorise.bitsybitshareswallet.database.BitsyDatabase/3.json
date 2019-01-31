@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 2,
-    "identityHash": "79a582fa39e989852699b131383e993a",
+    "version": 3,
+    "identityHash": "36ac924b7b8d78fb2d937d1ff9ba8897",
     "entities": [
       {
         "tableName": "assets",
@@ -132,14 +132,8 @@
       },
       {
         "tableName": "equivalent_values",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `transfer_id` TEXT NOT NULL, `value` INTEGER NOT NULL, `asset_id` TEXT NOT NULL, FOREIGN KEY(`transfer_id`) REFERENCES `transfers`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`asset_id`) REFERENCES `assets`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`transfer_id` TEXT NOT NULL, `value` INTEGER NOT NULL, `symbol` TEXT NOT NULL, PRIMARY KEY(`transfer_id`, `symbol`), FOREIGN KEY(`transfer_id`) REFERENCES `transfers`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
           {
             "fieldPath": "transferId",
             "columnName": "transfer_id",
@@ -153,17 +147,18 @@
             "notNull": true
           },
           {
-            "fieldPath": "assetId",
-            "columnName": "asset_id",
+            "fieldPath": "symbol",
+            "columnName": "symbol",
             "affinity": "TEXT",
             "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "transfer_id",
+            "symbol"
           ],
-          "autoGenerate": true
+          "autoGenerate": false
         },
         "indices": [],
         "foreignKeys": [
@@ -173,17 +168,6 @@
             "onUpdate": "NO ACTION",
             "columns": [
               "transfer_id"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
-          },
-          {
-            "table": "assets",
-            "onDelete": "NO ACTION",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "asset_id"
             ],
             "referencedColumns": [
               "id"
@@ -425,7 +409,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"79a582fa39e989852699b131383e993a\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"36ac924b7b8d78fb2d937d1ff9ba8897\")"
     ]
   }
 }
