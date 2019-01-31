@@ -304,7 +304,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                 _asset.symbol,
                 _asset.precision,
                 _asset.description ?: "",
-                _asset.bitassetId ?: ""
+                _asset.issuer ?: ""
             )
 
             assets.add(asset)

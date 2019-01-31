@@ -233,7 +233,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
                     _asset.symbol,
                     _asset.precision,
                     _asset.description ?: "",
-                    _asset.bitassetId ?: ""
+                    _asset.issuer ?: ""
                 )
 
                 assets.add(asset)

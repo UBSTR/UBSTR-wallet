@@ -68,6 +68,9 @@ abstract class BitsyDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("DROP TABLE 'equivalent_values'")
                 database.execSQL("CREATE TABLE IF NOT EXISTS 'equivalent_values' ('transfer_id' TEXT NOT NULL, 'value' INTEGER NOT NULL, 'symbol' TEXT NOT NULL, PRIMARY KEY(transfer_id, symbol), FOREIGN KEY (transfer_id) REFERENCES transfers(id))")
+
+                database.execSQL("DROP TABLE assets")
+                database.execSQL("CREATE TABLE IF NOT EXISTS assets (`id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `precision` INTEGER NOT NULL, `description` TEXT NOT NULL, `issuer` TEXT NOT NULL, PRIMARY KEY(`id`))")
             }
         }
     }

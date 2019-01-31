@@ -88,7 +88,7 @@ class MainActivity : ConnectedActivity() {
     }
 
     private fun startHandler() {
-        mHandler.postDelayed(mRunnable, 30 * 1000) //for 3 minutes
+        mHandler.postDelayed(mRunnable, 3 * 60 * 1000) //for 3 minutes
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
