@@ -299,13 +299,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
         cursor?.close()
 
         if (lat != null && lon != null) {
-            val builder = LatLngBounds.builder()
-            builder.include(LatLng(lat, lon))
-
-            val bounds = builder.build()
-
             try {
-                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))
             } catch (e: Exception) {
                 Log.d(TAG, e.message)
             }
