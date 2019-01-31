@@ -147,7 +147,11 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         mDisposable = RxBus.getBusInstance()
             .asFlowable()
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { handleIncomingMessage(it) }
+            .subscribe({
+                this.handleIncomingMessage(it)
+            }, {
+                this.handleError(it)
+            })
     }
 
     /**
@@ -159,6 +163,19 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
             .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "") ?: ""
         if (userId != "")
             mCurrentAccount = UserAccount(userId)
+    }
+
+    /**
+     * Error consumer used to handle potential errors caused by the NetworkService while processing
+     * incoming data.
+     */
+    private fun handleError(throwable: Throwable){
+        Log.e(TAG, "Error while processing received message. Msg: " + throwable.message)
+        val stack = throwable.stackTrace
+        for (e in stack) {
+            Log.e(TAG, String.format("%s#%s:%d", e.className, e.methodName, e.lineNumber))
+        }
+        Crashlytics.log(Log.ERROR, TAG, "ConnectedActivity reporting error. Msg: ${throwable.message}")
     }
 
     private fun handleIncomingMessage(message: Any?) {
