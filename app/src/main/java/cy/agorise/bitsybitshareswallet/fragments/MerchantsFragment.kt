@@ -102,6 +102,11 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
     private var showMerchantsMarkers = true
     private var showTellerMarkers = true
 
+    // Variables used to dynamically obtain the status bar and navigation bar height, to automatically and correctly
+    // place the Toolbar and Map UI controllers
+    private var statusBarSize = 0
+    private var navigationBarSize = 0
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Hide the activity's Toolbar so that we can make the trick of the translucent navigation and status bars
         val activityToolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
@@ -117,6 +122,16 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Dynamically obtain status bar and navigation bar heights, and account for the status bar height to add
+        // the correct top margin to the Toolbar and place it just below the status bar
+        view.setOnApplyWindowInsetsListener { v, insets ->
+            statusBarSize = insets.systemWindowInsetTop
+            navigationBarSize = insets.systemWindowInsetBottom
+            val layoutParams = toolbar.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.topMargin = statusBarSize
+            insets
+        }
 
         // Set the fragment's toolbar as the activity toolbar just for this fragment
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
@@ -343,8 +358,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
         mMap = googleMap
 
         // Add padding to move the controls out of the toolbar/status bar and navigation bar.
-        // TODO might be necessary to convert dp to pixels
-        mMap.setPadding(0, 200, 0, 100)
+        mMap.setPadding(0, toolbar.height +  statusBarSize, 0, navigationBarSize)
 
         applyMapTheme()
 
