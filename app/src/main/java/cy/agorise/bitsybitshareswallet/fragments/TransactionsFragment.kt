@@ -162,7 +162,7 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
                 continue
 
             // Filter by asset
-            if (!filterAssetAll && transferDetail.cryptoSymbol != filterAsset)
+            if (!filterAssetAll && transferDetail.assetSymbol != filterAsset)
                 continue
 
 //            // Filter by fiat amount

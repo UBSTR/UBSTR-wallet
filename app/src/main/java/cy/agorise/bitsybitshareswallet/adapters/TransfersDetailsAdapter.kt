@@ -119,13 +119,13 @@ class TransfersDetailsAdapter(private val context: Context) :
 
         // Show the crypto amount correctly formatted
         // TODO lift the DecimalFormat declaration to other place to make things more efficient
-        val df = DecimalFormat("####."+("#".repeat(transferDetail.cryptoPrecision)))
+        val df = DecimalFormat("####."+("#".repeat(transferDetail.assetPrecision)))
         df.roundingMode = RoundingMode.CEILING
         df.decimalFormatSymbols = DecimalFormatSymbols(Locale.getDefault())
 
-        val amount = transferDetail.cryptoAmount.toDouble() /
-                Math.pow(10.toDouble(), transferDetail.cryptoPrecision.toDouble())
-        val cryptoAmount = "${df.format(amount)} ${transferDetail.cryptoSymbol}"
+        val amount = transferDetail.assetAmount.toDouble() /
+                Math.pow(10.toDouble(), transferDetail.assetPrecision.toDouble())
+        val cryptoAmount = "${df.format(amount)} ${transferDetail.getUIAssetSymbol()}"
         viewHolder.tvCryptoAmount.text = cryptoAmount
 
         viewHolder.tvFiatEquivalent.text = "-"

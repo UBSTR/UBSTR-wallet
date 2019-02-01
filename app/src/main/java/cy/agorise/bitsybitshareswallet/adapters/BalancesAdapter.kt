@@ -14,7 +14,7 @@ class BalancesAdapter(private val context: Context) :
     RecyclerView.Adapter<BalancesAdapter.ViewHolder>() {
 
     private val mComparator =
-        Comparator<BalanceDetail> { a, b -> a.symbol.compareTo(b.symbol) }
+        Comparator<BalanceDetail> { a, b -> a.toString().compareTo(b.toString(), true) }
 
     private val mSortedList =
         SortedList<BalanceDetail>(BalanceDetail::class.java, object : SortedList.Callback<BalanceDetail>() {
