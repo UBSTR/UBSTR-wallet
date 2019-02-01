@@ -58,6 +58,11 @@
     <string name="text__ignore_network_fees">Ignorar cuotas de red</string>
     <string name="button__filter">Filtrar</string>
 
+    <!-- Transactions export options -->
+    <string name="title_export_transactions">Exportar transacciones filtradas</string>
+    <string name="text__pdf">PDF</string>
+    <string name="text__csv">CSV</string>
+
     <!-- Merchants & Tellers -->
     <string name="title_merchants">Comerciantes</string>
     <string name="title_tellers">Tellers</string>

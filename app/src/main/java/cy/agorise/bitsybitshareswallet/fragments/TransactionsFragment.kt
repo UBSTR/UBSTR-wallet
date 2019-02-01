@@ -10,6 +10,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.jakewharton.rxbinding3.appcompat.queryTextChangeEvents
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.TransfersDetailsAdapter
@@ -118,7 +120,15 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
                 true
             }
             R.id.menu_export -> {
-                // TODO add export options
+                MaterialDialog(context!!).show {
+                    title(R.string.title_export_transactions)
+                    listItemsMultiChoice(R.array.export_options, initialSelection = intArrayOf(0,1)) { _, indices, _ ->
+                        val exportPDF = indices.contains(0)
+                        val exportCSV = indices.contains(1)
+                        exportFilteredTransactions(exportPDF, exportCSV)
+                    }
+                    positiveButton(R.string.title_export)
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -213,6 +223,11 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
         this.filterToFiatAmount = filterToFiatAmount
         this.filterAgoriseFees = filterAgoriseFees
         applyFilterOptions(true)
+    }
+
+    /** Created the export procedures for PDF and CSV, depending on the user selection. */
+    private fun exportFilteredTransactions(exportPDF: Boolean, exportCSV: Boolean) {
+
     }
 
     override fun onDestroy() {

@@ -107,7 +107,7 @@ dependencies {
     implementation 'org.bitcoinj:bitcoinj-core:0.14.3'
     implementation 'com.moldedbits.r2d2:r2d2:1.0.1'
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
-    implementation 'com.afollestad.material-dialogs:core:2.0.0-rc7'
+    implementation 'com.afollestad.material-dialogs:core:2.0.0-rc9'
     // Android Debug Database
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
 
