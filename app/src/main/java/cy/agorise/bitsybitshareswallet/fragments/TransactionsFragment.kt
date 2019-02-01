@@ -1,10 +1,13 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Point
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.*
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
@@ -18,6 +21,7 @@ import cy.agorise.bitsybitshareswallet.adapters.TransfersDetailsAdapter
 import cy.agorise.bitsybitshareswallet.database.joins.TransferDetail
 import cy.agorise.bitsybitshareswallet.utils.BounceTouchListener
 import cy.agorise.bitsybitshareswallet.utils.Constants
+import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.bitsybitshareswallet.viewmodels.TransferDetailViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -27,6 +31,10 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSelectedListener {
+
+    companion object {
+        private const val REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION = 100
+    }
 
     private lateinit var mTransferDetailViewModel: TransferDetailViewModel
 
@@ -120,15 +128,7 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
                 true
             }
             R.id.menu_export -> {
-                MaterialDialog(context!!).show {
-                    title(R.string.title_export_transactions)
-                    listItemsMultiChoice(R.array.export_options, initialSelection = intArrayOf(0,1)) { _, indices, _ ->
-                        val exportPDF = indices.contains(0)
-                        val exportCSV = indices.contains(1)
-                        exportFilteredTransactions(exportPDF, exportCSV)
-                    }
-                    positiveButton(R.string.title_export)
-                }
+                verifyStoragePermission()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -223,6 +223,46 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
         this.filterToFiatAmount = filterToFiatAmount
         this.filterAgoriseFees = filterAgoriseFees
         applyFilterOptions(true)
+    }
+
+    /** Verifies that the storage permission has been granted before attempting to generate the export options */
+    private fun verifyStoragePermission() {
+        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not already granted
+            requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION)
+        } else {
+            // Permission is already granted
+            showExportOptionsDialog()
+        }
+    }
+
+    /** Received the result of the storage permission request and if it was accepted then shows the export options
+     * dialog, but if it was not accepted then shows a toast explaining that the permission is necessary to generate
+     * the export options */
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                showExportOptionsDialog()
+            } else {
+                context?.toast(getString(R.string.msg__storage_permission_necessary_export))
+            }
+            return
+        }
+    }
+
+    private fun showExportOptionsDialog() {
+        MaterialDialog(context!!).show {
+            title(R.string.title_export_transactions)
+            listItemsMultiChoice(R.array.export_options, initialSelection = intArrayOf(0,1)) { _, indices, _ ->
+                val exportPDF = indices.contains(0)
+                val exportCSV = indices.contains(1)
+                exportFilteredTransactions(exportPDF, exportCSV)
+            }
+            positiveButton(R.string.title_export)
+        }
     }
 
     /** Created the export procedures for PDF and CSV, depending on the user selection. */

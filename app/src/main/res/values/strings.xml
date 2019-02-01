@@ -62,6 +62,7 @@
     <string name="title_export_transactions">Export filtered transactions</string>
     <string name="text__pdf">PDF</string>
     <string name="text__csv">CSV</string>
+    <string name="msg__storage_permission_necessary_export">Storage permission is necessary to export PDF/CSV files.</string>
 
     <!-- Merchants & Tellers -->
     <string name="title_merchants">Merchants</string>
@@ -102,7 +103,7 @@
     <string name="msg__invoice_subject">BiTSy invoice from %1$s</string>
     <string name="title_share">Share</string>
     <string name="text__share_with">Share with</string>
-    <string name="msg__storage__permission__necessary">Storage permission is necessary to share images.</string>
+    <string name="msg__storage_permission_necessary_share">Storage permission is necessary to share images.</string>
 
     <!-- Settings -->
     <string name="title_settings">Settings</string>

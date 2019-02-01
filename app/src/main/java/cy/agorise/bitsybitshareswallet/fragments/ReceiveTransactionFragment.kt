@@ -380,7 +380,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 shareQRScreenshot()
             } else {
-                Toast.makeText(context!!, getString(R.string.msg__storage__permission__necessary), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context!!, getString(R.string.msg__storage_permission_necessary_share), Toast.LENGTH_SHORT).show()
             }
             return
         }
