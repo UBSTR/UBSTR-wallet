@@ -37,6 +37,10 @@ class TransferRepository internal constructor(context: Context) {
         return mTransferDao.getTransferBlockNumberWithMissingTime()
     }
 
+    fun getTransfersWithMissingValueIn(symbol: String): LiveData<List<Transfer>> {
+        return mTransferDao.getTransfersWithMissingValueIn(symbol)
+    }
+
     fun deleteAll() {
         deleteAllAsyncTask(mTransferDao).execute()
     }

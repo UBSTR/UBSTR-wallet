@@ -26,6 +26,7 @@ import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import cy.agorise.graphenej.Asset
 import cy.agorise.graphenej.AssetAmount
 import cy.agorise.graphenej.UserAccount
+import cy.agorise.graphenej.api.ApiAccess
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
@@ -223,6 +224,11 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                 // If we got a disconnection notification, we should clear our response map, since
                 // all its stored request ids will now be reset
                 responseMap.clear()
+            } else if (message.updateCode == ConnectionStatusUpdate.API_UPDATE) {
+                // If we got an API update
+                if(message.api == ApiAccess.API_HISTORY) {
+                    //TODO: Start the procedure that will obtain the missing equivalent values
+                }
             }
         }
     }
