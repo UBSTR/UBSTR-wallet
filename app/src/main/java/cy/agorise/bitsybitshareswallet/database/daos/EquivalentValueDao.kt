@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import cy.agorise.bitsybitshareswallet.database.entities.EquivalentValue
+import cy.agorise.bitsybitshareswallet.database.entities.Transfer
 
 @Dao
 interface EquivalentValueDao {

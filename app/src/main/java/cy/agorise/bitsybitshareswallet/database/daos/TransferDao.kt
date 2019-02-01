@@ -29,6 +29,9 @@ interface TransferDao {
     @Query("SELECT block_number FROM transfers WHERE timestamp='0' LIMIT 1")
     fun getTransferBlockNumberWithMissingTime(): LiveData<Long>
 
+    @Query("SELECT * FROM transfers WHERE id NOT IN (SELECT transfer_id FROM equivalent_values WHERE symbol = :symbol)")
+    fun getTransfersWithMissingValueIn(symbol: String): LiveData<List<Transfer>>
+
     @Query("DELETE FROM transfers")
     fun deleteAll()
 }
