@@ -71,6 +71,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
 
     private var mAssets = ArrayList<cy.agorise.bitsybitshareswallet.database.entities.Asset>()
 
+    /** Keeps track of the current selected asset symbol */
     private var selectedAssetSymbol = ""
 
     /** Used to avoid erasing the QR code when the user selects an item from the AutoComplete suggestions */
@@ -150,7 +151,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
                     tilAsset.visibility = View.GONE
                     selectedAssetSymbol = asset.symbol
 
-                    mAsset = Asset(asset.id, asset.symbol, asset.precision)
+                    mAsset = Asset(asset.id, asset.toString(), asset.precision)
                 }
                 updateQR()
             }
@@ -194,7 +195,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
 
         actvAsset.setOnItemClickListener { parent, _, position, _ ->
             val asset = parent.adapter.getItem(position) as cy.agorise.bitsybitshareswallet.database.entities.Asset
-            mAsset = Asset(asset.id, asset.symbol, asset.precision)
+            mAsset = Asset(asset.id, asset.toString(), asset.precision)
             selectedInAutoCompleteTextView = true
             updateQR()
         }
@@ -250,23 +251,26 @@ class ReceiveTransactionFragment : ConnectedFragment() {
             return
         }
 
+        val asset = mAsset!!
+
         // Try to obtain the amount from the Amount Text Field or make it zero otherwise
         val amount: Long = try {
             val tmpAmount = tietAmount.text.toString().toDouble()
-            (tmpAmount * Math.pow(10.0, mAsset!!.precision.toDouble())).toLong()
+            (tmpAmount * Math.pow(10.0, asset.precision.toDouble())).toLong()
         }catch (e: Exception) {
             0
         }
 
-        val total = AssetAmount(UnsignedLong.valueOf(amount), mAsset!!)
+        val total = AssetAmount(UnsignedLong.valueOf(amount), asset)
         val totalInDouble = Util.fromBase(total)
         val items = arrayOf(LineItem("transfer", 1, totalInDouble))
-        val invoice = Invoice(mUserAccount!!.name, "", "", mAsset!!.symbol, items, "", "")
+        val invoice = Invoice(mUserAccount?.name, "", "",
+            asset.symbol.replaceFirst("bit", ""), items, "", "")
         Log.d(TAG, "invoice: " + invoice.toJsonString())
         try {
             val bitmap = encodeAsBitmap(Invoice.toQrCode(invoice), "#139657") // PalmPay green
             ivQR.setImageBitmap(bitmap)
-            updateAmountAddressUI(total, mUserAccount!!.name)
+            updateAmountAddressUI(amount, asset.symbol, asset.precision, mUserAccount!!.name)
         } catch (e: WriterException) {
             Log.e(TAG, "WriterException. Msg: " + e.message)
         }
@@ -323,17 +327,17 @@ class ReceiveTransactionFragment : ConnectedFragment() {
      * @param total Total Amount in crypto to be paid
      * @param account Account to pay total
      */
-    private fun updateAmountAddressUI(total: AssetAmount, account: String) {
-        val txtAmount: String = if (total.amount.toLong() == 0L) {
+    private fun updateAmountAddressUI(assetAmount: Long, assetSymbol: String, assetPrecision: Int, account: String) {
+        val txtAmount: String = if (assetAmount == 0L) {
             getString(R.string.template__please_send, getString(R.string.text__any_amount), " ")
         } else {
-            val df = DecimalFormat("####."+("#".repeat(total.asset.precision)))
+            val df = DecimalFormat("####."+("#".repeat(assetPrecision)))
             df.roundingMode = RoundingMode.CEILING
             df.decimalFormatSymbols = DecimalFormatSymbols(Locale.getDefault())
 
-            val amount = total.amount.toDouble() / Math.pow(10.toDouble(), total.asset.precision.toDouble())
+            val amount = assetAmount.toDouble() / Math.pow(10.toDouble(), assetPrecision.toDouble())
             val strAmount = df.format(amount)
-            getString(R.string.template__please_send, strAmount, total.asset.symbol)
+            getString(R.string.template__please_send, strAmount, assetSymbol)
         }
 
         val txtAccount = getString(R.string.template__to, account)

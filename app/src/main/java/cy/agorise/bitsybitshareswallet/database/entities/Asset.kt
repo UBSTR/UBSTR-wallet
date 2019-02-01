@@ -13,7 +13,10 @@ data class Asset(
     @ColumnInfo(name = "description") val description: String,
     @ColumnInfo(name = "issuer") val issuer: String
 ) {
+    // Add the bit prefix to smartcoins, ie bitUSD, bitEUR, bitMXN, etc.
     override fun toString(): String {
+        if (issuer == "1.2.0")
+            return "bit$symbol"
         return symbol
     }
 }

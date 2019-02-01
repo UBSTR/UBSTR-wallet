@@ -26,7 +26,7 @@ class BalancesDetailsAdapter(context: Context, resource: Int, data: List<Balance
         val text: TextView = cv!!.findViewById(android.R.id.text1)
 
         val balanceDetail = getItem(position)
-        text.text = balanceDetail!!.symbol
+        text.text = balanceDetail?.toString()
 
         return cv
     }
@@ -37,7 +37,7 @@ class BalancesDetailsAdapter(context: Context, resource: Int, data: List<Balance
         val text: TextView = v.findViewById(android.R.id.text1)
 
         val balanceDetail = getItem(position)
-        text.text = balanceDetail!!.symbol
+        text.text = balanceDetail?.toString()
 
         return v
     }

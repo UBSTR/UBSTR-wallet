@@ -22,7 +22,7 @@ class AssetsAdapter(context: Context, resource: Int, data: List<Asset>) :
         val text: TextView = cv!!.findViewById(android.R.id.text1)
 
         val asset = getItem(position)
-        text.text = asset!!.symbol
+        text.text = asset?.toString()
 
         return cv
     }
@@ -33,7 +33,7 @@ class AssetsAdapter(context: Context, resource: Int, data: List<Asset>) :
         val text: TextView = v.findViewById(android.R.id.text1)
 
         val asset = getItem(position)
-        text.text = asset!!.symbol
+        text.text = asset?.toString()
 
         return v
     }

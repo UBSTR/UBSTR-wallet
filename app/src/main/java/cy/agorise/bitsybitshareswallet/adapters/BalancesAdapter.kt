@@ -63,7 +63,7 @@ class BalancesAdapter(private val context: Context) :
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val balance = mSortedList.get(position)
 
-        viewHolder.tvSymbol.text = balance.symbol
+        viewHolder.tvSymbol.text = balance.toString()
 
         val amount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
         viewHolder.tvAmount.text = String.format("%." + Math.min(balance.precision, 8) + "f", amount)

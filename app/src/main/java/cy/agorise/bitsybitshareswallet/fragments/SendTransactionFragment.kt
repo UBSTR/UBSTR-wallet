@@ -213,7 +213,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
             val amount = balance.amount.toDouble() / Math.pow(10.0, balance.precision.toDouble())
 
             tvAvailableAssetAmount.text =
-                    String.format("%." + Math.min(balance.precision, 8) + "f %s", amount, balance.symbol)
+                    String.format("%." + Math.min(balance.precision, 8) + "f %s", amount, balance.toString())
 
             validateAmount()
         }
