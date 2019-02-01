@@ -72,7 +72,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
     private var mAssets = ArrayList<cy.agorise.bitsybitshareswallet.database.entities.Asset>()
 
     /** Keeps track of the current selected asset symbol */
-    private var selectedAssetSymbol = ""
+    private var selectedAssetSymbol = "BTS"
 
     /** Used to avoid erasing the QR code when the user selects an item from the AutoComplete suggestions */
     private var selectedInAutoCompleteTextView = false
@@ -119,6 +119,9 @@ class ReceiveTransactionFragment : ConnectedFragment() {
             Observer<List<cy.agorise.bitsybitshareswallet.database.entities.Asset>> { assets ->
                 mAssets.clear()
                 mAssets.addAll(assets)
+                mAssets.sortWith(
+                    Comparator { a, b -> a.toString().compareTo(b.toString(), true) }
+                )
 
                 // Add an option at the end so the user can search for an asset other than the ones saved in the db
                 val asset = cy.agorise.bitsybitshareswallet.database.entities.Asset(

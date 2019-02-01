@@ -21,6 +21,7 @@ import cy.agorise.bitsybitshareswallet.views.DatePickerFragment
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.ClassCastException
+import kotlin.collections.ArrayList
 
 
 /**
@@ -99,6 +100,8 @@ class FilterOptionsDialog : DialogFragment() {
 //     * Variable used to keep track of the current user's currency
 //     */
 //    private val mUserCurrency = RuntimeData.EXTERNAL_CURRENCY
+
+    private var mBalanceDetails = ArrayList<BalanceDetail>()
 
     private lateinit var mBalanceDetailViewModel: BalanceDetailViewModel
 
@@ -218,7 +221,12 @@ class FilterOptionsDialog : DialogFragment() {
         mBalanceDetailViewModel = ViewModelProviders.of(this).get(BalanceDetailViewModel::class.java)
 
         mBalanceDetailViewModel.getAll().observe(this, Observer<List<BalanceDetail>> { balancesDetails ->
-            mBalancesDetailsAdapter = BalancesDetailsAdapter(context!!, android.R.layout.simple_spinner_item, balancesDetails!!)
+            mBalanceDetails.clear()
+            mBalanceDetails.addAll(balancesDetails)
+            mBalanceDetails.sortWith(
+                Comparator { a, b -> a.toString().compareTo(b.toString(), true) }
+            )
+            mBalancesDetailsAdapter = BalancesDetailsAdapter(context!!, android.R.layout.simple_spinner_item, mBalanceDetails)
             sAsset.adapter = mBalancesDetailsAdapter
 
             val assetSelected = arguments!!.getString(KEY_FILTER_ASSET)

@@ -72,14 +72,14 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
     private var isToAccountCorrect = false
     private var isAmountCorrect = false
 
-    private var mBalancesDetails: List<BalanceDetail>? = null
+    private var mBalancesDetails = ArrayList<BalanceDetail>()
 
     private lateinit var mBalanceDetailViewModel: BalanceDetailViewModel
 
     private var mBalancesDetailsAdapter: BalancesDetailsAdapter? = null
 
     /** Keeps track of the asset's symbol selected in the Asset spinner */
-    private var selectedAssetSymbol = ""
+    private var selectedAssetSymbol = "BTS"
 
     /** Current user account */
     private var mUserAccount: UserAccount? = null
@@ -144,8 +144,12 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         mBalanceDetailViewModel = ViewModelProviders.of(this).get(BalanceDetailViewModel::class.java)
 
         mBalanceDetailViewModel.getAll().observe(this, Observer<List<BalanceDetail>> { balancesDetails ->
-            mBalancesDetails = balancesDetails
-            mBalancesDetailsAdapter = BalancesDetailsAdapter(context!!, android.R.layout.simple_spinner_item, mBalancesDetails!!)
+            mBalancesDetails.clear()
+            mBalancesDetails.addAll(balancesDetails)
+            mBalancesDetails.sortWith(
+                Comparator { a, b -> a.toString().compareTo(b.toString(), true) }
+            )
+            mBalancesDetailsAdapter = BalancesDetailsAdapter(context!!, android.R.layout.simple_spinner_item, mBalancesDetails)
             spAsset.adapter = mBalancesDetailsAdapter
 
             // Try to select the selectedAssetSymbol
