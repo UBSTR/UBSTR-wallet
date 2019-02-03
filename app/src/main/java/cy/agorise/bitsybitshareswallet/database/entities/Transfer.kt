@@ -25,4 +25,10 @@ data class Transfer (
         // Constant used to specify a BTS equivalent value whose calculation returned an error
         val ERROR: Long? = -2L
     }
+    init {
+        if(transferAssetId.equals("1.3.0")){
+            // If the transferred asset is BTS, we can fill the btsValue field immediately
+            btsValue = transferAmount
+        }
+    }
 }

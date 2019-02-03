@@ -147,7 +147,6 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         mTransferViewModel.getTransferBlockNumberWithMissingTime().observe(this, Observer<Long>{ blockNumber ->
             if (blockNumber != null && blockNumber != blockNumberWithMissingTime) {
                 blockNumberWithMissingTime = blockNumber
-                Log.d(TAG, "Block number: $blockNumber, Time: ${System.currentTimeMillis()}")
                 mHandler.post(mRequestBlockMissingTimeTask)
             }
         })
@@ -251,7 +250,6 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
      */
     private fun handleTransfersWithMissingBtsValue(transfer: Transfer) {
         if(mNetworkService?.isConnected == true){
-            Log.d(TAG,"Transfer: ${transfer}")
             val base = Asset(transfer.transferAssetId)
             val quote = Asset("1.3.0")
             val bucket: Long = TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)
@@ -373,7 +371,9 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
             val disposable = Observable.just(pair)
                 .subscribeOn(Schedulers.computation())
                 .map { mTransferViewModel.updateBtsValue(it.first!!, it.second) }
-                .subscribe({},{ Log.e(TAG,"Error at updateBtsValue. Msg: ${it.message}")
+                .subscribe({},{
+                    Log.e(TAG,"Error at updateBtsValue. Msg: ${it.message}")
+                    for(line in it.stackTrace) Log.e(TAG, "${line.className}#${line.methodName}:${line.lineNumber}")
                 })
             mCompositeDisposable.add(disposable)
         }else{
