@@ -1,17 +1,17 @@
 package cy.agorise.bitsybitshareswallet.database.daos
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import cy.agorise.bitsybitshareswallet.database.entities.Transfer
 import io.reactivex.Single
 
 @Dao
 interface TransferDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(transfer: Transfer)
+
+    @Update()
+    fun update(transfer: Transfer)
 
     // TODO find a way to return number of added rows
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -28,6 +28,9 @@ interface TransferDao {
 
     @Query("SELECT block_number FROM transfers WHERE timestamp='0' LIMIT 1")
     fun getTransferBlockNumberWithMissingTime(): LiveData<Long>
+
+    @Query("SELECT * FROM transfers WHERE timestamp != 0 AND bts_value = -1 AND transfer_asset_id != '1.3.0' LIMIT 1")
+    fun getTransfersWithMissingBtsValue(): LiveData<Transfer>
 
     @Query("SELECT * FROM transfers WHERE id NOT IN (SELECT transfer_id FROM equivalent_values WHERE symbol = :symbol)")
     fun getTransfersWithMissingValueIn(symbol: String): LiveData<List<Transfer>>

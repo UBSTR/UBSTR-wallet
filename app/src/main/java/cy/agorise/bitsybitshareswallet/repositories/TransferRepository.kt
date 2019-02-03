@@ -21,6 +21,10 @@ class TransferRepository internal constructor(context: Context) {
         insertAllAsyncTask(mTransferDao).execute(transfers)
     }
 
+    fun update(transfer: Transfer){
+        mTransferDao.insert(transfer)
+    }
+
     fun setBlockTime(blockNumber: Long, timestamp: Long) {
         setBlockTimeAsyncTask(mTransferDao).execute(Pair(blockNumber, timestamp))
     }
@@ -39,6 +43,10 @@ class TransferRepository internal constructor(context: Context) {
 
     fun getTransfersWithMissingValueIn(symbol: String): LiveData<List<Transfer>> {
         return mTransferDao.getTransfersWithMissingValueIn(symbol)
+    }
+
+    fun getTransfersWithMissingBtsValue(): LiveData<Transfer> {
+        return mTransferDao.getTransfersWithMissingBtsValue()
     }
 
     fun deleteAll() {

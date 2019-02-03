@@ -17,5 +17,12 @@ data class Transfer (
     @ColumnInfo(name = "transfer_amount") val transferAmount: Long,
     @ColumnInfo(name = "transfer_asset_id") val transferAssetId: String, // TODO should be foreign key to Asset
     @ColumnInfo(name = "memo") val memo: String,
-    @ColumnInfo(name = "bts_value") val btsValue: Long? = -1
-    )
+    @ColumnInfo(name = "bts_value") var btsValue: Long? = Transfer.NOT_CALCULATED
+    ){
+    companion object {
+        // Constant used to specify an uninitialized BTS equivalent value
+        val NOT_CALCULATED: Long? = -1L
+        // Constant used to specify a BTS equivalent value whose calculation returned an error
+        val ERROR: Long? = -2L
+    }
+}

@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
@@ -17,6 +18,7 @@ import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
 import cy.agorise.bitsybitshareswallet.BuildConfig
 import cy.agorise.bitsybitshareswallet.database.entities.Balance
+import cy.agorise.bitsybitshareswallet.database.entities.Transfer
 import cy.agorise.bitsybitshareswallet.processors.TransfersLoader
 import cy.agorise.bitsybitshareswallet.repositories.AssetRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
@@ -31,16 +33,16 @@ import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
 import cy.agorise.graphenej.api.calls.*
-import cy.agorise.graphenej.models.AccountProperties
-import cy.agorise.graphenej.models.BlockHeader
-import cy.agorise.graphenej.models.FullAccountDetails
-import cy.agorise.graphenej.models.JsonRpcResponse
+import cy.agorise.graphenej.models.*
 import io.fabric.sdk.android.Fabric
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -59,6 +61,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         private const val RESPONSE_GET_ACCOUNT_BALANCES = 3
         private const val RESPONSE_GET_ASSETS = 4
         private const val RESPONSE_GET_BLOCK_HEADER = 5
+        private const val RESPONSE_GET_MARKET_HISTORY = 6
     }
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
@@ -72,8 +75,8 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
     private val mHandler = Handler()
 
-    // Disposable returned at the bus subscription
-    private var mDisposable: Disposable? = null
+    // Composite disposable used to clear all disposables once the activity is destroyed
+    private val mCompositeDisposable = CompositeDisposable()
 
     private var storedOpCount: Long = -1
 
@@ -90,6 +93,10 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private val requestIdToBlockNumberMap = HashMap<Long, Long>()
 
     private var blockNumberWithMissingTime = 0L
+
+    // Variable used to hold a reference to the specific Transfer instance which we're currently trying
+    // to resolve an equivalent BTS value
+    var transfer: Transfer? = null
 
     /**
      * Flag used to keep track of the NetworkService binding state
@@ -145,7 +152,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
             }
         })
 
-        mDisposable = RxBus.getBusInstance()
+        val disposable = RxBus.getBusInstance()
             .asFlowable()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -153,6 +160,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
             }, {
                 this.handleError(it)
             })
+        mCompositeDisposable.add(disposable)
     }
 
     /**
@@ -203,6 +211,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
                             handleBlockHeader(message.result as BlockHeader, blockNumber)
                             requestIdToBlockNumberMap.remove(message.id)
                         }
+                        RESPONSE_GET_MARKET_HISTORY     -> handleMarketData(message.result as List<BucketObject>)
                     }
                     responseMap.remove(message.id)
                 }
@@ -227,9 +236,30 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
             } else if (message.updateCode == ConnectionStatusUpdate.API_UPDATE) {
                 // If we got an API update
                 if(message.api == ApiAccess.API_HISTORY) {
-                    //TODO: Start the procedure that will obtain the missing equivalent values
+                    // Starts the procedure that will obtain the missing equivalent values
+                    mTransferViewModel
+                        .getTransfersWithMissingBtsValue().observe(this, Observer<Transfer> {
+                            if(it != null) handleTransfersWithMissingBtsValue(it)
+                        })
                 }
             }
+        }
+    }
+
+    /**
+     * Method called whenever we get a list of transfers with their bts value missing.
+     */
+    private fun handleTransfersWithMissingBtsValue(transfer: Transfer) {
+        if(mNetworkService?.isConnected == true){
+            Log.d(TAG,"Transfer: ${transfer}")
+            val base = Asset(transfer.transferAssetId)
+            val quote = Asset("1.3.0")
+            val bucket: Long = TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)
+            val end: Long = transfer.timestamp * 1000L
+            val start: Long = (transfer.timestamp - bucket) * 1000L
+            val id = mNetworkService!!.sendMessage(GetMarketHistory(base, quote, bucket, start, end), GetMarketHistory.REQUIRED_API)
+            responseMap[id] = RESPONSE_GET_MARKET_HISTORY
+            this.transfer = transfer
         }
     }
 
@@ -281,7 +311,6 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun handleBalanceUpdate(assetAmountList: List<AssetAmount>) {
-        Log.d(TAG, "handleBalanceUpdate")
         val now = System.currentTimeMillis() / 1000
         val balances = ArrayList<Balance>()
         for (assetAmount in assetAmountList) {
@@ -333,6 +362,23 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
             mTransferViewModel.setBlockTime(blockNumber, date.time / 1000)
         } catch (e: ParseException) {
             Log.e(TAG, "ParseException. Msg: " + e.message)
+        }
+    }
+
+    private fun handleMarketData(buckets: List<BucketObject>) {
+        if(buckets.isNotEmpty()){
+            Log.d(TAG,"handleMarketData. Bucket is not empty")
+            val bucket = buckets[0]
+            val pair = Pair(transfer, bucket)
+            val disposable = Observable.just(pair)
+                .subscribeOn(Schedulers.computation())
+                .map { mTransferViewModel.updateBtsValue(it.first!!, it.second) }
+                .subscribe({},{ Log.e(TAG,"Error at updateBtsValue. Msg: ${it.message}")
+                })
+            mCompositeDisposable.add(disposable)
+        }else{
+            Log.i(TAG,"handleMarketData. Bucket IS empty")
+            AsyncTask.execute { mTransferViewModel.updateBtsValue(transfer!!, Transfer.ERROR) }
         }
     }
 
@@ -450,6 +496,6 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (!mDisposable!!.isDisposed) mDisposable!!.dispose()
+        if(!mCompositeDisposable.isDisposed) mCompositeDisposable.dispose()
     }
 }

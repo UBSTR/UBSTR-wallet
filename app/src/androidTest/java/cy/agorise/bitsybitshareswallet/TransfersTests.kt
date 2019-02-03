@@ -23,8 +23,22 @@ class TransfersTests {
 
     @Before
     fun createDb() {
+        Log.d(TAG,"createDb")
         db = Room.inMemoryDatabaseBuilder(context, BitsyDatabase::class.java).build()
+    }
 
+    @After
+    @Throws(IOException::class)
+    fun closeDb(){
+        Log.d(TAG,"closeDB")
+        db.close()
+    }
+
+    /**
+     * Prepares the database to the testGetTransfersMissingEquivalentValues and testGetTransfersMissingEquivalentValues2
+     * tests.
+     */
+    private fun prepareMissingEquivalentValues(){
         // We create 2 transfers for the 'transfers' table, but only one of them will have an equivalent value entry
         val t1 = Transfer("1.11.702181910", 34118155, 1485018549, 264174, "1.3.0", "1.2.32567","1.2.139293",15869682,"1.3.0","")
         val t2 = Transfer("1.11.684483739", 33890367, 1547171166, 11030, "1.3.0", "1.2.139293","1.2.1029856",98,"1.3.120","")
@@ -34,12 +48,6 @@ class TransfersTests {
         // Here's the equivalent value for the first transaction inserted (t1)
         val equivalentValue = EquivalentValue("1.11.702181910", 0, "usd")
         db.equivalentValueDao().insert(equivalentValue)
-    }
-
-    @After
-    @Throws(IOException::class)
-    fun closeDb(){
-        db.close()
     }
 
     /**
@@ -52,6 +60,7 @@ class TransfersTests {
      */
     @Test
     fun testGetTransfersMissingEquivalentValues(){
+        prepareMissingEquivalentValues()
         db.transferDao()
             .getTransfersWithMissingValueIn("usd")
             .test()
@@ -71,11 +80,42 @@ class TransfersTests {
      */
     @Test
     fun testGetTransfersMissingEquivalentValues2(){
+        prepareMissingEquivalentValues()
         val transfers: List<Transfer> = LiveDataTestUtil.getValue(db.transferDao().getTransfersWithMissingValueIn("usd"))
         Assert.assertNotNull(transfers)
         Assert.assertEquals(1, transfers.size)
         Assert.assertEquals("1.11.684483739", transfers[0].id)
         Assert.assertEquals(33890367, transfers[0].blockNumber)
         Log.d(TAG, "transfer ${transfers[0]}");
+    }
+
+    @Test
+    fun testGetTransfersWithMissingBtsValue(){
+        val t1 = Transfer("1.11.702181910",
+            34118155,
+            1485018549,
+            264174,
+            "1.3.0",
+            "1.2.32567",
+            "1.2.139293",
+            15869682,
+            "1.3.0","")
+        val t2 = Transfer("1.11.684483739",
+            33890367,
+            1547171166,
+            11030,
+            "1.3.0",
+            "1.2.139293",
+            "1.2.1029856",
+            98,
+            "1.3.120",
+            "",
+            1000)
+        db.transferDao().insert(t1)
+        db.transferDao().insert(t2)
+        db.transferDao().getTransfersWithMissingBtsValue()
+            .test()
+            .assertHasValue()
+            .assertValue { transfer -> transfer.id == "1.11.702181910" }
     }
 }

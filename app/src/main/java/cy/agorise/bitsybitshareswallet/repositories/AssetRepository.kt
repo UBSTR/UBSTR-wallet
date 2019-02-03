@@ -3,8 +3,8 @@ package cy.agorise.bitsybitshareswallet.repositories
 import android.content.Context
 import android.os.AsyncTask
 import androidx.lifecycle.LiveData
-import cy.agorise.bitsybitshareswallet.database.daos.AssetDao
 import cy.agorise.bitsybitshareswallet.database.BitsyDatabase
+import cy.agorise.bitsybitshareswallet.database.daos.AssetDao
 import cy.agorise.bitsybitshareswallet.database.entities.Asset
 
 class AssetRepository internal constructor(context: Context) {
@@ -22,6 +22,10 @@ class AssetRepository internal constructor(context: Context) {
 
     fun insertAll(assets: List<Asset>) {
         insertAllAsyncTask(mAssetDao).execute(assets)
+    }
+
+    fun getAssetDetails(assetId: String): Asset {
+        return mAssetDao.getAssetDetails(assetId)
     }
 
     private class insertAllAsyncTask internal constructor(private val mAsyncTaskDao: AssetDao) :
