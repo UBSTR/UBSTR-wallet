@@ -150,7 +150,8 @@ class TransferRepository internal constructor(context: Context) {
      * Called whenever the disposables have to be cleared.
      *
      * Since this repository manages a subscription it is necessary to clear the disposable after we're done with it.
-     * The parent ViewModel will let us know when that 
+     * The parent ViewModel will let us know when that subscription is no longer necessary and the resources can
+     * be cleared.
      */
     fun onCleared() {
         if(!compositeDisposable.isDisposed)
