@@ -20,10 +20,7 @@ import com.jakewharton.rxbinding3.appcompat.queryTextChangeEvents
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.TransfersDetailsAdapter
 import cy.agorise.bitsybitshareswallet.database.joins.TransferDetail
-import cy.agorise.bitsybitshareswallet.utils.BounceTouchListener
-import cy.agorise.bitsybitshareswallet.utils.Constants
-import cy.agorise.bitsybitshareswallet.utils.PDFGeneratorTask
-import cy.agorise.bitsybitshareswallet.utils.toast
+import cy.agorise.bitsybitshareswallet.utils.*
 import cy.agorise.bitsybitshareswallet.viewmodels.TransferDetailViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -32,6 +29,7 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
+import kotlin.math.exp
 
 class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSelectedListener {
 
@@ -279,6 +277,9 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
 
         if (exportPDF)
             activity?.let { PDFGeneratorTask(it).execute(filteredTransfersDetails) }
+
+        if (exportCSV)
+            activity?.let { CSVGenerationTask(it).execute(filteredTransfersDetails) }
 
     }
 
