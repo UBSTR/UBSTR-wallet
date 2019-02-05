@@ -130,15 +130,17 @@ class TransfersDetailsAdapter(private val context: Context) :
         val cryptoAmount = "${df.format(amount)} ${transferDetail.getUIAssetSymbol()}"
         viewHolder.tvCryptoAmount.text = cryptoAmount
 
+        // Fiat equivalent
         viewHolder.tvFiatEquivalent.text = "-"
 
+        // Give the correct direction arrow color depending on the direction of the transaction
         viewHolder.ivDirectionArrow.setImageDrawable(context.getDrawable(
             if(transferDetail.direction) R.drawable.ic_arrow_receive else R.drawable.ic_arrow_send
         ))
 
+        // Open the eReceipt when a transaction is tapped
         viewHolder.rootView.setOnClickListener { v ->
-            val action = TransactionsFragmentDirections.EReceiptAction()
-//            action.openCamera = true
+            val action = TransactionsFragmentDirections.eReceiptAction(transferDetail.id)
             v.findNavController().navigate(action)
         }
     }

@@ -69,10 +69,10 @@
         android:label="@string/title_e_receipt"
         tools:layout="@layout/fragment_e_receipt">
 
-        <!--<argument-->
-            <!--android:name="openCamera"-->
-            <!--app:argType="boolean"-->
-            <!--android:defaultValue="false" />-->
+        <argument
+            android:name="transferId"
+            app:argType="string"
+            android:defaultValue="0" />
     </fragment>
 
     <fragment

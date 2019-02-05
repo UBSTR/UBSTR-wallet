@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.google.common.primitives.UnsignedLong
@@ -66,6 +67,9 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         private const val RESPONSE_GET_REQUIRED_FEES = 3
         private const val RESPONSE_BROADCAST_TRANSACTION = 4
     }
+
+    // Navigation AAC Safe Args
+    private val args: SendTransactionFragmentArgs by navArgs()
 
     /** Variables used in field's validation */
     private var isCameraPreviewVisible = false
@@ -130,8 +134,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
             mUserAccount = UserAccount(userId)
 
         // Use Navigation SafeArgs to decide if we should activate or not the camera feed
-        val safeArgs = SendTransactionFragmentArgs.fromBundle(arguments!!)
-        if (safeArgs.openCamera) {
+        if (args.openCamera) {
             // Delay the camera action to avoid flicker in the fragment transition
             Handler().postDelayed({
                 run { verifyCameraPermission() }

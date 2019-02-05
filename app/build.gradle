@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
-apply plugin: "androidx.navigation.safeargs"
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'io.fabric'
 apply plugin: 'com.google.gms.google-services'
 
@@ -64,7 +64,6 @@ android {
 dependencies {
     def lifecycle_version = "2.0.0"
     def room_version = "2.1.0-alpha04"
-    def nav_version = "1.0.0-beta01"
     def rx_bindings_version = "3.0.0-alpha2"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
