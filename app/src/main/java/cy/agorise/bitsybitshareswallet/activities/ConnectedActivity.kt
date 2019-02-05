@@ -23,6 +23,7 @@ import cy.agorise.bitsybitshareswallet.processors.TransfersLoader
 import cy.agorise.bitsybitshareswallet.repositories.AssetRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.BalanceViewModel
+import cy.agorise.bitsybitshareswallet.viewmodels.ConnectedActivityViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.TransferViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import cy.agorise.graphenej.Asset
@@ -67,6 +68,7 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
     private lateinit var mUserAccountViewModel: UserAccountViewModel
     private lateinit var mBalanceViewModel: BalanceViewModel
     private lateinit var mTransferViewModel: TransferViewModel
+    private lateinit var mConnectedActivityViewModel: ConnectedActivityViewModel
 
     private lateinit var mAssetRepository: AssetRepository
 
@@ -114,6 +116,11 @@ abstract class ConnectedActivity : AppCompatActivity(), ServiceConnection {
         getUserAccount()
 
         mAssetRepository = AssetRepository(this)
+
+        // Configure ConnectedActivityViewModel to obtain missing equivalent values
+        mConnectedActivityViewModel = ViewModelProviders.of(this).get(ConnectedActivityViewModel::class.java)
+
+        mConnectedActivityViewModel.observeMissingEquivalentValuesIn("usd") //TODO: Obtain this from shared preferences?
 
         // Configure UserAccountViewModel to obtain the missing account ids
         mUserAccountViewModel = ViewModelProviders.of(this).get(UserAccountViewModel::class.java)

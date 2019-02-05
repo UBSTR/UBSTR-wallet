@@ -3,6 +3,8 @@ package cy.agorise.bitsybitshareswallet.network;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import cy.agorise.bitsybitshareswallet.models.coingecko.MarketData;
+import cy.agorise.bitsybitshareswallet.models.coingecko.MarketDataDeserializer;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -22,15 +24,19 @@ public class ServiceGenerator{
 
     private static HashMap<Class<?>, Object> Services;
 
-    public ServiceGenerator(String apiBaseUrl) {
+    public ServiceGenerator(String apiBaseUrl, Gson gson) {
         API_BASE_URL= apiBaseUrl;
         logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
         httpClient = new OkHttpClient.Builder().addInterceptor(logging);
         builder = new Retrofit.Builder()
                 .baseUrl(API_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create(getGson()))
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create());
         Services = new HashMap<Class<?>, Object>();
+    }
+
+    public ServiceGenerator(String apiBaseUrl){
+        this(apiBaseUrl, new Gson());
     }
 
     /**
@@ -38,7 +44,6 @@ public class ServiceGenerator{
      */
     private Gson getGson(){
         GsonBuilder builder = new GsonBuilder();
-
         return builder.create();
     }
 
@@ -76,6 +81,11 @@ public class ServiceGenerator{
         httpClient.readTimeout(5, TimeUnit.MINUTES);
         httpClient.connectTimeout(5, TimeUnit.MINUTES);
         OkHttpClient client = httpClient.build();
+        if(serviceClass == CoingeckoService.class){
+            // The MarketData class needs a custom de-serializer
+            Gson gson = new GsonBuilder().registerTypeAdapter(MarketData.class, new MarketDataDeserializer()).create();
+            builder.addConverterFactory(GsonConverterFactory.create(gson));
+        }
         Retrofit retrofit = builder.client(client).build();
         return retrofit.create(serviceClass);
     }

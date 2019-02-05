@@ -1,7 +1,6 @@
 package cy.agorise.bitsybitshareswallet.viewmodels
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.google.common.primitives.UnsignedLong
@@ -25,10 +24,6 @@ class TransferViewModel(application: Application) : AndroidViewModel(application
 
     internal fun getTransferBlockNumberWithMissingTime(): LiveData<Long> {
         return mTransferRepository.getTransferBlockNumberWithMissingTime()
-    }
-
-    fun getTransfersWithMissingValueIn(symbol: String) : LiveData<List<Transfer>>{
-        return mTransferRepository.getTransfersWithMissingValueIn(symbol)
     }
 
     fun getTransfersWithMissingBtsValue() : LiveData<Transfer> {

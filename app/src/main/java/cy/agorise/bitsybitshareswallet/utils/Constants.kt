@@ -22,6 +22,9 @@ object Constants {
     /** Faucet URL used to create new accounts */
     const val FAUCET_URL = "https://faucet.palmpay.io"
 
+    /** Coingecko's API URL */
+    const val COINGECKO_URL = "https://api.coingecko.com"
+
     /** The user selected encrypted PIN */
     const val KEY_ENCRYPTED_PIN = "key_encrypted_pin"
 
