@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Point
 import android.os.Bundle
+import android.os.Environment
 import android.preference.PreferenceManager
 import android.view.*
 import androidx.appcompat.widget.SearchView
@@ -21,11 +22,13 @@ import cy.agorise.bitsybitshareswallet.adapters.TransfersDetailsAdapter
 import cy.agorise.bitsybitshareswallet.database.joins.TransferDetail
 import cy.agorise.bitsybitshareswallet.utils.BounceTouchListener
 import cy.agorise.bitsybitshareswallet.utils.Constants
+import cy.agorise.bitsybitshareswallet.utils.PDFGeneratorTask
 import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.bitsybitshareswallet.viewmodels.TransferDetailViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_transactions.*
+import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -265,8 +268,17 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
         }
     }
 
-    /** Created the export procedures for PDF and CSV, depending on the user selection. */
+    /** Creates the export procedures for PDF and CSV, depending on the user selection. */
     private fun exportFilteredTransactions(exportPDF: Boolean, exportCSV: Boolean) {
+        // Verifies the BiTSy folder exists in the external storage and if it doesn't then it tries to create it
+        val dir = File(Environment.getExternalStorageDirectory(), Constants.EXTERNAL_STORAGE_FOLDER)
+        if (!dir.exists()) {
+            if (!dir.mkdirs())
+                return
+        }
+
+        if (exportPDF)
+            activity?.let { PDFGeneratorTask(it).execute(filteredTransfersDetails) }
 
     }
 
