@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * AsyncTask subclass used to move the PDF generation procedure to a background thread
+ * AsyncTask subclass used to move the CSV generation procedure to a background thread
  * and inform the UI of the progress.
  */
 class CSVGenerationTask(context: Context) : AsyncTask<List<TransferDetail>, Int, String>() {
