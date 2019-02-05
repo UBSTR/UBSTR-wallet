@@ -15,6 +15,10 @@ class TransferDetailRepository internal constructor(context: Context) {
         mTransferDetailDao = db!!.transferDetailDao()
     }
 
+    fun get(userId: String, transferId: String): LiveData<TransferDetail> {
+        return mTransferDetailDao.get(userId, transferId)
+    }
+
     fun getAll(userId: String): LiveData<List<TransferDetail>> {
         return mTransferDetailDao.getAll(userId)
     }

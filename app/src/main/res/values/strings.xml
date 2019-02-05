@@ -73,7 +73,10 @@
 
     <!-- eReceipt -->
     <string name="title_e_receipt">eReceipt</string>
-    <string name="template__memo">Memo: %1$d</string>
+    <string name="template__memo">Memo: %1$s</string>
+    <string name="template__date">Date: %1$s</string>
+    <string name="template__tx">Tx: %1$s</string>
+
 
     <!-- Merchants & Tellers -->
     <string name="title_merchants">Merchants</string>

@@ -23,6 +23,7 @@
         android:background="@android:color/white">
 
         <View
+            android:id="@+id/vPaymentDirection"
             android:layout_width="8dp"
             android:layout_height="0dp"
             android:background="@color/colorReceive"
@@ -176,7 +177,7 @@
             app:layout_constraintTop_toBottomOf="@id/tvMemo"/>
 
         <TextView
-            android:id="@+id/tvTransactionID"
+            android:id="@+id/tvTransferID"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
