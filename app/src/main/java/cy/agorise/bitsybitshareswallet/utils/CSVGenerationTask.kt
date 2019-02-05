@@ -43,7 +43,7 @@ class CSVGenerationTask(context: Context) : AsyncTask<List<TransferDetail>, Int,
             // Add the table header
             val row = Array(7) {""}     // Array initialized with empty strings
             val columnNames = arrayOf(R.string.title_from, R.string.title_to, R.string.title_memo, R.string.title_date,
-                R.string.title_time, R.string.title_asset_amount, R.string.title_fiat_equivalent)
+                R.string.title_time, R.string.title_amount, R.string.title_equivalent_value)
             for ((i, columnName) in columnNames.withIndex()) {
                 row[i] = mContext.get()?.getString(columnName) ?: ""
             }

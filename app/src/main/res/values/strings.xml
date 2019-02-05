@@ -68,11 +68,12 @@
     <string name="title_memo">Memo</string>
     <string name="title_date">Date</string>
     <string name="title_time">Time</string>
-    <string name="title_asset_amount">Asset Amount</string>
-    <string name="title_fiat_equivalent">Fiat Equivalent</string>
+    <string name="title_amount">Amount</string>
+    <string name="title_equivalent_value">Equivalent Value</string>
 
     <!-- eReceipt -->
     <string name="title_e_receipt">eReceipt</string>
+    <string name="template__memo">Memo: %1$d</string>
 
     <!-- Merchants & Tellers -->
     <string name="title_merchants">Merchants</string>

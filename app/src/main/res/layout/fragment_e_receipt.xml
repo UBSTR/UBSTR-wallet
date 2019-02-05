@@ -1,13 +1,194 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<!-- I am not proud of this hack but I did not find another way to render the eReceipt in the
+            center of the screen on big screens and also show and scroll nicely in small screens -->
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/title_e_receipt"/>
+        android:layout_centerInParent="true"
+        android:maxWidth="350dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:elevation="8dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@android:color/white">
 
-</LinearLayout>
+        <View
+            android:layout_width="8dp"
+            android:layout_height="0dp"
+            android:background="@color/colorReceive"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:text="@string/title_e_receipt"
+            android:textAppearance="@style/TextAppearance.Bitsy.Headline5"
+            android:textAlignment="center"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/bPrices"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="start"
+            app:constraint_referenced_ids="tvFrom,tvTo,tvAmount,tvEquivalentValue"/>
+
+        <TextView
+            android:id="@+id/tvFrom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            tools:text="kentest-5"
+            android:textColor="@color/darkGray"
+            android:textAlignment="textEnd"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/tvTitle"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/tvFromTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:text="@string/title_from"
+            android:textColor="@color/darkGray"
+            android:textAlignment="textEnd"
+            android:textSize="18sp"
+            app:layout_constraintTop_toTopOf="@+id/tvFrom"
+            app:layout_constraintEnd_toStartOf="@id/bPrices"/>
+
+        <TextView
+            android:id="@+id/tvTo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            tools:text="seventest-3"
+            android:textColor="@color/darkGray"
+            android:textAlignment="textEnd"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/tvFrom"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/tvToTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_to"
+            android:textColor="@color/darkGray"
+            android:textAlignment="textEnd"
+            android:textSize="18sp"
+            app:layout_constraintTop_toTopOf="@+id/tvTo"
+            app:layout_constraintEnd_toEndOf="@id/tvFromTxt"/>
+
+
+        <TextView
+            android:id="@+id/tvAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            tools:text="225.23 BTS"
+            android:textColor="@color/darkGray"
+            android:textAlignment="textEnd"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/tvToTxt"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/tvAmountTxt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/title_amount"
+            android:textColor="@color/darkGray"
+            android:textAlignment="textEnd"
+            android:textSize="18sp"
+            android:maxLines="1"
+            app:layout_constraintTop_toTopOf="@id/tvAmount"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/tvFromTxt"/>
+
+        <TextView
+            android:id="@+id/tvEquivalentValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            tools:text="$23.45"
+            android:textColor="@color/darkGray"
+            android:textAlignment="textEnd"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/tvAmount"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/tvEquivalentValueTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_equivalent_value"
+            android:textColor="@color/darkGray"
+            android:textAlignment="textEnd"
+            android:textSize="18sp"
+            app:layout_constraintTop_toTopOf="@+id/tvEquivalentValue"
+            app:layout_constraintEnd_toEndOf="@id/tvFromTxt"/>
+
+        <TextView
+            android:id="@+id/tvMemo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:visibility="visible"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            tools:text="Memo: Hola Amigo"
+            android:textColor="@color/darkGray"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/tvEquivalentValue"/>
+
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_goneMarginTop="32dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            tools:text="Date: 26 Sep 2016 14:30 UTC+1"
+            android:textColor="@color/darkGray"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@id/tvMemo"/>
+
+        <TextView
+            android:id="@+id/tvTransactionID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="24dp"
+            tools:text="Tx: 1.10.18345786628"
+            android:textColor="@color/darkGray"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@id/tvDate"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</RelativeLayout>
