@@ -9,10 +9,12 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.database.joins.TransferDetail
+import cy.agorise.bitsybitshareswallet.fragments.TransactionsFragmentDirections
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -133,6 +135,12 @@ class TransfersDetailsAdapter(private val context: Context) :
         viewHolder.ivDirectionArrow.setImageDrawable(context.getDrawable(
             if(transferDetail.direction) R.drawable.ic_arrow_receive else R.drawable.ic_arrow_send
         ))
+
+        viewHolder.rootView.setOnClickListener { v ->
+            val action = TransactionsFragmentDirections.EReceiptAction()
+//            action.openCamera = true
+            v.findNavController().navigate(action)
+        }
     }
 
     fun add(transferDetail: TransferDetail) {

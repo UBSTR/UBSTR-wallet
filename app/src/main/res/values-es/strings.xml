@@ -71,6 +71,9 @@
     <string name="title_asset_amount">Cantidad de activo</string>
     <string name="title_fiat_equivalent">Equivalente fiat</string>
 
+    <!-- eReceipt -->
+    <string name="title_e_receipt">Recibo electrónico</string>
+
     <!-- Merchants & Tellers -->
     <string name="title_merchants">Comerciantes</string>
     <string name="title_tellers">Tellers</string>

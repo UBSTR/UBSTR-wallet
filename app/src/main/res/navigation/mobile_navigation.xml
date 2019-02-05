@@ -52,7 +52,28 @@
         android:id="@+id/transactions_dest"
         android:name="cy.agorise.bitsybitshareswallet.fragments.TransactionsFragment"
         android:label="@string/title_transactions"
-        tools:layout="@layout/fragment_transactions"/>
+        tools:layout="@layout/fragment_transactions">
+
+        <action
+            android:id="@+id/e_receipt_action"
+            app:destination="@id/e_receipt_dest"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/e_receipt_dest"
+        android:name="cy.agorise.bitsybitshareswallet.fragments.EReceiptFragment"
+        android:label="@string/title_e_receipt"
+        tools:layout="@layout/fragment_e_receipt">
+
+        <!--<argument-->
+            <!--android:name="openCamera"-->
+            <!--app:argType="boolean"-->
+            <!--android:defaultValue="false" />-->
+    </fragment>
 
     <fragment
         android:id="@+id/settings_dest"

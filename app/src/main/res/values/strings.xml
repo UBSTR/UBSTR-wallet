@@ -71,6 +71,9 @@
     <string name="title_asset_amount">Asset Amount</string>
     <string name="title_fiat_equivalent">Fiat Equivalent</string>
 
+    <!-- eReceipt -->
+    <string name="title_e_receipt">eReceipt</string>
+
     <!-- Merchants & Tellers -->
     <string name="title_merchants">Merchants</string>
     <string name="title_tellers">Tellers</string>
