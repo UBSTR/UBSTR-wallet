@@ -54,9 +54,10 @@ class PDFGeneratorTask(context: Context) : AsyncTask<List<TransferDetail>, Int, 
             val table = PdfPTable(7)
 
             // Add the table header
-            val columnNames = arrayOf("From", "To", "Memo", "Date", "Time", "Asset Amount", "Fiat Equivalent")
+            val columnNames = arrayOf(R.string.title_from, R.string.title_to, R.string.title_memo, R.string.title_date,
+                                    R.string.title_time, R.string.title_asset_amount, R.string.title_fiat_equivalent)
             for (columnName in columnNames) {
-                val cell = PdfPCell(Paragraph(columnName))
+                val cell = PdfPCell(Paragraph(mContext.get()?.getString(columnName)))
                 table.addCell(cell)
             }
             table.completeRow()

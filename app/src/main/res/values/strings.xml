@@ -63,6 +63,13 @@
     <string name="text__pdf">PDF</string>
     <string name="text__csv">CSV</string>
     <string name="msg__storage_permission_necessary_export">Storage permission is necessary to export PDF/CSV files.</string>
+    <string name="title_from">From</string>
+    <string name="title_to">To</string>
+    <string name="title_memo">Memo</string>
+    <string name="title_date">Date</string>
+    <string name="title_time">Time</string>
+    <string name="title_asset_amount">Asset Amount</string>
+    <string name="title_fiat_equivalent">Fiat Equivalent</string>
 
     <!-- Merchants & Tellers -->
     <string name="title_merchants">Merchants</string>
