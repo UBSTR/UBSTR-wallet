@@ -40,6 +40,7 @@
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:text="@string/title_e_receipt"
             android:textAppearance="@style/TextAppearance.Bitsy.Headline5"
+            android:textColor="@color/black"
             android:textAlignment="center"
             app:layout_constraintTop_toTopOf="parent"/>
 
