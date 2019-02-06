@@ -10,9 +10,9 @@ data class TransferDetail(
     val assetAmount: Long,
     val assetPrecision: Int,
     val assetSymbol: String,
-    val assetIssuer: String
-//    val fiatAmount: Long,
-//    val fiatCurrency: String
+    val assetIssuer: String,
+    val fiatAmount: Long?,
+    val fiatSymbol: String?
 ) {
     fun getUIAssetSymbol(): String {
         if (assetIssuer == "1.2.0")
