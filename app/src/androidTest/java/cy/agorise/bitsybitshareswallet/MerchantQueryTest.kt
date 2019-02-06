@@ -1,20 +1,19 @@
 package cy.agorise.bitsybitshareswallet;
 
 import android.content.Context
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.runner.AndroidJUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import cy.agorise.bitsybitshareswallet.database.BitsyDatabase
 import cy.agorise.bitsybitshareswallet.database.entities.Merchant
-import org.junit.After
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-public class MerchantQueryTest {
+class MerchantQueryTest {
+    @get:Rule val testRule = InstantTaskExecutorRule()
     private lateinit var db: BitsyDatabase
 
     @Before
