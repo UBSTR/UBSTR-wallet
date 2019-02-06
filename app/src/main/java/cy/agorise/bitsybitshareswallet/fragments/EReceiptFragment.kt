@@ -24,6 +24,7 @@ import kotlinx.android.synthetic.main.fragment_e_receipt.*
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -79,8 +80,18 @@ class EReceiptFragment : Fragment() {
         val assetAmount = "${df.format(amount)} ${transferDetail.getUIAssetSymbol()}"
         tvAmount.text = assetAmount
 
-        // TODO show the equivalent value
-        tvEquivalentValue.text = "-"
+        // Fiat equivalent
+        if (transferDetail.fiatAmount != null && transferDetail.fiatSymbol != null) {
+            val numberFormat = NumberFormat.getNumberInstance()
+            val currency = Currency.getInstance(transferDetail.fiatSymbol)
+            val fiatEquivalent = transferDetail.fiatAmount.toDouble() /
+                    Math.pow(10.0, currency.defaultFractionDigits.toDouble())
+
+            val equivalentValue = "${numberFormat.format(fiatEquivalent)} ${currency.currencyCode}"
+            tvEquivalentValue.text = equivalentValue
+        } else {
+            tvEquivalentValue.text = "-"
+        }
 
         // Memo
         if (transferDetail.memo != "")

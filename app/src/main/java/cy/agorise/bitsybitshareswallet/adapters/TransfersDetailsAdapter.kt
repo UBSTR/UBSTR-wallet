@@ -1,7 +1,6 @@
 package cy.agorise.bitsybitshareswallet.adapters
 
 import android.content.Context
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,24 +8,22 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.database.joins.TransferDetail
 import cy.agorise.bitsybitshareswallet.fragments.TransactionsFragmentDirections
-import cy.agorise.bitsybitshareswallet.utils.Constants
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
 class TransfersDetailsAdapter(private val context: Context) :
     RecyclerView.Adapter<TransfersDetailsAdapter.ViewHolder>() {
-
-    val userId = PreferenceManager.getDefaultSharedPreferences(context)
-        .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "")!!
 
     private val mComparator =
         Comparator<TransferDetail> { a, b -> b.id.compareTo(a.id) }
@@ -96,7 +93,7 @@ class TransfersDetailsAdapter(private val context: Context) :
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val transferDetail = mSortedList.get(position)
 
-        viewHolder.vPaymentDirection.setBackgroundColor(context.resources.getColor(
+        viewHolder.vPaymentDirection.setBackgroundColor(ContextCompat.getColor(context,
             if(transferDetail.direction) R.color.colorReceive else R.color.colorSend
         ))
 
@@ -126,12 +123,22 @@ class TransfersDetailsAdapter(private val context: Context) :
         df.decimalFormatSymbols = DecimalFormatSymbols(Locale.getDefault())
 
         val amount = transferDetail.assetAmount.toDouble() /
-                Math.pow(10.toDouble(), transferDetail.assetPrecision.toDouble())
+                Math.pow(10.0, transferDetail.assetPrecision.toDouble())
         val cryptoAmount = "${df.format(amount)} ${transferDetail.getUIAssetSymbol()}"
         viewHolder.tvCryptoAmount.text = cryptoAmount
 
         // Fiat equivalent
-        viewHolder.tvFiatEquivalent.text = "-"
+        if (transferDetail.fiatAmount != null && transferDetail.fiatSymbol != null) {
+            val numberFormat = NumberFormat.getNumberInstance()
+            val currency = Currency.getInstance(transferDetail.fiatSymbol)
+            val fiatEquivalent = transferDetail.fiatAmount.toDouble() /
+                    Math.pow(10.0, currency.defaultFractionDigits.toDouble())
+
+            val equivalentValue = "${numberFormat.format(fiatEquivalent)} ${currency.currencyCode}"
+            viewHolder.tvFiatEquivalent.text = equivalentValue
+        } else {
+            viewHolder.tvFiatEquivalent.text = "-"
+        }
 
         // Give the correct direction arrow color depending on the direction of the transaction
         viewHolder.ivDirectionArrow.setImageDrawable(context.getDrawable(
