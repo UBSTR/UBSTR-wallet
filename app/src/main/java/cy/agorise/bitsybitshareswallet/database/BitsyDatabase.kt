@@ -24,7 +24,6 @@ import cy.agorise.bitsybitshareswallet.database.joins.TransferDetailDao
     version = 3,
     exportSchema = true)
 abstract class BitsyDatabase : RoomDatabase() {
-
     abstract fun assetDao(): AssetDao
     abstract fun authorityDao(): AuthorityDao
     abstract fun balanceDao(): BalanceDao
@@ -70,6 +69,7 @@ abstract class BitsyDatabase : RoomDatabase() {
                 database.execSQL("CREATE TABLE IF NOT EXISTS 'equivalent_values' ('transfer_id' TEXT NOT NULL, 'value' INTEGER NOT NULL, 'symbol' TEXT NOT NULL, PRIMARY KEY(transfer_id, symbol), FOREIGN KEY (transfer_id) REFERENCES transfers(id))")
 
                 database.execSQL("ALTER TABLE transfers ADD bts_value INTEGER")
+                database.execSQL("UPDATE transfers SET bts_value = transfer_amount WHERE transfer_asset_id = '1.3.0'")
 
                 database.execSQL("DROP TABLE assets")
                 database.execSQL("CREATE TABLE IF NOT EXISTS assets (`id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `precision` INTEGER NOT NULL, `description` TEXT NOT NULL, `issuer` TEXT NOT NULL, PRIMARY KEY(`id`))")
