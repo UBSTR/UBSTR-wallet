@@ -54,7 +54,7 @@
     <string name="text__sent">Enviadas</string>
     <string name="text__received">Recibidas</string>
     <string name="text__date_range">Rango de fechas</string>
-    <string name="text__fiat_amount">Monto fiat</string>
+    <string name="text__equivalent_value">Valor Equivalente</string>
     <string name="text__ignore_network_fees">Ignorar cuotas de red</string>
     <string name="button__filter">Filtrar</string>
 

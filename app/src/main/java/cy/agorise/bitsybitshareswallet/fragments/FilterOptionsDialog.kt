@@ -38,9 +38,9 @@ class FilterOptionsDialog : DialogFragment() {
         const val KEY_FILTER_END_DATE = "key_filter_end_date"
         const val KEY_FILTER_ASSET_ALL = "key_filter_asset_all"
         const val KEY_FILTER_ASSET = "key_filter_asset"
-        const val KEY_FILTER_FIAT_AMOUNT_ALL = "key_filter_fiat_amount_all"
-        const val KEY_FILTER_FROM_FIAT_AMOUNT = "key_filter_from_fiat_amount"
-        const val KEY_FILTER_TO_FIAT_AMOUNT = "key_filter_to_fiat_amount"
+        const val KEY_FILTER_EQUIVALENT_VALUE_ALL = "key_filter_equivalent_value_all"
+        const val KEY_FILTER_FROM_EQUIVALENT_VALUE = "key_filter_from_equivalent_value"
+        const val KEY_FILTER_TO_EQUIVALENT_VALUE = "key_filter_to_equivalent_value"
         const val KEY_FILTER_AGORISE_FEES = "key_filter_agorise_fees"
 
         const val KEY_TIMESTAMP = "key_timestamp"
@@ -50,8 +50,8 @@ class FilterOptionsDialog : DialogFragment() {
 
         fun newInstance(filterTransactionsDirection: Int, filterDateRangeAll: Boolean,
                         filterStartDate: Long, filterEndDate: Long, filterAssetAll: Boolean,
-                        filterAsset: String, filterFiatAmountAll: Boolean,
-                        filterFromFiatAmount: Long, filterToFiatAmount: Long, filterAgoriseFees: Boolean): FilterOptionsDialog {
+                        filterAsset: String, filterEquivalentValueAll: Boolean, filterFromEquivalentValue: Long,
+                        filterToEquivalentValue: Long, filterAgoriseFees: Boolean): FilterOptionsDialog {
             val frag = FilterOptionsDialog()
             val args = Bundle()
             args.putInt(KEY_FILTER_TRANSACTION_DIRECTION, filterTransactionsDirection)
@@ -60,9 +60,9 @@ class FilterOptionsDialog : DialogFragment() {
             args.putLong(KEY_FILTER_END_DATE, filterEndDate)
             args.putBoolean(KEY_FILTER_ASSET_ALL, filterAssetAll)
             args.putString(KEY_FILTER_ASSET, filterAsset)
-            args.putBoolean(KEY_FILTER_FIAT_AMOUNT_ALL, filterFiatAmountAll)
-            args.putLong(KEY_FILTER_FROM_FIAT_AMOUNT, filterFromFiatAmount)
-            args.putLong(KEY_FILTER_TO_FIAT_AMOUNT, filterToFiatAmount)
+            args.putBoolean(KEY_FILTER_EQUIVALENT_VALUE_ALL, filterEquivalentValueAll)
+            args.putLong(KEY_FILTER_FROM_EQUIVALENT_VALUE, filterFromEquivalentValue)
+            args.putLong(KEY_FILTER_TO_EQUIVALENT_VALUE, filterToEquivalentValue)
             args.putBoolean(KEY_FILTER_AGORISE_FEES, filterAgoriseFees)
             frag.arguments = args
             return frag
@@ -80,10 +80,10 @@ class FilterOptionsDialog : DialogFragment() {
     private lateinit var tvEndDate: TextView
     private lateinit var cbAsset: CheckBox
     private lateinit var sAsset: Spinner
-    private lateinit var cbFiatAmount: CheckBox
-    private lateinit var llFiatAmount: LinearLayout
-//    lateinit var etFromFiatAmount: CurrencyEditText
-//    lateinit var etToFiatAmount: CurrencyEditText
+    private lateinit var cbEquivalentValue: CheckBox
+    private lateinit var llEquivalentValue: LinearLayout
+    lateinit var etFromEquivalentValue: EditText
+    lateinit var etToEquivalentValue: EditText
     private lateinit var switchAgoriseFees: Switch
 
     private var mCallback: OnFilterOptionsSelectedListener? = null
@@ -95,11 +95,6 @@ class FilterOptionsDialog : DialogFragment() {
 
     private var startDate: Long = 0
     private var endDate: Long = 0
-
-//    /**
-//     * Variable used to keep track of the current user's currency
-//     */
-//    private val mUserCurrency = RuntimeData.EXTERNAL_CURRENCY
 
     private var mBalanceDetails = ArrayList<BalanceDetail>()
 
@@ -158,9 +153,9 @@ class FilterOptionsDialog : DialogFragment() {
                                     filterEndDate: Long,
                                     filterAssetAll: Boolean,
                                     filterAsset: String,
-                                    filterFiatAmountAll: Boolean,
-                                    filterFromFiatAmount: Long,
-                                    filterToFiatAmount: Long,
+                                    filterEquivalentValueAll: Boolean,
+                                    filterFromEquivalentValue: Long,
+                                    filterToEquivalentValue: Long,
                                     filterAgoriseFees: Boolean)
     }
 
@@ -240,24 +235,20 @@ class FilterOptionsDialog : DialogFragment() {
             }
         })
 
-        // Initialize Fiat amount
-        cbFiatAmount = view.findViewById(R.id.cbFiatAmount)
-//        llFiatAmount = view.findViewById(R.id.llFiatAmount)
-//        cbFiatAmount.setOnCheckedChangeListener { _, isChecked ->
-//            llFiatAmount.visibility = if(isChecked) View.GONE else View.VISIBLE }
-        cbFiatAmount.isChecked = arguments!!.getBoolean(KEY_FILTER_FIAT_AMOUNT_ALL, true)
+        // Initialize Equivalent Value
+        cbEquivalentValue = view.findViewById(R.id.cbEquivalentValue)
+        llEquivalentValue = view.findViewById(R.id.llEquivalentValue)
+        cbEquivalentValue.setOnCheckedChangeListener { _, isChecked ->
+            llEquivalentValue.visibility = if(isChecked) View.GONE else View.VISIBLE }
+        cbEquivalentValue.isChecked = arguments!!.getBoolean(KEY_FILTER_EQUIVALENT_VALUE_ALL, true)
 
-//        val locale = Resources.getSystem().configuration.locale
-//
-//        etFromFiatAmount = view.findViewById(R.id.etFromFiatAmount)
-//        etFromFiatAmount.locale = locale
-//        val fromFiatAmount = arguments!!.getLong(KEY_FILTER_FROM_FIAT_AMOUNT, 0)
-//        etFromFiatAmount.setText("$fromFiatAmount", TextView.BufferType.EDITABLE)
-//
-//        etToFiatAmount = view.findViewById(R.id.etToFiatAmount)
-//        etToFiatAmount.locale = locale
-//        val toFiatAmount = arguments!!.getLong(KEY_FILTER_TO_FIAT_AMOUNT, 0)
-//        etToFiatAmount.setText("$toFiatAmount", TextView.BufferType.EDITABLE)
+        etFromEquivalentValue = view.findViewById(R.id.etFromEquivalentValue)
+        val fromEquivalentValue = arguments!!.getLong(KEY_FILTER_FROM_EQUIVALENT_VALUE, 0)
+        etFromEquivalentValue.setText("$fromEquivalentValue", TextView.BufferType.EDITABLE)
+
+        etToEquivalentValue = view.findViewById(R.id.etToEquivalentValue)
+        val toEquivalentValue = arguments!!.getLong(KEY_FILTER_TO_EQUIVALENT_VALUE, 0)
+        etToEquivalentValue.setText("$toEquivalentValue", TextView.BufferType.EDITABLE)
 
         // Initialize transaction network fees
         switchAgoriseFees = view.findViewById(R.id.switchAgoriseFees)
@@ -276,7 +267,7 @@ class FilterOptionsDialog : DialogFragment() {
         try {
             mCallback = fragment as OnFilterOptionsSelectedListener
         } catch (e: ClassCastException) {
-            throw ClassCastException(fragment.toString() + " must implement OnFilterOptionsSelectedListener")
+            throw ClassCastException("$fragment must implement OnFilterOptionsSelectedListener")
         }
     }
 
@@ -318,24 +309,21 @@ class FilterOptionsDialog : DialogFragment() {
 
         val filterAsset = (sAsset.selectedItem as BalanceDetail).symbol
 
-        val filterFiatAmountAll = cbFiatAmount.isChecked
+        val filterEquivalentValueAll = cbEquivalentValue.isChecked
 
-        val filterFromFiatAmount = 0L//(etFromFiatAmount.currencyDouble *
-//                Math.pow(10.0, mUserCurrency.defaultFractionDigits.toDouble())).toLong()
+        val filterFromEquivalentValue = etFromEquivalentValue.text.toString().toLong()
 
-        var filterToFiatAmount = 1L//(etToFiatAmount.currencyDouble *
-//                Math.pow(10.0, mUserCurrency.defaultFractionDigits.toDouble())).toLong()
+        var filterToEquivalentValue = etToEquivalentValue.text.toString().toLong()
 
-        // Make sure ToFiatAmount is at least 50 units bigger than FromFiatAmount
-//        if (!filterFiatAmountAll && filterToFiatAmount <= filterFromFiatAmount) {
-//            filterToFiatAmount = filterFromFiatAmount + 50 *
-//                    Math.pow(10.0, mUserCurrency.defaultFractionDigits.toDouble()).toLong()
-//        }
+        // Make sure ToEquivalentValue is at least 50 units bigger than FromEquivalentValue
+        if (!filterEquivalentValueAll && filterToEquivalentValue < filterFromEquivalentValue + 50) {
+            filterToEquivalentValue = filterFromEquivalentValue + 50
+        }
 
         val filterAgoriseFees = switchAgoriseFees.isChecked
 
         mCallback!!.onFilterOptionsSelected(filterTransactionsDirection, filterDateRangeAll,
-            startDate, endDate, filterAssetAll, filterAsset, filterFiatAmountAll,
-            filterFromFiatAmount, filterToFiatAmount, filterAgoriseFees)
+            startDate, endDate, filterAssetAll, filterAsset, filterEquivalentValueAll,
+            filterFromEquivalentValue, filterToEquivalentValue, filterAgoriseFees)
     }
 }

@@ -140,62 +140,71 @@
         android:textColor="?android:textColorSecondary"
         app:layout_constraintTop_toBottomOf="@id/sAsset"/>
 
-    <!-- Fiat Amount -->
+    <!-- Equivalent Value -->
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/text__fiat_amount"
+        android:layout_marginTop="2dp"
+        android:text="@string/text__equivalent_value"
         android:textSize="16sp"
-        app:layout_constraintTop_toTopOf="@id/cbFiatAmount"
+        app:layout_constraintTop_toTopOf="@id/cbEquivalentValue"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <CheckBox
-        android:id="@+id/cbFiatAmount"
+        android:id="@+id/cbEquivalentValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_different_topic"
         android:text="@string/text__all"
-        android:enabled="false"
         app:layout_constraintTop_toBottomOf="@id/switchAgoriseFees"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <LinearLayout
-        android:id="@+id/llFiatAmount"
+        android:id="@+id/llEquivalentValue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
         android:orientation="horizontal"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/cbFiatAmount">
+        app:layout_constraintTop_toBottomOf="@id/cbEquivalentValue">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Between"/>
 
-        <!--<faranjit.currency.edittext.CurrencyEditText-->
-            <!--android:id="@+id/etFromFiatAmount"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:inputType="number"-->
-            <!--android:textAlignment="center"-->
-            <!--app:showSymbol="true"/>-->
+        <EditText
+            android:id="@+id/etFromEquivalentValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="number"
+            android:digits="0123456789"
+            android:singleLine="true"
+            android:imeOptions="actionNext"
+            android:textAlignment="center"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="and"/>
 
-        <!--<faranjit.currency.edittext.CurrencyEditText-->
-            <!--android:id="@+id/etToFiatAmount"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:inputType="number"-->
-            <!--android:textAlignment="center"-->
-            <!--app:showSymbol="true"/>-->
+        <EditText
+            android:id="@+id/etToEquivalentValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="number"
+            android:digits="0123456789"
+            android:singleLine="true"
+            android:imeOptions="actionDone"
+            android:textAlignment="center"/>
+
+        <TextView
+                android:id="@+id/tvEquivalentValueSymbol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="USD"/>
 
     </LinearLayout>
 

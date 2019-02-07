@@ -51,9 +51,9 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
     private var filterEndDate = 0L
     private var filterAssetAll = true
     private var filterAsset = "BTS"
-    private var filterFiatAmountAll = true
-    private var filterFromFiatAmount = 0L
-    private var filterToFiatAmount = 500L
+    private var filterEquivalentValueAll = true
+    private var filterFromEquivalentValue = 0L
+    private var filterToEquivalentValue = 50L
     private var filterAgoriseFees = true
 
     private var mDisposables = CompositeDisposable()
@@ -122,7 +122,7 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
                 val filterOptionsDialog = FilterOptionsDialog.newInstance(
                     filterTransactionsDirection, filterDateRangeAll, filterStartDate * 1000,
                     filterEndDate * 1000, filterAssetAll, filterAsset,
-                    filterFiatAmountAll, filterFromFiatAmount, filterToFiatAmount, filterAgoriseFees
+                    filterEquivalentValueAll, filterFromEquivalentValue, filterToEquivalentValue, filterAgoriseFees
                 )
                 filterOptionsDialog.show(childFragmentManager, "filter-options-tag")
                 true
@@ -175,8 +175,8 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
             if (!filterAssetAll && transferDetail.assetSymbol != filterAsset)
                 continue
 
-//            // Filter by fiat amount
-//            if (!filterFiatAmountAll && (transferDetail.fiatAmount < filterFromFiatAmount || transferDetail.fiatAmount > filterToFiatAmount))
+//            // Filter by equivalent value
+//            if (!filterEquivalentValueAll && (transferDetail.fiatAmount < filterFromEquivalentValue || transferDetail.fiatAmount > filterToEquivalentValue))
 //                continue
 
             // Filter transactions sent to agorise
@@ -207,9 +207,9 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
         filterEndDate: Long,
         filterAssetAll: Boolean,
         filterAsset: String,
-        filterFiatAmountAll: Boolean,
-        filterFromFiatAmount: Long,
-        filterToFiatAmount: Long,
+        filterEquivalentValueAll: Boolean,
+        filterFromEquivalentValue: Long,
+        filterToEquivalentValue: Long,
         filterAgoriseFees: Boolean
     ) {
         this.filterTransactionsDirection = filterTransactionsDirection
@@ -218,9 +218,9 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
         this.filterEndDate = filterEndDate / 1000
         this.filterAssetAll = filterAssetAll
         this.filterAsset = filterAsset
-        this.filterFiatAmountAll = filterFiatAmountAll
-        this.filterFromFiatAmount = filterFromFiatAmount
-        this.filterToFiatAmount = filterToFiatAmount
+        this.filterEquivalentValueAll = filterEquivalentValueAll
+        this.filterFromEquivalentValue = filterFromEquivalentValue
+        this.filterToEquivalentValue = filterToEquivalentValue
         this.filterAgoriseFees = filterAgoriseFees
         applyFilterOptions(true)
     }

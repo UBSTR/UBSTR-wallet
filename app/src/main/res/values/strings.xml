@@ -54,7 +54,7 @@
     <string name="text__sent">Sent</string>
     <string name="text__received">Received</string>
     <string name="text__date_range">Date Range</string>
-    <string name="text__fiat_amount">Fiat Amount</string>
+    <string name="text__equivalent_value">Equivalent Value</string>
     <string name="text__ignore_network_fees">Ignore Network fees</string>
     <string name="button__filter">Filter</string>
 
