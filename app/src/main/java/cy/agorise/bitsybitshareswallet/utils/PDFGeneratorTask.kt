@@ -84,7 +84,14 @@ class PDFGeneratorTask(context: Context) : AsyncTask<List<TransferDetail>, Int, 
                 val assetAmount = transferDetail.assetAmount.toDouble() / Math.pow(10.0, assetPrecision.toDouble())
                 table.addCell(makeCell(String.format("%.${assetPrecision}f %s", assetAmount, transferDetail.assetSymbol)))
 
-                // Fiat Equivalent TODO add once Nelson finishes
+                // Fiat Equivalent
+                if (transferDetail.fiatAmount != null && transferDetail.fiatSymbol != null) {
+                    val currency = Currency.getInstance(transferDetail.fiatSymbol)
+                    val fiatAmount = transferDetail.fiatAmount.toDouble() /
+                            Math.pow(10.0, currency.defaultFractionDigits.toDouble())
+                    table.addCell(makeCell(String.format("%.${currency.defaultFractionDigits}f %s",
+                        fiatAmount, currency.currencyCode)))
+                }
 
                 table.completeRow()
 
