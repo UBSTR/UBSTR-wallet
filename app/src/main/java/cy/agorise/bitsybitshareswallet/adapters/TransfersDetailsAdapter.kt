@@ -26,7 +26,16 @@ class TransfersDetailsAdapter(private val context: Context) :
     RecyclerView.Adapter<TransfersDetailsAdapter.ViewHolder>() {
 
     private val mComparator =
-        Comparator<TransferDetail> { a, b -> b.id.compareTo(a.id) }
+        Comparator<TransferDetail> { a, b ->
+            getTransferNumber(b.id).compareTo(getTransferNumber(a.id))
+        }
+
+    /** A transferId has the format 1.11.x where x is the identifier of the transfer, this identifier is converted
+     * to Long and returned */
+    private fun getTransferNumber(transferId: String): Long {
+        val transferNumber = transferId.split(".").last()
+        return transferNumber.toLong()
+    }
 
     private val mSortedList =
         SortedList<TransferDetail>(TransferDetail::class.java, object : SortedList.Callback<TransferDetail>() {
