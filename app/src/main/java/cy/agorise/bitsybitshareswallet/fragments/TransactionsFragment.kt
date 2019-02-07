@@ -53,7 +53,7 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
     private var filterAsset = "BTS"
     private var filterEquivalentValueAll = true
     private var filterFromEquivalentValue = 0L
-    private var filterToEquivalentValue = 50L
+    private var filterToEquivalentValue = 5000L
     private var filterAgoriseFees = true
 
     private var mDisposables = CompositeDisposable()
@@ -176,8 +176,9 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
                 continue
 
 //            // Filter by equivalent value
-//            if (!filterEquivalentValueAll && (transferDetail.fiatAmount < filterFromEquivalentValue || transferDetail.fiatAmount > filterToEquivalentValue))
-//                continue
+            if (!filterEquivalentValueAll && ((transferDetail.fiatAmount ?: -1 ) < filterFromEquivalentValue
+                        || (transferDetail.fiatAmount ?: -1) > filterToEquivalentValue))
+                continue
 
             // Filter transactions sent to agorise
             if (filterAgoriseFees && transferDetail.to.equals("agorise"))

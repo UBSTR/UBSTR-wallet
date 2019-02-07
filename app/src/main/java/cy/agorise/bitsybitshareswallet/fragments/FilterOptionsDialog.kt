@@ -103,6 +103,8 @@ class FilterOptionsDialog : DialogFragment() {
 
     private var mBalancesDetailsAdapter: BalancesDetailsAdapter? = null
 
+    private lateinit var mCurrency: Currency
+
     /**
      * DatePicker message handler.
      */
@@ -243,16 +245,20 @@ class FilterOptionsDialog : DialogFragment() {
             llEquivalentValue.visibility = if(isChecked) View.GONE else View.VISIBLE }
         cbEquivalentValue.isChecked = arguments!!.getBoolean(KEY_FILTER_EQUIVALENT_VALUE_ALL, true)
 
+        // TODO obtain user selected currency
+        val currencySymbol = "usd"
+        mCurrency = Currency.getInstance(currencySymbol)
+
         etFromEquivalentValue = view.findViewById(R.id.etFromEquivalentValue)
-        val fromEquivalentValue = arguments!!.getLong(KEY_FILTER_FROM_EQUIVALENT_VALUE, 0)
+        val fromEquivalentValue = arguments!!.getLong(KEY_FILTER_FROM_EQUIVALENT_VALUE, 0) /
+                Math.pow(10.0, mCurrency.defaultFractionDigits.toDouble()).toLong()
         etFromEquivalentValue.setText("$fromEquivalentValue", TextView.BufferType.EDITABLE)
 
         etToEquivalentValue = view.findViewById(R.id.etToEquivalentValue)
-        val toEquivalentValue = arguments!!.getLong(KEY_FILTER_TO_EQUIVALENT_VALUE, 0)
+        val toEquivalentValue = arguments!!.getLong(KEY_FILTER_TO_EQUIVALENT_VALUE, 0) /
+                Math.pow(10.0, mCurrency.defaultFractionDigits.toDouble()).toLong()
         etToEquivalentValue.setText("$toEquivalentValue", TextView.BufferType.EDITABLE)
 
-        // TODO obtain user selected currency
-        val currencySymbol = "usd"
         tvEquivalentValueSymbol = view.findViewById(R.id.tvEquivalentValueSymbol)
         tvEquivalentValueSymbol.text = currencySymbol.toUpperCase()
 
@@ -317,9 +323,11 @@ class FilterOptionsDialog : DialogFragment() {
 
         val filterEquivalentValueAll = cbEquivalentValue.isChecked
 
-        val filterFromEquivalentValue = etFromEquivalentValue.text.toString().toLong()
+        val filterFromEquivalentValue = etFromEquivalentValue.text.toString().toLong() *
+                Math.pow(10.0, mCurrency.defaultFractionDigits.toDouble()).toLong()
 
-        var filterToEquivalentValue = etToEquivalentValue.text.toString().toLong()
+        var filterToEquivalentValue = etToEquivalentValue.text.toString().toLong() *
+                Math.pow(10.0, mCurrency.defaultFractionDigits.toDouble()).toLong()
 
         // Make sure ToEquivalentValue is at least 50 units bigger than FromEquivalentValue
         if (!filterEquivalentValueAll && filterToEquivalentValue < filterFromEquivalentValue + 50) {
