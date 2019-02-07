@@ -70,6 +70,7 @@ abstract class BitsyDatabase : RoomDatabase() {
 
                 database.execSQL("ALTER TABLE transfers ADD bts_value INTEGER")
                 database.execSQL("UPDATE transfers SET bts_value = transfer_amount WHERE transfer_asset_id = '1.3.0'")
+                database.execSQL("UPDATE transfers SET bts_value = -1 WHERE transfer_asset_id != '1.3.0'")
 
                 database.execSQL("DROP TABLE assets")
                 database.execSQL("CREATE TABLE IF NOT EXISTS assets (`id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `precision` INTEGER NOT NULL, `description` TEXT NOT NULL, `issuer` TEXT NOT NULL, PRIMARY KEY(`id`))")
