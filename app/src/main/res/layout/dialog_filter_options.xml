@@ -171,7 +171,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Between"/>
+            android:text="@string/text__between"/>
 
         <EditText
             android:id="@+id/etFromEquivalentValue"
@@ -187,7 +187,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="and"/>
+            android:text="@string/text__and"/>
 
         <EditText
             android:id="@+id/etToEquivalentValue"
@@ -204,7 +204,7 @@
                 android:id="@+id/tvEquivalentValueSymbol"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="USD"/>
+                tools:text="USD"/>
 
     </LinearLayout>
 

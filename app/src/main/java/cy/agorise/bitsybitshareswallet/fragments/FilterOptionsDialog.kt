@@ -84,6 +84,7 @@ class FilterOptionsDialog : DialogFragment() {
     private lateinit var llEquivalentValue: LinearLayout
     lateinit var etFromEquivalentValue: EditText
     lateinit var etToEquivalentValue: EditText
+    lateinit var tvEquivalentValueSymbol: TextView
     private lateinit var switchAgoriseFees: Switch
 
     private var mCallback: OnFilterOptionsSelectedListener? = null
@@ -249,6 +250,11 @@ class FilterOptionsDialog : DialogFragment() {
         etToEquivalentValue = view.findViewById(R.id.etToEquivalentValue)
         val toEquivalentValue = arguments!!.getLong(KEY_FILTER_TO_EQUIVALENT_VALUE, 0)
         etToEquivalentValue.setText("$toEquivalentValue", TextView.BufferType.EDITABLE)
+
+        // TODO obtain user selected currency
+        val currencySymbol = "usd"
+        tvEquivalentValueSymbol = view.findViewById(R.id.tvEquivalentValueSymbol)
+        tvEquivalentValueSymbol.text = currencySymbol.toUpperCase()
 
         // Initialize transaction network fees
         switchAgoriseFees = view.findViewById(R.id.switchAgoriseFees)
