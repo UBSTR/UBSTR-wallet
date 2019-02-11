@@ -28,15 +28,12 @@ android {
     }
     buildTypes {
         release {
-            // TODO Fix minify issues and enable again
-            minifyEnabled false
-            shrinkResources false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             // enable crashlytics
             ext.enableCrashlytics = true
         }
         debug {
-            // TODO enabling minify breaks the debugger breakpoints, find a way to fix it and enable minify again
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             resValue("string", "PORT_NUMBER", "8082")
