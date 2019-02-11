@@ -325,10 +325,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
     }
 
     /**
-     * Updates the UI to show amount and account to send the payment
-     *
-     * @param total Total Amount in crypto to be paid
-     * @param account Account to pay total
+     * Updates the UI to show the amount and account to send the payment
      */
     private fun updateAmountAddressUI(assetAmount: Long, assetSymbol: String, assetPrecision: Int, account: String) {
         val txtAmount: String = if (assetAmount == 0L) {

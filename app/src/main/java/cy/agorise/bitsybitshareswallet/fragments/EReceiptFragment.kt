@@ -9,6 +9,7 @@ import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.view.*
 import androidx.core.content.ContextCompat
+import androidx.core.os.ConfigurationCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -48,7 +49,7 @@ class EReceiptFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mLocale = resources.configuration.locale
+        mLocale = ConfigurationCompat.getLocales(resources.configuration)[0]
 
         val userId = PreferenceManager.getDefaultSharedPreferences(context)
             .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "") ?: ""
@@ -63,9 +64,9 @@ class EReceiptFragment : Fragment() {
     }
 
     private fun bindTransferDetail(transferDetail: TransferDetail) {
-        vPaymentDirection.setBackgroundColor(resources.getColor(
+        context?.let { vPaymentDirection.setBackgroundColor(ContextCompat.getColor(it,
             if(transferDetail.direction) R.color.colorReceive else R.color.colorSend
-        ))
+        ))}
 
         tvFrom.text = transferDetail.from ?: ""
         tvTo.text = transferDetail.to ?: ""

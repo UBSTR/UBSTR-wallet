@@ -16,7 +16,6 @@ import cy.agorise.bitsybitshareswallet.viewmodels.BalanceDetailViewModel
 import kotlinx.android.synthetic.main.fragment_balances.*
 
 class BalancesFragment: Fragment() {
-    private val TAG = this.javaClass.simpleName
 
     private lateinit var mBalanceDetailViewModel: BalanceDetailViewModel
 
@@ -49,7 +48,7 @@ class BalancesFragment: Fragment() {
         super.setUserVisibleHint(isVisibleToUser)
         if (isVisibleToUser) {
             // TODO find a better way to recreate the fragment, that does it only when the theme has been changed
-            fragmentManager!!.beginTransaction().detach(this).attach(this).commit()
+            fragmentManager?.beginTransaction()?.detach(this)?.attach(this)?.commit()
         }
     }
 }

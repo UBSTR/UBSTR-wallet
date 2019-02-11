@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.os.ConfigurationCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
@@ -72,7 +73,7 @@ class TransfersDetailsAdapter(private val context: Context) :
     private val timeFormat: SimpleDateFormat
 
     init {
-        val locale = context.resources.configuration.locale
+        val locale = ConfigurationCompat.getLocales(context.resources.configuration)[0]
         dateFormat = SimpleDateFormat("dd MMM", locale)
         timeFormat = SimpleDateFormat("HH:mm:ss z", locale)
     }

@@ -19,8 +19,6 @@ import cy.agorise.bitsybitshareswallet.database.entities.UserAccount
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
-import android.os.Build
-import android.content.res.ColorStateList
 import androidx.appcompat.app.AppCompatActivity
 
 
@@ -112,10 +110,9 @@ class HomeFragment : Fragment() {
 
         var icon = tabLayout.getTabAt(2)?.icon
         if (icon != null) {
-            val colors: ColorStateList = if (Build.VERSION.SDK_INT >= 23) {
-                resources.getColorStateList(R.color.tab_icon_selector, context?.theme)
-            } else {
-                resources.getColorStateList(R.color.tab_icon_selector)
+            val colors = context?.let {context ->
+                ContextCompat.getColorStateList(
+                    context, R.color.tab_icon_selector)
             }
 
             icon = DrawableCompat.wrap(icon)

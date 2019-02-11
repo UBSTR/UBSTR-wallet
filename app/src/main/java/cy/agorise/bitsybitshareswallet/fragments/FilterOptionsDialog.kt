@@ -10,6 +10,7 @@ import android.view.View
 import androidx.fragment.app.DialogFragment
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.ConfigurationCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.Observer
@@ -92,7 +93,7 @@ class FilterOptionsDialog : DialogFragment() {
     private lateinit var mDatePickerHandler: DatePickerHandler
 
     private var dateFormat: SimpleDateFormat = SimpleDateFormat("d/MMM/yyyy",
-        Resources.getSystem().configuration.locale)
+        ConfigurationCompat.getLocales(Resources.getSystem().configuration)[0])
 
     private var startDate: Long = 0
     private var endDate: Long = 0
