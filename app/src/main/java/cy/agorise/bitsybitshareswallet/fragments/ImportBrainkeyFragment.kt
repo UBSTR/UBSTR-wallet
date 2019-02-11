@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit
 class ImportBrainkeyFragment : BaseAccountFragment() {
 
     companion object {
-        private const val TAG = "ImportBrainkeyActivity"
+        private const val TAG = "ImportBrainkeyFragment"
     }
 
     /** User account associated with the key derived from the brainkey that the user just typed in */
