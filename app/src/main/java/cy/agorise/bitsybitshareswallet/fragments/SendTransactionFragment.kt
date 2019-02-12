@@ -372,6 +372,8 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
             tietTo.setText(invoice.to)
 
+            var balanceDetail: BalanceDetail? = null
+
             // Try to select the invoice's Asset in the Assets spinner
             for (i in 0 until (mBalancesDetailsAdapter?.count ?: 0)) {
                 if (mBalancesDetailsAdapter?.getItem(i)?.symbol == invoice.currency.toUpperCase() ||
@@ -379,6 +381,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
                             invoice.currency.replaceFirst("bit", "").toUpperCase() ==
                             mBalancesDetailsAdapter?.getItem(i)?.symbol)) {
                     spAsset.setSelection(i)
+                    balanceDetail = mBalancesDetailsAdapter?.getItem(i)
                     break
                 }
             }
@@ -394,7 +397,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
                 amount += nextItem.quantity * nextItem.price
             }
             // TODO Improve pattern to account for different asset precisions
-            val df = DecimalFormat("####.########")
+            val df = DecimalFormat("####." + "#".repeat(balanceDetail?.precision ?: 5))
             df.roundingMode = RoundingMode.CEILING
             df.decimalFormatSymbols = DecimalFormatSymbols(Locale.getDefault())
             tietAmount.setText(df.format(amount))
