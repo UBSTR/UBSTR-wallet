@@ -98,6 +98,7 @@
     <string name="msg__camera_permission_necessary">El permiso de cámara es necesario para leer códigos QR.</string>
     <string name="text__transaction_sent">¡Transacción enviada!</string>
     <string name="msg__transaction_not_sent">No se pudo enviar la transacción</string>
+    <string name="error__you_dont_own_asset">No tienes nada de %1$s</string>
 
     <!-- Send Transaction info dialog -->
     <string name="msg__to_explanation">Escribe la cuenta BitShares de la persona a la que le deseas enviar fondos.\nPor ejemplo: agorise-faucet</string>

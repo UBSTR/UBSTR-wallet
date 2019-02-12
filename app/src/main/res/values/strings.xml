@@ -99,6 +99,7 @@
     <string name="msg__camera_permission_necessary">Camera permission is necessary to read QR codes.</string>
     <string name="text__transaction_sent">Transaction sent!</string>
     <string name="msg__transaction_not_sent">Unable to send transaction</string>
+    <string name="error__you_dont_own_asset">You don\'t own any %1$s</string>
 
     <!-- Send Transaction info dialog -->
     <string name="msg__to_explanation">Type in the Bitshares account name of the person you want to send funds to.\nFor example: agorise-faucet</string>

@@ -17,9 +17,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
+import com.google.android.material.snackbar.Snackbar
 import com.google.common.primitives.UnsignedLong
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
+import com.jakewharton.rxbinding3.material.dismisses
 import com.jakewharton.rxbinding3.widget.textChanges
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.BalancesDetailsAdapter
@@ -372,6 +374,12 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
             tietTo.setText(invoice.to)
 
+            if (invoice.memo != null) {
+                tietMemo.setText(invoice.memo)
+                if (invoice.memo.startsWith("PP"))
+                    tietMemo.isEnabled = false
+            }
+
             var balanceDetail: BalanceDetail? = null
 
             // Try to select the invoice's Asset in the Assets spinner
@@ -386,18 +394,20 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
                 }
             }
 
-            if (invoice.memo != null) {
-                tietMemo.setText(invoice.memo)
-                if (invoice.memo.startsWith("PP"))
-                    tietMemo.isEnabled = false
+            // If the user does not own any of the requested asset then show a SnackBar to explain the issue and
+            // return early to avoid filling the asset field
+            if (balanceDetail == null) {
+                Snackbar.make(rootView, getString(R.string.error__you_dont_own_asset, invoice.currency.toUpperCase()),
+                    Snackbar.LENGTH_INDEFINITE).setAction(android.R.string.ok) {  }.show()
+                return
             }
 
             var amount = 0.0
             for (nextItem in invoice.lineItems) {
                 amount += nextItem.quantity * nextItem.price
             }
-            // TODO Improve pattern to account for different asset precisions
-            val df = DecimalFormat("####." + "#".repeat(balanceDetail?.precision ?: 5))
+
+            val df = DecimalFormat("####." + "#".repeat(balanceDetail.precision))
             df.roundingMode = RoundingMode.CEILING
             df.decimalFormatSymbols = DecimalFormatSymbols(Locale.getDefault())
             tietAmount.setText(df.format(amount))
