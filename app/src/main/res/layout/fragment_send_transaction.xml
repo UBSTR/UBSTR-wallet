@@ -136,18 +136,32 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tilMemo" />
 
-        <View
-            android:id="@+id/viewCamera"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="@dimen/spacing_same_topic"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:background="@drawable/camera_view_background"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintTop_toBottomOf="@+id/tvScan"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/cameraVerticalGuideline"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/holderCamera"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/spacing_same_topic"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:background="@drawable/camera_view_background"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintTop_toBottomOf="@+id/tvScan"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/cameraVerticalGuideline">
+
+            <me.dm7.barcodescanner.zxing.ZXingScannerView
+                    android:id="@+id/cameraPreview"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:squaredFinder="true"
+                    app:borderColor="@color/colorSend"
+                    app:layout_constraintDimensionRatio="h,3:4"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabOpenCamera"
@@ -161,16 +175,6 @@
             app:layout_constraintStart_toEndOf="@id/cameraVerticalGuideline"
             app:layout_constraintTop_toBottomOf="@+id/tvScan"/>
 
-        <me.dm7.barcodescanner.zxing.ZXingScannerView
-            android:id="@+id/cameraPreview"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintDimensionRatio="w,3:4"
-            app:layout_constraintTop_toTopOf="@+id/viewCamera"
-            app:layout_constraintBottom_toBottomOf="@id/viewCamera"
-            app:layout_constraintStart_toStartOf="@id/viewCamera"
-            app:layout_constraintEnd_toEndOf="@id/viewCamera" />
-
         <View
             android:id="@+id/vSend"
             android:layout_width="120dp"
@@ -178,8 +182,8 @@
             android:layout_marginEnd="0dp"
             android:background="@drawable/send_fab_background_disabled"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/viewCamera"
-            app:layout_constraintBottom_toBottomOf="@id/viewCamera"/>
+            app:layout_constraintTop_toTopOf="@id/holderCamera"
+            app:layout_constraintBottom_toBottomOf="@id/holderCamera"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabSendTransaction"

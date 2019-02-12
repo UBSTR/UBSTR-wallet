@@ -351,6 +351,8 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         cameraPreview.setMaskColor(R.color.colorAccent)
         cameraPreview.setResultHandler(this)
         cameraPreview.startCamera()
+
+        cameraPreview.scrollY = holderCamera.width / 6
     }
 
     private fun stopCameraPreview() {
