@@ -14,12 +14,14 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.customListAdapter
+import com.afollestad.materialdialogs.list.listItems
 import cy.agorise.bitsybitshareswallet.BuildConfig
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.FullNodesAdapter
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
+import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.graphenej.BrainKey
 import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
@@ -96,6 +98,19 @@ class SettingsFragment : Fragment(), ServiceConnection {
                 mHandler.post(mRequestDynamicGlobalPropertiesTask)
             }
         }
+
+        // Obtain the current Security Lock Option selected and display it in the screen
+        val securityLockSelected = PreferenceManager.getDefaultSharedPreferences(context)
+                .getInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0)
+        // Security Lock Options
+        // 0 -> PIN
+        // 1 -> Pattern
+        // 2 -> None
+
+        tvSecurityLockSelected.text = resources.getStringArray(R.array.security_lock_options)[securityLockSelected]
+
+        tvSecurityLock.setOnClickListener { v -> showChooseSecurityLockDialog(v) }
+        tvSecurityLockSelected.setOnClickListener { v -> showChooseSecurityLockDialog(v) }
 
         // Connect to the RxBus, which receives events from the NetworkService
         mDisposables.add(
@@ -192,6 +207,18 @@ class SettingsFragment : Fragment(), ServiceConnection {
 
             // Recreates the activity to apply the selected theme
             activity?.recreate()
+        }
+    }
+
+    /**
+     * Shows a dialog so the user can select its desired Security Lock option.
+     */
+    private fun showChooseSecurityLockDialog(view: View) {
+        MaterialDialog(view.context).show {
+            title(R.string.title__security_dialog)
+            listItems(R.array.security_lock_options) {dialog, index, text ->
+                dialog.context.toast("$text selected!")
+            }
         }
     }
 

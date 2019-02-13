@@ -1,112 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:layout_weight="1"
     tools:context=".fragments.SettingsFragment">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <!-- General -->
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin"
-            android:orientation="vertical">
+            android:text="@string/title__general"
+            android:textAppearance="@style/TextAppearance.Bitsy.Subtitle1"
+            android:textStyle="bold"/>
 
-            <!-- General -->
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchAutoClose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_different_topic"
+            app:switchPadding="12dp"
+            android:text="@string/msg__close_timer"
+            android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+            android:textColor="?android:textColorPrimary"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/title__general"
-                android:textAppearance="@style/TextAppearance.Bitsy.Subtitle1"
-                android:textStyle="bold"/>
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchNightMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_same_topic"
+            android:text="@string/msg__night_mode"
+            android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+            android:textColor="?android:textColorPrimary"/>
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/switchAutoClose"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_different_topic"
-                app:switchPadding="12dp"
-                android:text="@string/msg__close_timer"
-                android:textAppearance="@style/TextAppearance.Bitsy.Body1"
-                android:textColor="?android:textColorPrimary"/>
+        <TextView
+            android:id="@+id/tvNetworkStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_same_topic"
+            android:layout_marginEnd="2dp"
+            android:text="@string/text__view_network_status"
+            android:gravity="center_vertical"
+            android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+            android:drawableEnd="@drawable/ic_disconnected"/>
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/switchNightMode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_same_topic"
-                android:text="@string/msg__night_mode"
-                android:textAppearance="@style/TextAppearance.Bitsy.Body1"
-                android:textColor="?android:textColorPrimary"/>
+        <!-- Security -->
 
-            <TextView
-                android:id="@+id/tvNetworkStatus"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_same_topic"
-                android:layout_marginEnd="2dp"
-                android:text="@string/text__view_network_status"
-                android:gravity="center_vertical"
-                android:textAppearance="@style/TextAppearance.Bitsy.Body1"
-                android:drawableEnd="@drawable/ic_disconnected"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_different_section"
+            android:text="@string/title__security"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+            android:textStyle="bold"/>
 
-            <!-- Backup -->
+        <TextView
+            android:id="@+id/tvSecurityLock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_different_topic"
+            android:text="@string/text__security_lock"
+            android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_different_section"
-                android:text="@string/title__backup"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-                android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvSecurityLockSelected"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            tools:text="PIN"
+            android:textSize="16sp"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_different_topic"
-                android:text="@string/msg__brainkey_description"
-                android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+        <!-- Backup -->
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnViewBrainKey"
-                style="@style/Widget.Bitsy.Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_same_topic"
-                android:text="@string/button__view_and_copy"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_different_section"
+            android:text="@string/title__backup"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+            android:textStyle="bold"/>
 
-            <!-- Bugs or Ideas -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_different_topic"
+            android:text="@string/msg__brainkey_description"
+            android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_different_section"
-                android:text="@string/title__bugs_or_ideas"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-                android:textStyle="bold"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnViewBrainKey"
+            style="@style/Widget.Bitsy.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_same_topic"
+            android:text="@string/button__view_and_copy"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_same_topic"
-                android:autoLink="all"
-                android:lineSpacingExtra="8dp"
-                android:text="@string/msg__bugs_or_ideas"
-                android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+        <!-- Bugs or Ideas -->
 
-        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_different_section"
+            android:text="@string/title__bugs_or_ideas"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+            android:textStyle="bold"/>
 
-    </ScrollView>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_same_topic"
+            android:autoLink="all"
+            android:lineSpacingExtra="8dp"
+            android:text="@string/msg__bugs_or_ideas"
+            android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
 
-</LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

@@ -137,4 +137,12 @@
     <string name="msg__bugs_or_ideas">Telegram: https://t.me/Agorise\nKeybase: https://keybase.io/team/Agorise</string>
     <string name="title__bitshares_nodes_dialog">Bloque: %1$s</string>
 
+    <!-- Security Settings -->
+    <string name="title__security">Seguridad</string>
+    <string name="text__security_lock">Bloqueo de Seguridad</string>
+    <string name="title__security_dialog">Choose Security Lock</string>
+    <string name="text__pin">PIN</string>
+    <string name="text__pattern">Patrón</string>
+    <string name="text__none">Ninguno</string>
+
 </resources>

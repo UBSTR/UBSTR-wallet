@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Options used to populate the Export Options Dialog in the Transactions Screen -->
     <string-array name="export_options">
         <item>@string/text__pdf</item>
         <item>@string/text__csv</item>
+    </string-array>
+
+    <!-- Options used to populate the Security Lock Options Dialog in the Settings Screen -->
+    <string-array name="security_lock_options">
+        <item>@string/text__pin</item>
+        <item>@string/text__pattern</item>
+        <item>@string/text__none</item>
     </string-array>
 </resources>

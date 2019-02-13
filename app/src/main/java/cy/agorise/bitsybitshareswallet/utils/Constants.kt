@@ -101,4 +101,7 @@ object Constants {
 
     /** Name of the external storage folder used to save files like PDF and CSV exports and Backups **/
     const val EXTERNAL_STORAGE_FOLDER = "BiTSy"
+
+    /** Key used to store the user's selected Security Lock option */
+    const val KEY_SECURITY_LOCK_SELECTED = "key_security_lock_selected"
 }
