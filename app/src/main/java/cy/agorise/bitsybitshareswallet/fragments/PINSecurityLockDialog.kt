@@ -33,12 +33,16 @@ class PINSecurityLockDialog : BaseSecurityLockDialog() {
             var handled = false
             if (actionId == EditorInfo.IME_ACTION_GO) {
                 val encryptedPIN = CryptoUtils.encrypt(v.context, v.text.toString()).trim()
-                if (encryptedPIN == currentEncryptedPINPattern) {
-                    // PIN is correct, proceed
-                    dismiss()
-                    mCallback?.onPINPatternEntered(actionIdentifier)
-                } else {
-                    tilPIN.error = "Wrong PIN"
+
+                if (currentStep == STEP_SECURITY_LOCK_VERIFY) {
+                    // The user just wants to verify the current encrypted PIN/Pattern
+                    if (encryptedPIN == currentEncryptedPINPattern) {
+                        // PIN is correct, proceed
+                        dismiss()
+                        mCallback?.onPINPatternEntered(actionIdentifier)
+                    } else {
+                        tilPIN.error = "Wrong PIN"
+                    }
                 }
 
                 handled = true

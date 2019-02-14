@@ -16,15 +16,19 @@ abstract class BaseSecurityLockDialog : DialogFragment() {
 
     companion object {
         /** Used to denote that the user is in the step of creating the preferred security lock option */
-        const val SECURITY_LOG_STEP_CREATE = 1
+        const val STEP_SECURITY_LOCK_CREATE = 1
 
         /** Used to denote that the user is in the step of confirming the newly created security lock option */
-        private const val SECURITY_LOG_STEP_CONFIRM = 2
+        private const val STEP_SECURITY_LOCK_CONFIRM = 2
 
         /** Used to denote that the user is in the step of verifying the current security lock option, to give
          * permission to do a security constrained action like sending a transaction or trying to change the
          * current security lock option */
-        const val SECURITY_LOG_STEP_VERIFY = 3
+        const val STEP_SECURITY_LOCK_VERIFY = 3
+
+        /** Used to let the dialog know if the user wants to create a new PIN/Pattern or just verify its correctness
+         * to get access to security constrained actions */
+        const val KEY_STEP_SECURITY_LOCK = "key_step_security_lock"
 
         /** The calling fragment can be calling this dialog to unlock many different things, this variable helps to
          * keep track of what action the calling fragment wants to achieve */
@@ -40,6 +44,10 @@ abstract class BaseSecurityLockDialog : DialogFragment() {
     /** Callback used to notify the parent that a PIN/Pattern has been entered successfully */
     protected var mCallback: OnPINPatternEnteredListener? = null
 
+    /** Keeps track of the current step, can be create, confirm of verify */
+    protected var currentStep: Int = 1
+
+    /** Used so the calling object knows what was the intention to ask for the Security Lock */
     protected var actionIdentifier: Int = 0
 
     /** Keeps track of all RxJava disposables, to make sure they are all disposed when the fragment is destroyed */
@@ -55,6 +63,8 @@ abstract class BaseSecurityLockDialog : DialogFragment() {
 
         currentEncryptedPINPattern = PreferenceManager.getDefaultSharedPreferences(context)
             .getString(Constants.KEY_ENCRYPTED_PIN, "")?.trim()
+
+        currentStep = arguments?.getInt(KEY_STEP_SECURITY_LOCK) ?: 0
 
         actionIdentifier = arguments?.getInt(KEY_ACTION_IDENTIFIER) ?: 0
     }

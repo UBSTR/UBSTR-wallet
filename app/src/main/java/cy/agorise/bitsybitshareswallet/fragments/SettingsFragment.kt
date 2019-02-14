@@ -43,6 +43,7 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
         private const val TAG = "SettingsFragment"
 
         private const val ACTION_CHANGE_SECURITY_LOCK = 1
+        private const val ACTION_SHOW_BRAINKEY = 2
     }
 
     private var mDisposables = CompositeDisposable()
@@ -73,8 +74,6 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
         initAutoCloseSwitch()
 
         initNightModeSwitch()
-
-        btnViewBrainKey.setOnClickListener { getBrainkey(it) }
 
         tvNetworkStatus.setOnClickListener { v ->
             if (mNetworkService != null) {
@@ -108,6 +107,11 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
         // 0 -> PIN
         // 1 -> Pattern
         // 2 -> None
+
+        btnViewBrainKey.setOnClickListener {
+            if (!verifySecurityLock(securityLockSelected, ACTION_SHOW_BRAINKEY))
+                getBrainkey()
+        }
 
         tvSecurityLockSelected.text = resources.getStringArray(R.array.security_lock_options)[securityLockSelected]
 
@@ -213,26 +217,46 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
     }
 
     private fun onSecurityLockTextSelected(securityLockSelected: Int) {
-        when (securityLockSelected) {
+        if (!verifySecurityLock(securityLockSelected, ACTION_CHANGE_SECURITY_LOCK))
+            showChooseSecurityLockDialog()
+    }
+
+    /**
+     * Encapsulated the logic required to do actions possibly locked by the Security Lock. If PIN/Pattern is selected
+     * then it prompts for it.
+     *
+     * @param securityLockSelected  Current Security Lock option selected
+     * @param actionIdentifier      Identifier used to know why a verify security lock was launched
+     * @return                      true if the action was handled, false otherwise
+     */
+    private fun verifySecurityLock(securityLockSelected: Int, actionIdentifier: Int): Boolean {
+        return when (securityLockSelected) {
             0 /* PIN */ -> {
                 val pinFrag = PINSecurityLockDialog()
                 val args = Bundle()
-                args.putInt(BaseSecurityLockDialog.KEY_ACTION_IDENTIFIER, ACTION_CHANGE_SECURITY_LOCK)
+                args.putInt(BaseSecurityLockDialog.KEY_STEP_SECURITY_LOCK,
+                    BaseSecurityLockDialog.STEP_SECURITY_LOCK_VERIFY)
+                args.putInt(BaseSecurityLockDialog.KEY_ACTION_IDENTIFIER, actionIdentifier)
                 pinFrag.arguments = args
                 pinFrag.show(childFragmentManager, "pin_security_lock_tag")
+                true
             }
             1 /* Pattern */ -> {
 
+                true
             }
             else -> { /* None */
-
+                false
             }
         }
     }
 
     override fun onPINPatternEntered(actionIdentifier: Int) {
-        if (actionIdentifier == ACTION_CHANGE_SECURITY_LOCK)
+        if (actionIdentifier == ACTION_CHANGE_SECURITY_LOCK) {
             showChooseSecurityLockDialog()
+        } else if (actionIdentifier == ACTION_SHOW_BRAINKEY) {
+            getBrainkey()
+        }
     }
 
     override fun onPINPatternChanged() {
@@ -249,9 +273,6 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
                 listItems(R.array.security_lock_options) {dialog, index, text ->
                     dialog.context.toast("$text selected!")
                 }
-                cancelable(false)
-                cancelOnTouchOutside(false)
-                negativeButton(android.R.string.cancel)
             }
         }
     }
@@ -260,37 +281,41 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
      * Obtains the brainKey from the authorities db table for the current user account and if it is not null it passes
      * the brainKey to a method to show it in a nice MaterialDialog
      */
-    private fun getBrainkey(view: View) {
-        val userId = PreferenceManager.getDefaultSharedPreferences(view.context)
-            .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "") ?: ""
+    private fun getBrainkey() {
+        context?.let {
+            val userId = PreferenceManager.getDefaultSharedPreferences(it)
+                .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "") ?: ""
 
-        val authorityRepository = AuthorityRepository(view.context)
+            val authorityRepository = AuthorityRepository(it)
 
-        mDisposables.add(authorityRepository.get(userId)
-            .subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { authority ->
-                if (authority != null) {
-                    val plainBrainKey = CryptoUtils.decrypt(view.context, authority.encryptedBrainKey)
-                    val plainSequenceNumber = CryptoUtils.decrypt(view.context, authority.encryptedSequenceNumber)
-                    val sequenceNumber = Integer.parseInt(plainSequenceNumber)
-                    val brainKey = BrainKey(plainBrainKey, sequenceNumber)
-                    showBrainKeyDialog(view, brainKey)
+            mDisposables.add(authorityRepository.get(userId)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { authority ->
+                    if (authority != null) {
+                        val plainBrainKey = CryptoUtils.decrypt(it, authority.encryptedBrainKey)
+                        val plainSequenceNumber = CryptoUtils.decrypt(it, authority.encryptedSequenceNumber)
+                        val sequenceNumber = Integer.parseInt(plainSequenceNumber)
+                        val brainKey = BrainKey(plainBrainKey, sequenceNumber)
+                        showBrainKeyDialog(brainKey)
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 
     /**
      * Shows the plain brainkey in a dialog so that the user can view and Copy it.
      */
-    private fun showBrainKeyDialog(view: View, brainKey: BrainKey) {
-        MaterialDialog(view.context).show {
-            title(text = "BrainKey")
-            message(text = brainKey.brainKey)
-            customView(R.layout.dialog_copy_brainkey)
-            cancelable(false)
-            positiveButton(R.string.button__copied) { it.dismiss() }
+    private fun showBrainKeyDialog(brainKey: BrainKey) {
+        context?.let { context ->
+            MaterialDialog(context).show {
+                title(text = "BrainKey")
+                message(text = brainKey.brainKey)
+                customView(R.layout.dialog_copy_brainkey)
+                cancelable(false)
+                positiveButton(R.string.button__copied) { it.dismiss() }
+            }
         }
     }
 
