@@ -83,9 +83,9 @@ class FilterOptionsDialog : DialogFragment() {
     private lateinit var sAsset: Spinner
     private lateinit var cbEquivalentValue: CheckBox
     private lateinit var llEquivalentValue: LinearLayout
-    lateinit var etFromEquivalentValue: EditText
-    lateinit var etToEquivalentValue: EditText
-    lateinit var tvEquivalentValueSymbol: TextView
+    private lateinit var etFromEquivalentValue: EditText
+    private lateinit var etToEquivalentValue: EditText
+    private lateinit var tvEquivalentValueSymbol: TextView
     private lateinit var switchAgoriseFees: Switch
 
     private var mCallback: OnFilterOptionsSelectedListener? = null

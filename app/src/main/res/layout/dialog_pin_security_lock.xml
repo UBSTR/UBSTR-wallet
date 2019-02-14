@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingStart="@dimen/activity_horizontal_margin"
+    android:paddingEnd="@dimen/activity_horizontal_margin"
+    android:orientation="vertical"
+    tools:context=".fragments.PINSecurityLockDialog">
+
+    <ImageView
+        android:id="@+id/ivLock"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="@dimen/spacing_same_topic"
+        android:src="@drawable/ic_lock"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_same_topic"
+        android:text="Enter your PIN"
+        android:textAppearance="@style/TextAppearance.Bitsy.Headline5"
+        app:layout_constraintTop_toBottomOf="@id/ivLock" />
+
+    <TextView
+        android:id="@+id/tvSubTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Enter your BiTSy PIN to continue"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_different_section"
+        android:layout_marginEnd="@dimen/spacing_different_section"
+        app:layout_constraintTop_toBottomOf="@id/tvSubTitle"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/tietPIN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            tools:text="123456"
+            android:inputType="numberPassword"
+            android:imeOptions="actionGo"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

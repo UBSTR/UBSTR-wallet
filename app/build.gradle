@@ -107,6 +107,7 @@ dependencies {
     implementation 'com.moldedbits.r2d2:r2d2:1.0.1'
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
     implementation 'com.afollestad.material-dialogs:core:2.0.0-rc9'
+    implementation 'com.andrognito.patternlockview:patternlockview:1.0.0'
     // Android Debug Database
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
 

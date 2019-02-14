@@ -109,8 +109,8 @@ class SettingsFragment : Fragment(), ServiceConnection {
 
         tvSecurityLockSelected.text = resources.getStringArray(R.array.security_lock_options)[securityLockSelected]
 
-        tvSecurityLock.setOnClickListener { v -> showChooseSecurityLockDialog(v) }
-        tvSecurityLockSelected.setOnClickListener { v -> showChooseSecurityLockDialog(v) }
+        tvSecurityLock.setOnClickListener { onSecurityLockTextSelected(securityLockSelected) }
+        tvSecurityLockSelected.setOnClickListener { onSecurityLockTextSelected(securityLockSelected) }
 
         // Connect to the RxBus, which receives events from the NetworkService
         mDisposables.add(
@@ -210,14 +210,34 @@ class SettingsFragment : Fragment(), ServiceConnection {
         }
     }
 
+    private fun onSecurityLockTextSelected(securityLockSelected: Int) {
+        when (securityLockSelected) {
+            0 /* PIN */ -> {
+                val pinFrag = PINSecurityLockDialog()
+                pinFrag.show(childFragmentManager, "pin_security_lock_tag")
+            }
+            1 /* Pattern */ -> {
+
+            }
+            else -> { /* None */
+
+            }
+        }
+    }
+
     /**
      * Shows a dialog so the user can select its desired Security Lock option.
      */
-    private fun showChooseSecurityLockDialog(view: View) {
-        MaterialDialog(view.context).show {
-            title(R.string.title__security_dialog)
-            listItems(R.array.security_lock_options) {dialog, index, text ->
-                dialog.context.toast("$text selected!")
+    private fun showChooseSecurityLockDialog() {
+        context?.let {
+            MaterialDialog(it).show {
+                title(R.string.title__security_dialog)
+                listItems(R.array.security_lock_options) {dialog, index, text ->
+                    dialog.context.toast("$text selected!")
+                }
+                cancelable(false)
+                cancelOnTouchOutside(false)
+                negativeButton(android.R.string.cancel)
             }
         }
     }
