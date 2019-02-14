@@ -21,7 +21,6 @@ import cy.agorise.bitsybitshareswallet.adapters.FullNodesAdapter
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
-import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.graphenej.BrainKey
 import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
@@ -108,15 +107,12 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
         // 1 -> Pattern
         // 2 -> None
 
-        btnViewBrainKey.setOnClickListener {
-            if (!verifySecurityLock(securityLockSelected, ACTION_SHOW_BRAINKEY))
-                getBrainkey()
-        }
-
         tvSecurityLockSelected.text = resources.getStringArray(R.array.security_lock_options)[securityLockSelected]
 
-        tvSecurityLock.setOnClickListener { onSecurityLockTextSelected(securityLockSelected) }
-        tvSecurityLockSelected.setOnClickListener { onSecurityLockTextSelected(securityLockSelected) }
+        tvSecurityLock.setOnClickListener { onSecurityLockTextSelected() }
+        tvSecurityLockSelected.setOnClickListener { onSecurityLockTextSelected() }
+
+        btnViewBrainKey.setOnClickListener { onShowBrainKeyButtonSelected() }
 
         // Connect to the RxBus, which receives events from the NetworkService
         mDisposables.add(
@@ -216,7 +212,14 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
         }
     }
 
-    private fun onSecurityLockTextSelected(securityLockSelected: Int) {
+    private fun onSecurityLockTextSelected() {
+        val securityLockSelected = PreferenceManager.getDefaultSharedPreferences(context)
+            .getInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0)
+        // Security Lock Options
+        // 0 -> PIN
+        // 1 -> Pattern
+        // 2 -> None
+
         if (!verifySecurityLock(securityLockSelected, ACTION_CHANGE_SECURITY_LOCK))
             showChooseSecurityLockDialog()
     }
@@ -231,7 +234,7 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
      */
     private fun verifySecurityLock(securityLockSelected: Int, actionIdentifier: Int): Boolean {
         return when (securityLockSelected) {
-            0 /* PIN */ -> {
+            0 -> { /* PIN */
                 val pinFrag = PINSecurityLockDialog()
                 val args = Bundle()
                 args.putInt(BaseSecurityLockDialog.KEY_STEP_SECURITY_LOCK,
@@ -241,7 +244,7 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
                 pinFrag.show(childFragmentManager, "pin_security_lock_tag")
                 true
             }
-            1 /* Pattern */ -> {
+            1 -> { /* Pattern */
 
                 true
             }
@@ -260,7 +263,15 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
     }
 
     override fun onPINPatternChanged() {
+        // Obtain the new Security Lock Option selected and display it in the screen
+        val securityLockSelected = PreferenceManager.getDefaultSharedPreferences(context)
+            .getInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0)
+        // Security Lock Options
+        // 0 -> PIN
+        // 1 -> Pattern
+        // 2 -> None
 
+        tvSecurityLockSelected.text = resources.getStringArray(R.array.security_lock_options)[securityLockSelected]
     }
 
     /**
@@ -271,10 +282,42 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
             MaterialDialog(it).show {
                 title(R.string.title__security_dialog)
                 listItems(R.array.security_lock_options) {dialog, index, text ->
-                    dialog.context.toast("$text selected!")
+                    when (index) {
+                        0 -> { /* PIN */
+                            val pinFrag = PINSecurityLockDialog()
+                            val args = Bundle()
+                            args.putInt(BaseSecurityLockDialog.KEY_STEP_SECURITY_LOCK,
+                                BaseSecurityLockDialog.STEP_SECURITY_LOCK_CREATE)
+                            args.putInt(BaseSecurityLockDialog.KEY_ACTION_IDENTIFIER, -1)
+                            pinFrag.arguments = args
+                            pinFrag.show(childFragmentManager, "pin_security_lock_tag")
+                        }
+                        1 -> { /* Pattern */
+
+                        }
+                        else -> { /* None */
+                            PreferenceManager.getDefaultSharedPreferences(context).edit()
+                                .putInt(Constants.KEY_SECURITY_LOCK_SELECTED, 2).apply() // 2 -> None
+
+                            // Call this function to update the UI
+                            onPINPatternChanged()
+                        }
+                    }
                 }
             }
         }
+    }
+
+    private fun onShowBrainKeyButtonSelected() {
+        val securityLockSelected = PreferenceManager.getDefaultSharedPreferences(context)
+            .getInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0)
+        // Security Lock Options
+        // 0 -> PIN
+        // 1 -> Pattern
+        // 2 -> None
+
+        if (!verifySecurityLock(securityLockSelected, ACTION_SHOW_BRAINKEY))
+            getBrainkey()
     }
 
     /**

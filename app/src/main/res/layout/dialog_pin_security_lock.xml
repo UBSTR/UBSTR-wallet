@@ -19,14 +19,15 @@
         android:layout_marginTop="@dimen/spacing_same_topic"
         android:src="@drawable/ic_lock"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="@string/title__re_enter_your_pin" />
 
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_same_topic"
-        android:text="Enter your PIN"
+        tools:text="Enter your PIN"
         android:textAppearance="@style/TextAppearance.Bitsy.Headline5"
         app:layout_constraintTop_toBottomOf="@id/ivLock" />
 
@@ -35,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Enter your BiTSy PIN to continue"
+        tools:text="Enter your BiTSy PIN to continue"
         android:textAppearance="@style/TextAppearance.Bitsy.Body1"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"/>
 

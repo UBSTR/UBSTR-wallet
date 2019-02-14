@@ -144,5 +144,12 @@
     <string name="text__pin">PIN</string>
     <string name="text__pattern">Patrón</string>
     <string name="text__none">Ninguno</string>
+    <string name="title__re_enter_your_pin">Reingresa tu PIN</string>
+    <string name="msg__enter_your_pin">Digita tu PIN de BiTSy para continuar</string>
+    <string name="error__wrong_pin">PIN incorrecto</string>
+    <string name="title__set_bitsy_screen_lock">Crea un bloqueo de seguridad para BiTSy</string>
+    <string name="msg__set_bitsy_pin">Por seguridad, crea un PIN para BiTSy</string>
+    <string name="msg__min_pin_length">El PIN debe tener al menos 6 dígitos</string>
+    <string name="title__pins_dont_match">El PIN no concuerda</string>
 
 </resources>
