@@ -37,10 +37,12 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_settings.*
 import java.text.NumberFormat
 
-class SettingsFragment : Fragment(), ServiceConnection {
+class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.OnPINPatternEnteredListener {
 
     companion object {
         private const val TAG = "SettingsFragment"
+
+        private const val ACTION_CHANGE_SECURITY_LOCK = 1
     }
 
     private var mDisposables = CompositeDisposable()
@@ -214,6 +216,9 @@ class SettingsFragment : Fragment(), ServiceConnection {
         when (securityLockSelected) {
             0 /* PIN */ -> {
                 val pinFrag = PINSecurityLockDialog()
+                val args = Bundle()
+                args.putInt(BaseSecurityLockDialog.KEY_ACTION_IDENTIFIER, ACTION_CHANGE_SECURITY_LOCK)
+                pinFrag.arguments = args
                 pinFrag.show(childFragmentManager, "pin_security_lock_tag")
             }
             1 /* Pattern */ -> {
@@ -223,6 +228,15 @@ class SettingsFragment : Fragment(), ServiceConnection {
 
             }
         }
+    }
+
+    override fun onPINPatternEntered(actionIdentifier: Int) {
+        if (actionIdentifier == ACTION_CHANGE_SECURITY_LOCK)
+            showChooseSecurityLockDialog()
+    }
+
+    override fun onPINPatternChanged() {
+
     }
 
     /**

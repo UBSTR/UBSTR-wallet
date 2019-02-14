@@ -32,7 +32,7 @@ abstract class BaseAccountFragment : ConnectedFragment() {
      * @param accountProperties Account properties object
      */
     protected fun onAccountSelected(accountProperties: AccountProperties, pin: String) {
-        val encryptedPIN = CryptoUtils.encrypt(context!!, pin)
+        val encryptedPIN = CryptoUtils.encrypt(context!!, pin).trim()
 
         // Stores the user selected PIN encrypted
         PreferenceManager.getDefaultSharedPreferences(context!!)

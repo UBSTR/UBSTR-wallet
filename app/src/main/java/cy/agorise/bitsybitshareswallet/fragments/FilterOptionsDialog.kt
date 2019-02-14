@@ -149,7 +149,7 @@ class FilterOptionsDialog : DialogFragment() {
         tvEndDate.text = dateFormat.format(date)
     }
 
-    // Container Activity must implement this interface
+    // Container Fragment must implement this interface
     interface OnFilterOptionsSelectedListener {
         fun onFilterOptionsSelected(filterTransactionsDirection: Int,
                                     filterDateRangeAll: Boolean,
