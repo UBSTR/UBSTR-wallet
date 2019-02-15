@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingStart="@dimen/activity_horizontal_margin"
+    android:paddingEnd="@dimen/activity_horizontal_margin"
+    android:orientation="vertical"
+    tools:context=".fragments.PINSecurityLockDialog">
+
+    <ImageView
+        android:id="@+id/ivLock"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="@dimen/spacing_same_topic"
+        android:src="@drawable/ic_lock"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="@string/title__re_enter_your_pin" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_same_topic"
+        tools:text="Enter your pattern"
+        android:textAppearance="@style/TextAppearance.Bitsy.Headline5"
+        app:layout_constraintTop_toBottomOf="@id/ivLock" />
+
+    <TextView
+        android:id="@+id/tvSubTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        tools:text="Enter your BiTSy pattern to continue"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"/>
+
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Draw an unlock pattern"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@id/patternLockView"
+        app:layout_constraintTop_toBottomOf="@id/tvSubTitle"
+        app:layout_constraintVertical_chainStyle="spread"
+        tools:layout_editor_absoluteX="16dp" />
+
+    <com.andrognito.patternlockview.PatternLockView
+        android:id="@+id/patternLockView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="@dimen/spacing_different_topic"
+        app:normalStateColor="?android:textColorSecondary"
+        app:correctStateColor="@color/colorPrimary"
+        app:wrongStateColor="@color/colorSend"
+        app:layout_constraintDimensionRatio="h,1:1"
+        app:layout_constraintTop_toBottomOf="@id/tvMessage"
+        app:layout_constraintBottom_toTopOf="@id/btnClear"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/btnClear"
+        style="@style/Widget.Bitsy.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn__clear"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <Button
+        android:id="@+id/btnNext"
+        style="@style/Widget.Bitsy.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn__next"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

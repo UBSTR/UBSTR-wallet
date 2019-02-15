@@ -152,5 +152,11 @@
     <string name="msg__set_bitsy_pin">For security, set BiTSy PIN</string>
     <string name="msg__min_pin_length">PIN must be at least 6 digits</string>
     <string name="title__pins_dont_match">PINs don\'t match</string>
+    <string name="title__re_enter_your_pattern">Re-enter your pattern</string>
+    <string name="msg__enter_your_pattern">Enter your BiTSy pattern to continue</string>
+    <string name="msg__set_bitsy_pattern">For security, set BiTSy pattern</string>
+    <string name="msg__release_finger">Release finger when done</string>
+    <string name="btn__clear">Clear</string>
+    <string name="btn__next">Next</string>
 
 </resources>

@@ -233,19 +233,23 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
      * @return                      true if the action was handled, false otherwise
      */
     private fun verifySecurityLock(securityLockSelected: Int, actionIdentifier: Int): Boolean {
+        // Args used for both PIN and Pattern options
+        val args = Bundle()
+        args.putInt(BaseSecurityLockDialog.KEY_STEP_SECURITY_LOCK,
+            BaseSecurityLockDialog.STEP_SECURITY_LOCK_VERIFY)
+        args.putInt(BaseSecurityLockDialog.KEY_ACTION_IDENTIFIER, actionIdentifier)
+
         return when (securityLockSelected) {
             0 -> { /* PIN */
                 val pinFrag = PINSecurityLockDialog()
-                val args = Bundle()
-                args.putInt(BaseSecurityLockDialog.KEY_STEP_SECURITY_LOCK,
-                    BaseSecurityLockDialog.STEP_SECURITY_LOCK_VERIFY)
-                args.putInt(BaseSecurityLockDialog.KEY_ACTION_IDENTIFIER, actionIdentifier)
                 pinFrag.arguments = args
                 pinFrag.show(childFragmentManager, "pin_security_lock_tag")
                 true
             }
             1 -> { /* Pattern */
-
+                val patternFrag = PatternSecurityLockDialog()
+                patternFrag.arguments = args
+                patternFrag.show(childFragmentManager, "pattern_security_lock_tag")
                 true
             }
             else -> { /* None */
@@ -281,19 +285,23 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
         context?.let {
             MaterialDialog(it).show {
                 title(R.string.title__security_dialog)
-                listItems(R.array.security_lock_options) {dialog, index, text ->
+                listItems(R.array.security_lock_options) {_, index, _ ->
+                    // Args used for both PIN and Pattern options
+                    val args = Bundle()
+                    args.putInt(BaseSecurityLockDialog.KEY_STEP_SECURITY_LOCK,
+                        BaseSecurityLockDialog.STEP_SECURITY_LOCK_CREATE)
+                    args.putInt(BaseSecurityLockDialog.KEY_ACTION_IDENTIFIER, -1)
+
                     when (index) {
                         0 -> { /* PIN */
                             val pinFrag = PINSecurityLockDialog()
-                            val args = Bundle()
-                            args.putInt(BaseSecurityLockDialog.KEY_STEP_SECURITY_LOCK,
-                                BaseSecurityLockDialog.STEP_SECURITY_LOCK_CREATE)
-                            args.putInt(BaseSecurityLockDialog.KEY_ACTION_IDENTIFIER, -1)
                             pinFrag.arguments = args
                             pinFrag.show(childFragmentManager, "pin_security_lock_tag")
                         }
                         1 -> { /* Pattern */
-
+                            val patternFrag = PatternSecurityLockDialog()
+                            patternFrag.arguments = args
+                            patternFrag.show(childFragmentManager, "pattern_security_lock_tag")
                         }
                         else -> { /* None */
                             PreferenceManager.getDefaultSharedPreferences(context).edit()
