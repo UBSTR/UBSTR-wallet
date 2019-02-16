@@ -42,15 +42,16 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
     private val mPatternLockViewListener = object : PatternLockViewListener {
         override fun onStarted() {
             // Make sure the button is hidden when the user starts a new pattern when it was incorrect
-            btnClear.visibility = View.INVISIBLE
             when (currentStep) {
                 STEP_SECURITY_LOCK_VERIFY -> {
-                    // Do something
+                    tvMessage.text = ""
                 }
                 STEP_SECURITY_LOCK_CREATE -> {
+                    btnClear.visibility = View.INVISIBLE
                     tvMessage.text = getString(R.string.msg__release_finger)
                 }
                 STEP_SECURITY_LOCK_CONFIRM -> {
+                    btnClear.visibility = View.INVISIBLE
                     tvMessage.text = getString(R.string.msg__release_finger)
                 }
             }
@@ -62,7 +63,16 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
 
         override fun onComplete(pattern: List<PatternLockView.Dot>) {
             if (currentStep == STEP_SECURITY_LOCK_VERIFY) {
-                // Do something
+                context?.let {
+                    val encryptedPattern = CryptoUtils.encrypt(it, getStringPattern(pattern)).trim()
+                    if (encryptedPattern == currentEncryptedPINPattern) {
+                        // Pattern is correct, proceed
+                        dismiss()
+                        mCallback?.onPINPatternEntered(actionIdentifier)
+                    } else {
+                        tvMessage.text = getString(R.string.error__wront_pattern)
+                    }
+                }
             } else if (currentStep == STEP_SECURITY_LOCK_CREATE) {
                 btnClear.visibility = View.VISIBLE
                 if (pattern.size < 4) {
@@ -128,7 +138,9 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
             STEP_SECURITY_LOCK_VERIFY -> {
                 tvTitle.text = getString(R.string.title__re_enter_your_pattern)
                 tvSubTitle.text = getString(R.string.msg__enter_your_pattern)
-                btnClear.visibility = View.INVISIBLE
+                btnClear.visibility = View.GONE
+                btnNext.visibility = View.GONE
+                patternLockView.isInStealthMode = true
             }
             STEP_SECURITY_LOCK_CREATE -> {
                 tvTitle.text = getString(R.string.title__set_bitsy_screen_lock)
