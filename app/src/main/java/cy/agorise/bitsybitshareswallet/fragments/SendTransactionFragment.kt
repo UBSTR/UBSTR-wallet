@@ -21,7 +21,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.common.primitives.UnsignedLong
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
-import com.jakewharton.rxbinding3.material.dismisses
 import com.jakewharton.rxbinding3.widget.textChanges
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.BalancesDetailsAdapter
@@ -55,7 +54,8 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.crypto.AEADBadTagException
 
-class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHandler {
+class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHandler,
+    BaseSecurityLockDialog.OnPINPatternEnteredListener {
 
     companion object {
         private const val TAG = "SendTransactionFragment"
@@ -68,6 +68,9 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         private const val RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS = 2
         private const val RESPONSE_GET_REQUIRED_FEES = 3
         private const val RESPONSE_BROADCAST_TRANSACTION = 4
+
+        // Constant used to perform security locked requests
+        private const val ACTION_SEND_TRANSFER = 1
     }
 
     // Navigation AAC Safe Args
@@ -168,7 +171,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
         spAsset.onItemSelectedListener = assetItemSelectedListener
 
-        fabSendTransaction.setOnClickListener { startSendTransferOperation() }
+        fabSendTransaction.setOnClickListener { verifySecurityLockSendTransfer() }
         fabSendTransaction.disable(R.color.lightGray)
 
         authorityRepository = AuthorityRepository(context!!)
@@ -457,6 +460,45 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
             vSend.setBackgroundResource(R.drawable.send_fab_background_disabled)
         }
     }
+
+    private fun verifySecurityLockSendTransfer() {
+        val securityLockSelected = PreferenceManager.getDefaultSharedPreferences(context)
+            .getInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0)
+        // Security Lock Options
+        // 0 -> PIN
+        // 1 -> Pattern
+        // 2 -> None
+
+        // Args used for both PIN and Pattern options
+        val args = Bundle()
+        args.putInt(BaseSecurityLockDialog.KEY_STEP_SECURITY_LOCK,
+            BaseSecurityLockDialog.STEP_SECURITY_LOCK_VERIFY)
+        args.putInt(BaseSecurityLockDialog.KEY_ACTION_IDENTIFIER, ACTION_SEND_TRANSFER)
+
+        when (securityLockSelected) {
+            0 -> { /* PIN */
+                val pinFrag = PINSecurityLockDialog()
+                pinFrag.arguments = args
+                pinFrag.show(childFragmentManager, "pin_security_lock_tag")
+            }
+            1 -> { /* Pattern */
+                val patternFrag = PatternSecurityLockDialog()
+                patternFrag.arguments = args
+                patternFrag.show(childFragmentManager, "pattern_security_lock_tag")
+            }
+            else -> { /* None */
+                startSendTransferOperation()
+            }
+        }
+    }
+
+    override fun onPINPatternEntered(actionIdentifier: Int) {
+        if (actionIdentifier == ACTION_SEND_TRANSFER) {
+            startSendTransferOperation()
+        }
+    }
+
+    override fun onPINPatternChanged() { /* Do nothing */ }
 
     /** Starts the Send Transfer operation procedure, creating a [TransferOperation] and sending a call to the
      * NetworkService to obtain the [DynamicGlobalProperties] object needed to successfully send a Transfer */

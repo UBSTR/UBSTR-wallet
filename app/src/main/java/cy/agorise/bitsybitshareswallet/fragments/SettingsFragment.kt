@@ -41,6 +41,7 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
     companion object {
         private const val TAG = "SettingsFragment"
 
+        // Constants used to perform security locked requests
         private const val ACTION_CHANGE_SECURITY_LOCK = 1
         private const val ACTION_SHOW_BRAINKEY = 2
     }
@@ -213,14 +214,7 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
     }
 
     private fun onSecurityLockTextSelected() {
-        val securityLockSelected = PreferenceManager.getDefaultSharedPreferences(context)
-            .getInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0)
-        // Security Lock Options
-        // 0 -> PIN
-        // 1 -> Pattern
-        // 2 -> None
-
-        if (!verifySecurityLock(securityLockSelected, ACTION_CHANGE_SECURITY_LOCK))
+        if (!verifySecurityLock(ACTION_CHANGE_SECURITY_LOCK))
             showChooseSecurityLockDialog()
     }
 
@@ -228,11 +222,17 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
      * Encapsulated the logic required to do actions possibly locked by the Security Lock. If PIN/Pattern is selected
      * then it prompts for it.
      *
-     * @param securityLockSelected  Current Security Lock option selected
      * @param actionIdentifier      Identifier used to know why a verify security lock was launched
      * @return                      true if the action was handled, false otherwise
      */
-    private fun verifySecurityLock(securityLockSelected: Int, actionIdentifier: Int): Boolean {
+    private fun verifySecurityLock(actionIdentifier: Int): Boolean {
+        val securityLockSelected = PreferenceManager.getDefaultSharedPreferences(context)
+            .getInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0)
+        // Security Lock Options
+        // 0 -> PIN
+        // 1 -> Pattern
+        // 2 -> None
+
         // Args used for both PIN and Pattern options
         val args = Bundle()
         args.putInt(BaseSecurityLockDialog.KEY_STEP_SECURITY_LOCK,
@@ -317,14 +317,7 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
     }
 
     private fun onShowBrainKeyButtonSelected() {
-        val securityLockSelected = PreferenceManager.getDefaultSharedPreferences(context)
-            .getInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0)
-        // Security Lock Options
-        // 0 -> PIN
-        // 1 -> Pattern
-        // 2 -> None
-
-        if (!verifySecurityLock(securityLockSelected, ACTION_SHOW_BRAINKEY))
+        if (!verifySecurityLock(ACTION_SHOW_BRAINKEY))
             getBrainkey()
     }
 
