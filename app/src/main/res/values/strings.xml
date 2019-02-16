@@ -158,5 +158,12 @@
     <string name="msg__release_finger">Release finger when done</string>
     <string name="btn__clear">Clear</string>
     <string name="btn__next">Next</string>
+    <string name="text__draw_an_unlock_pattern">Draw an unlock pattern</string>
+    <string name="msg__draw_pattern_confirm">Draw pattern again to confirm</string>
+    <string name="btn__confirm">Confirm</string>
+    <string name="msg__your_new_unlock_pattern">Your new unlock pattern</string>
+    <string name="error__wront_pattern">Wrong pattern</string>
+    <string name="text__pattern_recorded">Pattern recorded</string>
+    <string name="error__connect_at_least_4_dots">Connect at least 4 dots. Try again.</string>
 
 </resources>

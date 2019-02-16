@@ -157,5 +157,12 @@
     <string name="msg__release_finger">Suelta tu dedo al terminar</string>
     <string name="btn__clear">Limpiar</string>
     <string name="btn__next">Siguiente</string>
+    <string name="text__draw_an_unlock_pattern">Dibuja un patrón de desbloqueo</string>
+    <string name="msg__draw_pattern_confirm">Dibuja tu patrón de nuevo para confirmar</string>
+    <string name="btn__confirm">Confirmar</string>
+    <string name="msg__your_new_unlock_pattern">Tu nuevo patrón de desbloqueo</string>
+    <string name="error__wront_pattern">Patrón incorrecto</string>
+    <string name="text__pattern_recorded">Patrón registrado</string>
+    <string name="error__connect_at_least_4_dots">Conecta al menos 4 puntos. Intenta de nuevo.</string>
 
 </resources>
