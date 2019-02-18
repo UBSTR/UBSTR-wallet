@@ -32,13 +32,14 @@ abstract class BaseAccountFragment : ConnectedFragment() {
      * @param accountProperties Account properties object
      */
     protected fun onAccountSelected(accountProperties: AccountProperties, pin: String) {
-        val encryptedPIN = CryptoUtils.encrypt(context!!, pin).trim()
+        val salt = CryptoUtils.generateSalt()
+        val hashedPIN = CryptoUtils.createSHA256Hash(salt + pin)
 
-        // Stores the user selected PIN encrypted
-        PreferenceManager.getDefaultSharedPreferences(context!!)
-            .edit()
-            .putString(Constants.KEY_HASHED_PIN_PATTERN, encryptedPIN)
-            .apply()
+        // Stores the user selected PIN, hashed
+        PreferenceManager.getDefaultSharedPreferences(context!!).edit()
+            .putString(Constants.KEY_HASHED_PIN_PATTERN, hashedPIN)
+            .putString(Constants.KEY_PIN_PATTERN_SALT, salt)
+            .putInt(Constants.KEY_SECURITY_LOCK_SELECTED, 1).apply() // 1 -> PIN
 
         // Stores the accounts this key refers to
         val id = accountProperties.id
