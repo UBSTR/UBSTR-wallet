@@ -2,10 +2,15 @@ package cy.agorise.bitsybitshareswallet.utils
 
 import android.content.Context
 import android.preference.PreferenceManager
+import android.util.Base64
 
 import com.moldedbits.r2d2.R2d2
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import java.security.SecureRandom
 
 import javax.crypto.AEADBadTagException
+
 
 /**
  * Class that provides encryption/decryption support by using the key management framework provided
@@ -67,6 +72,28 @@ object CryptoUtils {
     fun decrypt(context: Context, ciphertext: String): String {
         val r2d2 = R2d2(context)
         return r2d2.decryptData(ciphertext)
+    }
+
+    /**
+     * Generates a random salt string
+     */
+    fun generateSalt(): String {
+        val salt = ByteArray(16)
+        SecureRandom().nextBytes(salt)
+        return Base64.encodeToString(salt, Base64.DEFAULT).trim()
+    }
+
+    /**
+     * Creates a SHA-256 hash of the given string
+     */
+    @Throws(NoSuchAlgorithmException::class)
+    fun createSHA256Hash(text: String): String {
+        val md = MessageDigest.getInstance("SHA-256")
+
+        md.update(text.toByteArray())
+        val digest = md.digest()
+
+        return Base64.encodeToString(digest, Base64.DEFAULT).trim()
     }
 }
 

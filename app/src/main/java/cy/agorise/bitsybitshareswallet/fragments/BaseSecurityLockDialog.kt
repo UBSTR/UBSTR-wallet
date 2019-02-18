@@ -54,16 +54,22 @@ abstract class BaseSecurityLockDialog : DialogFragment() {
     /** Keeps track of all RxJava disposables, to make sure they are all disposed when the fragment is destroyed */
     protected var mDisposables = CompositeDisposable()
 
-    /** Current encrypted version of the PIN/Pattern */
-    protected var currentEncryptedPINPattern: String? = null
+    /** Current hashed version of the salt + PIN/Pattern */
+    protected var currentHashedPINPattern: String? = null
+
+    /** Salt used to hash the current PIN/Pattern */
+    protected var currentPINPatternSalt: String? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         onAttachToParentFragment(parentFragment)
 
-        currentEncryptedPINPattern = PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(Constants.KEY_ENCRYPTED_PIN, "")?.trim()
+        currentHashedPINPattern = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString(Constants.KEY_HASHED_PIN_PATTERN, "")
+
+        currentPINPatternSalt = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString(Constants.KEY_PIN_PATTERN_SALT, "")
 
         currentStep = arguments?.getInt(KEY_STEP_SECURITY_LOCK) ?: -1
 

@@ -10,6 +10,7 @@ import com.jakewharton.rxbinding3.widget.textChanges
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
+import cy.agorise.bitsybitshareswallet.utils.hideKeyboard
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.dialog_pin_security_lock.*
 
@@ -39,16 +40,20 @@ class PINSecurityLockDialog : BaseSecurityLockDialog() {
             var handled = false
             if (actionId == EditorInfo.IME_ACTION_GO) {
                 if (currentStep == STEP_SECURITY_LOCK_VERIFY) {
-                    // The user just wants to verify the current encrypted PIN/Pattern
-                    val encryptedPIN = CryptoUtils.encrypt(v.context, v.text.toString()).trim()
+                    // The user just wants to verify the current hashed PIN/Pattern
+                    val pin = v.text.toString().trim()
+                    val hashedPIN = CryptoUtils.createSHA256Hash(currentPINPatternSalt + pin)
 
-                    if (encryptedPIN == currentEncryptedPINPattern) {
+                    if (hashedPIN == currentHashedPINPattern) {
                         // PIN is correct, proceed
+                        tietPIN.hideKeyboard()
+                        rootView.requestFocus()
                         dismiss()
                         mCallback?.onPINPatternEntered(actionIdentifier)
                     } else {
                         tilPIN.error = getString(R.string.error__wrong_pin)
                     }
+
                 } else if (currentStep == STEP_SECURITY_LOCK_CREATE) {
                     // The user is trying to create a new PIN
                     if (v.text.toString().trim().length >= Constants.MIN_PIN_LENGTH) {
@@ -62,12 +67,14 @@ class PINSecurityLockDialog : BaseSecurityLockDialog() {
                     if (pinConfirm != newPIN) {
                         tvTitle.text = getString(R.string.title__pins_dont_match)
                     } else {
-                        val encryptedPIN = CryptoUtils.encrypt(v.context, v.text.toString()).trim()
+                        val salt = CryptoUtils.generateSalt()
+                        val hashedPIN = CryptoUtils.createSHA256Hash(salt + pinConfirm)
 
-                        // Stores the newly selected PIN, encrypted
+                        // Stores the newly selected PIN, hashed
                         PreferenceManager.getDefaultSharedPreferences(v.context).edit()
-                            .putString(Constants.KEY_ENCRYPTED_PIN, encryptedPIN)
-                            .putInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0).apply() // 0 -> PIN
+                            .putString(Constants.KEY_HASHED_PIN_PATTERN, hashedPIN)
+                            .putString(Constants.KEY_PIN_PATTERN_SALT, salt)
+                            .putInt(Constants.KEY_SECURITY_LOCK_SELECTED, 1).apply() // 1 -> PIN
 
                         dismiss()
                         mCallback?.onPINPatternChanged()

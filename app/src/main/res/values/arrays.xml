@@ -8,8 +8,8 @@
 
     <!-- Options used to populate the Security Lock Options Dialog in the Settings Screen -->
     <string-array name="security_lock_options">
+        <item>@string/text__none</item>
         <item>@string/text__pin</item>
         <item>@string/text__pattern</item>
-        <item>@string/text__none</item>
     </string-array>
 </resources>

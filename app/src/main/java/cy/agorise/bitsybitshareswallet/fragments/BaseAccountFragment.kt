@@ -37,7 +37,7 @@ abstract class BaseAccountFragment : ConnectedFragment() {
         // Stores the user selected PIN encrypted
         PreferenceManager.getDefaultSharedPreferences(context!!)
             .edit()
-            .putString(Constants.KEY_ENCRYPTED_PIN, encryptedPIN)
+            .putString(Constants.KEY_HASHED_PIN_PATTERN, encryptedPIN)
             .apply()
 
         // Stores the accounts this key refers to

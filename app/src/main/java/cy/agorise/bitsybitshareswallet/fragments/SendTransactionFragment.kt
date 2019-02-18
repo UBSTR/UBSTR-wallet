@@ -465,9 +465,9 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         val securityLockSelected = PreferenceManager.getDefaultSharedPreferences(context)
             .getInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0)
         // Security Lock Options
-        // 0 -> PIN
-        // 1 -> Pattern
-        // 2 -> None
+        // 0 -> None
+        // 1 -> PIN
+        // 2 -> Pattern
 
         // Args used for both PIN and Pattern options
         val args = Bundle()
@@ -476,18 +476,19 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         args.putInt(BaseSecurityLockDialog.KEY_ACTION_IDENTIFIER, ACTION_SEND_TRANSFER)
 
         when (securityLockSelected) {
-            0 -> { /* PIN */
+            0 -> { /* None */
+                startSendTransferOperation()
+
+            }
+            1 -> { /* PIN */
                 val pinFrag = PINSecurityLockDialog()
                 pinFrag.arguments = args
                 pinFrag.show(childFragmentManager, "pin_security_lock_tag")
             }
-            1 -> { /* Pattern */
+            else -> { /* Pattern */
                 val patternFrag = PatternSecurityLockDialog()
                 patternFrag.arguments = args
                 patternFrag.show(childFragmentManager, "pattern_security_lock_tag")
-            }
-            else -> { /* None */
-                startSendTransferOperation()
             }
         }
     }

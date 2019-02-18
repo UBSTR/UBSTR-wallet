@@ -104,9 +104,9 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
         val securityLockSelected = PreferenceManager.getDefaultSharedPreferences(context)
                 .getInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0)
         // Security Lock Options
-        // 0 -> PIN
-        // 1 -> Pattern
-        // 2 -> None
+        // 0 -> None
+        // 1 -> PIN
+        // 2 -> Pattern
 
         tvSecurityLockSelected.text = resources.getStringArray(R.array.security_lock_options)[securityLockSelected]
 
@@ -229,9 +229,9 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
         val securityLockSelected = PreferenceManager.getDefaultSharedPreferences(context)
             .getInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0)
         // Security Lock Options
-        // 0 -> PIN
-        // 1 -> Pattern
-        // 2 -> None
+        // 0 -> None
+        // 1 -> PIN
+        // 2 -> Pattern
 
         // Args used for both PIN and Pattern options
         val args = Bundle()
@@ -240,20 +240,20 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
         args.putInt(BaseSecurityLockDialog.KEY_ACTION_IDENTIFIER, actionIdentifier)
 
         return when (securityLockSelected) {
-            0 -> { /* PIN */
+            0 -> { /* None */
+                false
+            }
+            1 -> { /* PIN */
                 val pinFrag = PINSecurityLockDialog()
                 pinFrag.arguments = args
                 pinFrag.show(childFragmentManager, "pin_security_lock_tag")
                 true
             }
-            1 -> { /* Pattern */
+            else -> { /* Pattern */
                 val patternFrag = PatternSecurityLockDialog()
                 patternFrag.arguments = args
                 patternFrag.show(childFragmentManager, "pattern_security_lock_tag")
                 true
-            }
-            else -> { /* None */
-                false
             }
         }
     }
@@ -271,9 +271,9 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
         val securityLockSelected = PreferenceManager.getDefaultSharedPreferences(context)
             .getInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0)
         // Security Lock Options
-        // 0 -> PIN
-        // 1 -> Pattern
-        // 2 -> None
+        // 0 -> None
+        // 1 -> PIN
+        // 2 -> Pattern
 
         tvSecurityLockSelected.text = resources.getStringArray(R.array.security_lock_options)[securityLockSelected]
     }
@@ -293,22 +293,22 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
                     args.putInt(BaseSecurityLockDialog.KEY_ACTION_IDENTIFIER, -1)
 
                     when (index) {
-                        0 -> { /* PIN */
+                        0 -> { /* None */
+                            PreferenceManager.getDefaultSharedPreferences(context).edit()
+                                .putInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0).apply() // 0 -> None
+
+                            // Call this function to update the UI
+                            onPINPatternChanged()
+                        }
+                        1 -> { /* PIN */
                             val pinFrag = PINSecurityLockDialog()
                             pinFrag.arguments = args
                             pinFrag.show(childFragmentManager, "pin_security_lock_tag")
                         }
-                        1 -> { /* Pattern */
+                        else -> { /* Pattern */
                             val patternFrag = PatternSecurityLockDialog()
                             patternFrag.arguments = args
                             patternFrag.show(childFragmentManager, "pattern_security_lock_tag")
-                        }
-                        else -> { /* None */
-                            PreferenceManager.getDefaultSharedPreferences(context).edit()
-                                .putInt(Constants.KEY_SECURITY_LOCK_SELECTED, 2).apply() // 2 -> None
-
-                            // Call this function to update the UI
-                            onPINPatternChanged()
                         }
                     }
                 }

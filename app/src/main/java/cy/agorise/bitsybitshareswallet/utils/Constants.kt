@@ -16,6 +16,15 @@ object Constants {
     /** The minimum required length for a PIN number */
     const val MIN_PIN_LENGTH = 6
 
+    /** Salt used to securely generate the hash of the PIN/Pattern */
+    const val KEY_PIN_PATTERN_SALT = "key_pin_pattern_salt"
+
+    /** The user selected hashed PIN/Pattern */
+    const val KEY_HASHED_PIN_PATTERN = "key_hashed_pin_pattern"
+
+    /** Key used to store the user's selected Security Lock option */
+    const val KEY_SECURITY_LOCK_SELECTED = "key_security_lock_selected"
+
     /** Name of the account passed to the faucet as the referrer */
     const val FAUCET_REFERRER = "agorise"
 
@@ -24,9 +33,6 @@ object Constants {
 
     /** Coingecko's API URL */
     const val COINGECKO_URL = "https://api.coingecko.com"
-
-    /** The user selected encrypted PIN */
-    const val KEY_ENCRYPTED_PIN = "key_encrypted_pin"
 
     /** The fee to send in every transfer (0.01%) */
     const val FEE_PERCENTAGE = 0.0001
@@ -101,7 +107,4 @@ object Constants {
 
     /** Name of the external storage folder used to save files like PDF and CSV exports and Backups **/
     const val EXTERNAL_STORAGE_FOLDER = "BiTSy"
-
-    /** Key used to store the user's selected Security Lock option */
-    const val KEY_SECURITY_LOCK_SELECTED = "key_security_lock_selected"
 }

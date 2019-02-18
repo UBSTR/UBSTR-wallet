@@ -64,8 +64,9 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
         override fun onComplete(pattern: List<PatternLockView.Dot>) {
             if (currentStep == STEP_SECURITY_LOCK_VERIFY) {
                 context?.let {
-                    val encryptedPattern = CryptoUtils.encrypt(it, getStringPattern(pattern)).trim()
-                    if (encryptedPattern == currentEncryptedPINPattern) {
+                    val hashedPattern = CryptoUtils.createSHA256Hash(currentPINPatternSalt +
+                            getStringPattern(pattern))
+                    if (hashedPattern == currentHashedPINPattern) {
                         // Pattern is correct, proceed
                         dismiss()
                         mCallback?.onPINPatternEntered(actionIdentifier)
@@ -102,12 +103,14 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
                     btnNext.isEnabled = true
                     btnNext.setOnClickListener {
                         context?.let {
-                            val encryptedPattern = CryptoUtils.encrypt(it, patternConfirm).trim()
+                            val salt = CryptoUtils.generateSalt()
+                            val hashedPattern = CryptoUtils.createSHA256Hash(salt + patternConfirm)
 
                             // Stores the newly selected Pattern, encrypted
                             PreferenceManager.getDefaultSharedPreferences(it).edit()
-                                .putString(Constants.KEY_ENCRYPTED_PIN, encryptedPattern)
-                                .putInt(Constants.KEY_SECURITY_LOCK_SELECTED, 1).apply() // 1 -> Pattern
+                                .putString(Constants.KEY_HASHED_PIN_PATTERN, hashedPattern)
+                                .putString(Constants.KEY_PIN_PATTERN_SALT, salt)
+                                .putInt(Constants.KEY_SECURITY_LOCK_SELECTED, 2).apply() // 2 -> Pattern
 
                             dismiss()
                             mCallback?.onPINPatternChanged()
