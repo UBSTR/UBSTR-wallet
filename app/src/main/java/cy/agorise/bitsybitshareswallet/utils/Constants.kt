@@ -30,7 +30,7 @@ object Constants {
 
     /** Minimum time that the security lock options will be disabled when the user has incorrectly tried to enter
      * the current security lock option more than MAX_INCORRECT_SECURITY_LOCK_ATTEMPTS times */
-    const val INCORRECT_SECURITY_LOCK_COOLDOWN = 5L * 60 * 1000 // 5 minutes
+    const val INCORRECT_SECURITY_LOCK_COOLDOWN = 5L * 1000 // 5 minutes
 
     /** Key used to store the consecutive number of times the user has incorrectly tried to enter the
      * current security lock option */
