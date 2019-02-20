@@ -5,6 +5,7 @@ import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import cy.agorise.bitsybitshareswallet.R
 import kotlinx.android.synthetic.main.dialog_pattern_security_lock.*
 import com.andrognito.patternlockview.PatternLockView
@@ -63,16 +64,21 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
 
         override fun onComplete(pattern: List<PatternLockView.Dot>) {
             if (currentStep == STEP_SECURITY_LOCK_VERIFY) {
-                context?.let {
-                    val hashedPattern = CryptoUtils.createSHA256Hash(currentPINPatternSalt +
-                            getStringPattern(pattern))
-                    if (hashedPattern == currentHashedPINPattern) {
-                        // Pattern is correct, proceed
-                        dismiss()
-                        mCallback?.onPINPatternEntered(actionIdentifier)
-                    } else {
+                val hashedPattern = CryptoUtils.createSHA256Hash(currentPINPatternSalt +
+                        getStringPattern(pattern))
+                if (hashedPattern == currentHashedPINPattern) {
+                    // Pattern is correct, proceed
+                    resetIncorrectSecurityLockAttemptsAndTime()
+                    dismiss()
+                    mCallback?.onPINPatternEntered(actionIdentifier)
+                } else {
+                    increaseIncorrectSecurityLockAttemptsAndTime()
+                    if (incorrectSecurityLockAttempts < Constants.MAX_INCORRECT_SECURITY_LOCK_ATTEMPTS) {
+                        // Show the error only when the user has not reached the max attempts limit, because if that
+                        // is the case another error is gonna be shown in the setupScreen() method
                         tvMessage.text = getString(R.string.error__wront_pattern)
                     }
+                    setupScreen()
                 }
             } else if (currentStep == STEP_SECURITY_LOCK_CREATE) {
                 btnClear.visibility = View.VISIBLE
@@ -143,6 +149,21 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
                 tvSubTitle.text = getString(R.string.msg__enter_your_pattern)
                 btnClear.visibility = View.GONE
                 btnNext.visibility = View.GONE
+                tvMessage.text = ""
+                if (incorrectSecurityLockAttempts >= Constants.MAX_INCORRECT_SECURITY_LOCK_ATTEMPTS) {
+                    // User has entered the Pattern incorrectly too many times
+                    val now = System.currentTimeMillis()
+                    if (now <= incorrectSecurityLockTime + Constants.INCORRECT_SECURITY_LOCK_COOLDOWN) {
+                        patternLockView.isInputEnabled = false
+                        startContDownTimer()
+                        return
+                    } else {
+                        resetIncorrectSecurityLockAttemptsAndTime()
+                    }
+                }
+                // This is not in an else statement because we also want to enable the EditText and remove the error
+                // when the cooldown time has been reached
+                patternLockView.isInputEnabled = true
                 patternLockView.isInStealthMode = true
             }
             STEP_SECURITY_LOCK_CREATE -> {
@@ -169,7 +190,7 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
     }
 
     override fun onTimerSecondPassed(errorMessage: String) {
-        tvMessage.error = errorMessage
+        tvMessage.text = errorMessage
     }
 
     override fun onTimerFinished() {
