@@ -165,5 +165,7 @@
     <string name="error__wront_pattern">Wrong pattern</string>
     <string name="text__pattern_recorded">Pattern recorded</string>
     <string name="error__connect_at_least_4_dots">Connect at least 4 dots. Try again.</string>
+    <string name="error__security_lock_too_many_attempts_minutes">Too many incorrect attempts. Try again in %1$d minutes.</string>
+    <string name="error__security_lock_too_many_attempts_seconds">Too many incorrect attempts. Try again in %1$d seconds.</string>
 
 </resources>

@@ -46,12 +46,19 @@ class PINSecurityLockDialog : BaseSecurityLockDialog() {
 
                     if (hashedPIN == currentHashedPINPattern) {
                         // PIN is correct, proceed
+                        resetIncorrectSecurityLockAttemptsAndTime()
                         tietPIN.hideKeyboard()
                         rootView.requestFocus()
                         dismiss()
                         mCallback?.onPINPatternEntered(actionIdentifier)
                     } else {
-                        tilPIN.error = getString(R.string.error__wrong_pin)
+                        increaseIncorrectSecurityLockAttemptsAndTime()
+                        if (incorrectSecurityLockAttempts < Constants.MAX_INCORRECT_SECURITY_LOCK_ATTEMPTS) {
+                            // Show the error only when the user has not reached the max attempts limit, because if that
+                            // is the case another error is gonna be shown in the setupScreen() method
+                            tilPIN.error = getString(R.string.error__wrong_pin)
+                        }
+                        setupScreen()
                     }
 
                 } else if (currentStep == STEP_SECURITY_LOCK_CREATE) {
@@ -88,9 +95,11 @@ class PINSecurityLockDialog : BaseSecurityLockDialog() {
 
         mDisposables.add(
             tietPIN.textChanges()
+                .skipInitialValue()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    if (currentStep == STEP_SECURITY_LOCK_VERIFY) {
+                    if (currentStep == STEP_SECURITY_LOCK_VERIFY &&
+                        incorrectSecurityLockAttempts < Constants.MAX_INCORRECT_SECURITY_LOCK_ATTEMPTS) {
                         // Make sure the error is removed when the user types again
                         tilPIN.isErrorEnabled = false
                     } else if (currentStep == STEP_SECURITY_LOCK_CREATE) {
@@ -110,6 +119,21 @@ class PINSecurityLockDialog : BaseSecurityLockDialog() {
             STEP_SECURITY_LOCK_VERIFY -> {
                 tvTitle.text = getString(R.string.title__re_enter_your_pin)
                 tvSubTitle.text = getString(R.string.msg__enter_your_pin)
+                if (incorrectSecurityLockAttempts >= Constants.MAX_INCORRECT_SECURITY_LOCK_ATTEMPTS) {
+                    // User has entered the PIN incorrectly too many times
+                    val now = System.currentTimeMillis()
+                    if (now <= incorrectSecurityLockTime + Constants.INCORRECT_SECURITY_LOCK_COOLDOWN) {
+                        tietPIN.setText("")
+                        tietPIN.isEnabled = false
+                        startContDownTimer()
+                        return
+                    } else {
+                        resetIncorrectSecurityLockAttemptsAndTime()
+                    }
+                }
+                // This is not in an else statement because we also want to enable the EditText and remove the error
+                // when the cooldown time has been reached
+                tietPIN.isEnabled = true
                 tilPIN.helperText = ""
                 tilPIN.isErrorEnabled = false
             }
@@ -128,5 +152,13 @@ class PINSecurityLockDialog : BaseSecurityLockDialog() {
                 tilPIN.isErrorEnabled = false
             }
         }
+    }
+
+    override fun onTimerSecondPassed(errorMessage: String) {
+        tilPIN.error = errorMessage
+    }
+
+    override fun onTimerFinished() {
+        setupScreen()
     }
 }

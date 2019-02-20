@@ -1,13 +1,16 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.preference.PreferenceManager
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import io.reactivex.disposables.CompositeDisposable
+import kotlin.math.roundToInt
 
 /**
  * Encapsulates the shared logic required for the PIN and Pattern Security Lock Fragments.
@@ -60,6 +63,16 @@ abstract class BaseSecurityLockDialog : DialogFragment() {
     /** Salt used to hash the current PIN/Pattern */
     protected var currentPINPatternSalt: String? = null
 
+    /** Current count of incorrect attempts to verify the current security lock */
+    protected var incorrectSecurityLockAttempts = 0
+
+    /** Time of the last lock/disable due to too many incorrect attempts to verify the security lock */
+    protected var incorrectSecurityLockTime = 0L
+
+    /** Timer used to update the error message when the user has tried too many incorrect attempts tu enter the
+     * current security lock option */
+    private var mCountDownTimer: CountDownTimer? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -70,6 +83,12 @@ abstract class BaseSecurityLockDialog : DialogFragment() {
 
         currentPINPatternSalt = PreferenceManager.getDefaultSharedPreferences(context)
             .getString(Constants.KEY_PIN_PATTERN_SALT, "")
+
+        incorrectSecurityLockAttempts = PreferenceManager.getDefaultSharedPreferences(context)
+            .getInt(Constants.KEY_INCORRECT_SECURITY_LOCK_ATTEMPTS, 0)
+
+        incorrectSecurityLockTime = PreferenceManager.getDefaultSharedPreferences(context)
+            .getLong(Constants.KEY_INCORRECT_SECURITY_LOCK_TIME, 0L)
 
         currentStep = arguments?.getInt(KEY_STEP_SECURITY_LOCK) ?: -1
 
@@ -88,6 +107,68 @@ abstract class BaseSecurityLockDialog : DialogFragment() {
         }
     }
 
+    /**
+     * Increases the incorrectSecurityLockAttempts counter by one and saves that value into the shared preferences
+     * to account for cases when the user could try to trick the app by just closing and reopening the dialog. Also,
+     * stores the current time, so that when the number of attempts is bigger than the maximum allowed, the security
+     * lock gets locked for a certain amount of time.
+     */
+    protected fun increaseIncorrectSecurityLockAttemptsAndTime() {
+        val now = System.currentTimeMillis()
+
+        incorrectSecurityLockTime = now
+
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+            .putInt(Constants.KEY_INCORRECT_SECURITY_LOCK_ATTEMPTS, ++incorrectSecurityLockAttempts)
+            .putLong(Constants.KEY_INCORRECT_SECURITY_LOCK_TIME, now)
+            .apply()
+    }
+
+    /**
+     * Resets the values of the incorrectSecurityLockAttempts and Time, both in the local variable as well as the one
+     * stored in the shared preferences.
+     */
+    protected fun resetIncorrectSecurityLockAttemptsAndTime() {
+        incorrectSecurityLockTime = 0
+        incorrectSecurityLockAttempts = 0
+
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+            .putInt(Constants.KEY_INCORRECT_SECURITY_LOCK_ATTEMPTS, incorrectSecurityLockAttempts)
+            .putLong(Constants.KEY_INCORRECT_SECURITY_LOCK_TIME, incorrectSecurityLockTime)
+            .apply()
+    }
+
+    protected fun startContDownTimer() {
+        var millis = incorrectSecurityLockTime + Constants.INCORRECT_SECURITY_LOCK_COOLDOWN - System.currentTimeMillis()
+        millis = millis / 1000 * 1000 + 1000    // Make sure millis account for a whole second multiple
+
+        mCountDownTimer = object : CountDownTimer(millis, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsUntilFinished = millisUntilFinished / 1000
+                if (secondsUntilFinished < 60) {
+                    // Less than a minute remains
+                    val errorMessage = getString(R.string.error__security_lock_too_many_attempts_seconds,
+                        secondsUntilFinished.toInt())
+                    onTimerSecondPassed(errorMessage)
+                } else {
+                    // At least a minute remains
+                    val minutesUntilFinished = (secondsUntilFinished / 60.0).roundToInt()
+                    val errorMessage = getString(R.string.error__security_lock_too_many_attempts_minutes,
+                        minutesUntilFinished)
+                    onTimerSecondPassed(errorMessage)
+                }
+            }
+
+            override fun onFinish() {
+                onTimerFinished()
+            }
+        }.start()
+    }
+
+    abstract fun onTimerSecondPassed(errorMessage: String)
+
+    abstract fun onTimerFinished()
+
     override fun onResume() {
         super.onResume()
 
@@ -100,5 +181,8 @@ abstract class BaseSecurityLockDialog : DialogFragment() {
         super.onDestroy()
 
         if (!mDisposables.isDisposed) mDisposables.dispose()
+
+        mCountDownTimer?.cancel()
+        mCountDownTimer = null
     }
 }

@@ -25,6 +25,20 @@ object Constants {
     /** Key used to store the user's selected Security Lock option */
     const val KEY_SECURITY_LOCK_SELECTED = "key_security_lock_selected"
 
+    /** Maximum allowed number of incorrect attempts to input the current security lock */
+    const val MAX_INCORRECT_SECURITY_LOCK_ATTEMPTS = 1 // TODO 5
+
+    /** Minimum time that the security lock options will be disabled when the user has incorrectly tried to enter
+     * the current security lock option more than MAX_INCORRECT_SECURITY_LOCK_ATTEMPTS times */
+    const val INCORRECT_SECURITY_LOCK_COOLDOWN = 2 * 60L * 1000 // 5 seconds  TODO 5L * 60 * 1000 // 5 minutes
+
+    /** Key used to store the consecutive number of times the user has incorrectly tried to enter the
+     * current security lock option */
+    const val KEY_INCORRECT_SECURITY_LOCK_ATTEMPTS = "key_incorrect_security_lock_attempts"
+
+    /** Key used to store the time in millis when the security lock options got locked due to many incorrect attempts */
+    const val KEY_INCORRECT_SECURITY_LOCK_TIME = "key_incorrect_security_lock_time"
+
     /** Name of the account passed to the faucet as the referrer */
     const val FAUCET_REFERRER = "agorise"
 

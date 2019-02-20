@@ -167,4 +167,12 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
             }
         }
     }
+
+    override fun onTimerSecondPassed(errorMessage: String) {
+        tvMessage.error = errorMessage
+    }
+
+    override fun onTimerFinished() {
+        setupScreen()
+    }
 }
