@@ -9,6 +9,7 @@ import android.os.IBinder
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.crashlytics.android.Crashlytics
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
@@ -43,7 +44,10 @@ abstract class ConnectedFragment : Fragment(), ServiceConnection {
             RxBus.getBusInstance()
                 .asFlowable()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { handleIncomingMessage(it) }
+                .subscribe(
+                        { handleIncomingMessage(it) } ,
+                        {t -> Crashlytics.log(Log.DEBUG, TAG, t.message) }
+                )
         )
     }
 
