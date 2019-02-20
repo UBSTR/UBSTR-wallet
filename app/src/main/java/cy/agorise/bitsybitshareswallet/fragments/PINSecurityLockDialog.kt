@@ -119,6 +119,7 @@ class PINSecurityLockDialog : BaseSecurityLockDialog() {
             STEP_SECURITY_LOCK_VERIFY -> {
                 tvTitle.text = getString(R.string.title__re_enter_your_pin)
                 tvSubTitle.text = getString(R.string.msg__enter_your_pin)
+                tietPIN.isEnabled = true
                 if (incorrectSecurityLockAttempts >= Constants.MAX_INCORRECT_SECURITY_LOCK_ATTEMPTS) {
                     // User has entered the PIN incorrectly too many times
                     val now = System.currentTimeMillis()
@@ -126,16 +127,10 @@ class PINSecurityLockDialog : BaseSecurityLockDialog() {
                         tietPIN.setText("")
                         tietPIN.isEnabled = false
                         startContDownTimer()
-                        return
                     } else {
                         resetIncorrectSecurityLockAttemptsAndTime()
                     }
                 }
-                // This is not in an else statement because we also want to enable the EditText and remove the error
-                // when the cooldown time has been reached
-                tietPIN.isEnabled = true
-                tilPIN.helperText = ""
-                tilPIN.isErrorEnabled = false
             }
             STEP_SECURITY_LOCK_CREATE -> {
                 tvTitle.text = getString(R.string.title__set_bitsy_screen_lock)
@@ -160,5 +155,6 @@ class PINSecurityLockDialog : BaseSecurityLockDialog() {
 
     override fun onTimerFinished() {
         setupScreen()
+        tilPIN.isErrorEnabled = false
     }
 }

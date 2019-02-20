@@ -148,22 +148,18 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
                 tvSubTitle.text = getString(R.string.msg__enter_your_pattern)
                 btnClear.visibility = View.GONE
                 btnNext.visibility = View.GONE
-                setMessage("")
+                patternLockView.isInputEnabled = true
+                patternLockView.isInStealthMode = true
                 if (incorrectSecurityLockAttempts >= Constants.MAX_INCORRECT_SECURITY_LOCK_ATTEMPTS) {
                     // User has entered the Pattern incorrectly too many times
                     val now = System.currentTimeMillis()
                     if (now <= incorrectSecurityLockTime + Constants.INCORRECT_SECURITY_LOCK_COOLDOWN) {
                         patternLockView.isInputEnabled = false
                         startContDownTimer()
-                        return
                     } else {
                         resetIncorrectSecurityLockAttemptsAndTime()
                     }
                 }
-                // This is not in an else statement because we also want to enable the EditText and remove the error
-                // when the cooldown time has been reached
-                patternLockView.isInputEnabled = true
-                patternLockView.isInStealthMode = true
             }
             STEP_SECURITY_LOCK_CREATE -> {
                 tvTitle.text = getString(R.string.title__set_bitsy_screen_lock)
@@ -214,5 +210,6 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
 
     override fun onTimerFinished() {
         setupScreen()
+        setMessage("")
     }
 }
