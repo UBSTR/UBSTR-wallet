@@ -164,5 +164,7 @@
     <string name="error__wront_pattern">Patrón incorrecto</string>
     <string name="text__pattern_recorded">Patrón registrado</string>
     <string name="error__connect_at_least_4_dots">Conecta al menos 4 puntos. Intenta de nuevo.</string>
+    <string name="error__security_lock_too_many_attempts_minutes">Demasiados intentos incorrectos. Intenta de nuevo en %1$d minutos.</string>
+    <string name="error__security_lock_too_many_attempts_seconds">Demasiados intentos incorrectos. Intenta de nuevo en %1$d segundos.</string>
 
 </resources>

@@ -47,6 +47,7 @@
         android:layout_marginTop="@dimen/spacing_same_topic"
         tools:text="Draw an unlock pattern"
         android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body2"
         app:layout_constraintBottom_toTopOf="@id/patternLockView"
         app:layout_constraintTop_toBottomOf="@id/tvSubTitle"
         app:layout_constraintVertical_chainStyle="spread"

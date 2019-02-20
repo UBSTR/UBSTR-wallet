@@ -5,7 +5,6 @@ import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import cy.agorise.bitsybitshareswallet.R
 import kotlinx.android.synthetic.main.dialog_pattern_security_lock.*
 import com.andrognito.patternlockview.PatternLockView
@@ -45,15 +44,15 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
             // Make sure the button is hidden when the user starts a new pattern when it was incorrect
             when (currentStep) {
                 STEP_SECURITY_LOCK_VERIFY -> {
-                    tvMessage.text = ""
+                    setMessage("")
                 }
                 STEP_SECURITY_LOCK_CREATE -> {
                     btnClear.visibility = View.INVISIBLE
-                    tvMessage.text = getString(R.string.msg__release_finger)
+                    setMessage(getString(R.string.msg__release_finger))
                 }
                 STEP_SECURITY_LOCK_CONFIRM -> {
                     btnClear.visibility = View.INVISIBLE
-                    tvMessage.text = getString(R.string.msg__release_finger)
+                    setMessage(getString(R.string.msg__release_finger))
                 }
             }
         }
@@ -76,17 +75,17 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
                     if (incorrectSecurityLockAttempts < Constants.MAX_INCORRECT_SECURITY_LOCK_ATTEMPTS) {
                         // Show the error only when the user has not reached the max attempts limit, because if that
                         // is the case another error is gonna be shown in the setupScreen() method
-                        tvMessage.text = getString(R.string.error__wront_pattern)
+                        setError(getString(R.string.error__wront_pattern))
                     }
                     setupScreen()
                 }
             } else if (currentStep == STEP_SECURITY_LOCK_CREATE) {
                 btnClear.visibility = View.VISIBLE
                 if (pattern.size < 4) {
-                    tvMessage.text = getString(R.string.error__connect_at_least_4_dots)
+                    setError(getString(R.string.error__connect_at_least_4_dots))
                     patternLockView.setViewMode(PatternLockView.PatternViewMode.WRONG)
                 } else {
-                    tvMessage.text = getString(R.string.text__pattern_recorded)
+                    setMessage(getString(R.string.text__pattern_recorded))
                     patternLockView.setViewMode(PatternLockView.PatternViewMode.CORRECT)
                     patternLockView.isInputEnabled = false
                     btnNext.isEnabled = true
@@ -99,11 +98,11 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
             } else if (currentStep == STEP_SECURITY_LOCK_CONFIRM) {
                 val patternConfirm = getStringPattern(pattern)
                 if (patternConfirm != newPattern) {
-                    tvMessage.text = getString(R.string.error__wront_pattern)
+                    setError(getString(R.string.error__wront_pattern))
                     btnNext.isEnabled = false
                     patternLockView.setViewMode(PatternLockView.PatternViewMode.WRONG)
                 } else {
-                    tvMessage.text = getString(R.string.msg__your_new_unlock_pattern)
+                    setMessage(getString(R.string.msg__your_new_unlock_pattern))
                     patternLockView.isEnabled = false
                     patternLockView.setViewMode(PatternLockView.PatternViewMode.CORRECT)
                     btnNext.isEnabled = true
@@ -149,7 +148,7 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
                 tvSubTitle.text = getString(R.string.msg__enter_your_pattern)
                 btnClear.visibility = View.GONE
                 btnNext.visibility = View.GONE
-                tvMessage.text = ""
+                setMessage("")
                 if (incorrectSecurityLockAttempts >= Constants.MAX_INCORRECT_SECURITY_LOCK_ATTEMPTS) {
                     // User has entered the Pattern incorrectly too many times
                     val now = System.currentTimeMillis()
@@ -169,7 +168,7 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
             STEP_SECURITY_LOCK_CREATE -> {
                 tvTitle.text = getString(R.string.title__set_bitsy_screen_lock)
                 tvSubTitle.text = getString(R.string.msg__set_bitsy_pattern)
-                tvMessage.text = getString(R.string.text__draw_an_unlock_pattern)
+                setMessage(getString(R.string.text__draw_an_unlock_pattern))
                 patternLockView.clearPattern()
                 patternLockView.isInputEnabled = true
                 btnClear.visibility = View.INVISIBLE
@@ -178,7 +177,7 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
             STEP_SECURITY_LOCK_CONFIRM -> {
                 tvTitle.text = getString(R.string.title__re_enter_your_pattern)
                 tvSubTitle.text = ""
-                tvMessage.text = getString(R.string.msg__draw_pattern_confirm)
+                setMessage(getString(R.string.msg__draw_pattern_confirm))
                 tvSubTitle.visibility = View.GONE
                 patternLockView.clearPattern()
                 patternLockView.isInputEnabled = true
@@ -189,8 +188,28 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
         }
     }
 
+    @Suppress("DEPRECATION")
+    private fun setMessage(message: String) {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
+            tvMessage.setTextAppearance(context, R.style.TextAppearance_Bitsy_Body2)
+        } else {
+            tvMessage.setTextAppearance(R.style.TextAppearance_Bitsy_Body2)
+        }
+        tvMessage.text = message
+    }
+
+    @Suppress("DEPRECATION")
+    private fun setError(error: String) {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
+            tvMessage.setTextAppearance(context, R.style.TextAppearance_Bitsy_Body2_Error)
+        } else {
+            tvMessage.setTextAppearance(R.style.TextAppearance_Bitsy_Body2_Error)
+        }
+        tvMessage.text = error
+    }
+
     override fun onTimerSecondPassed(errorMessage: String) {
-        tvMessage.text = errorMessage
+        setError(errorMessage)
     }
 
     override fun onTimerFinished() {

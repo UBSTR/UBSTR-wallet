@@ -64,5 +64,8 @@
     <style name="TextAppearance.Bitsy.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1" />
     <style name="TextAppearance.Bitsy.Body1" parent="TextAppearance.MaterialComponents.Body1" />
     <style name="TextAppearance.Bitsy.Body2" parent="TextAppearance.MaterialComponents.Body2" />
+    <style name="TextAppearance.Bitsy.Body2.Error" >
+        <item name="android:textColor">@color/colorSend</item>
+    </style>
     <style name="TextAppearance.Bitsy.Caption" parent="TextAppearance.MaterialComponents.Caption"/>
 </resources>
