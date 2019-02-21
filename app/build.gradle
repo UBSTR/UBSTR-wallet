@@ -73,7 +73,7 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.1'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.google.android.material:material:1.0.0'
-    implementation 'com.google.android.gms:play-services-maps:16.0.0'
+    implementation 'com.google.android.gms:play-services-maps:16.1.0'
     implementation 'com.google.maps.android:android-maps-utils:0.5'
     // AAC Lifecycle
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
@@ -111,9 +111,8 @@ dependencies {
     // Android Debug Database
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
 
-//    TODO enable and make proper testing
+    // Testing libs
     testImplementation 'junit:junit:4.12'
-    // Core library
     androidTestImplementation 'androidx.test:core:1.1.0'
 
     androidTestImplementation "androidx.arch.core:core-testing:$lifecycle_version"
