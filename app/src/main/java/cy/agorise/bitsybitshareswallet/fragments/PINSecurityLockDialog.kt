@@ -138,8 +138,8 @@ class PINSecurityLockDialog : BaseSecurityLockDialog() {
                 }
             }
             STEP_SECURITY_LOCK_CREATE -> {
-                tvTitle.text = getString(R.string.title__set_bitsy_screen_lock)
-                tvSubTitle.text = getString(R.string.msg__set_bitsy_pin)
+                tvTitle.text = getString(R.string.title__set_bitsy_security_lock)
+                tvSubTitle.text = getString(R.string.msg__set_a_pin)
                 tilPIN.helperText = getString(R.string.msg__min_pin_length)
                 tilPIN.isErrorEnabled = false
             }

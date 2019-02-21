@@ -148,13 +148,13 @@
     <string name="title__re_enter_your_pin">Reingresa tu PIN</string>
     <string name="msg__enter_your_pin">Digita tu PIN de BiTSy para continuar</string>
     <string name="error__wrong_pin">PIN incorrecto</string>
-    <string name="title__set_bitsy_screen_lock">Crea un bloqueo de seguridad para BiTSy</string>
-    <string name="msg__set_bitsy_pin">Por seguridad, crea un PIN para BiTSy</string>
+    <string name="title__set_bitsy_security_lock">Establece seguridad para BiTSy</string>
+    <string name="msg__set_a_pin">Por seguridad, crea un PIN</string>
     <string name="msg__min_pin_length">El PIN debe tener al menos 6 dígitos</string>
     <string name="title__pins_dont_match">El PIN no concuerda</string>
     <string name="title__re_enter_your_pattern">Reingresa tu patrón</string>
     <string name="msg__enter_your_pattern">Ingresa tu patrón de BiTSy para continuar</string>
-    <string name="msg__set_bitsy_pattern">Por seguridad, crea un patrón para BiTSy</string>
+    <string name="msg__set_a_pattern">Por seguridad, crea un Patrón</string>
     <string name="msg__release_finger">Suelta tu dedo al terminar</string>
     <string name="button__clear">Limpiar</string>
     <string name="button__next">Siguiente</string>
