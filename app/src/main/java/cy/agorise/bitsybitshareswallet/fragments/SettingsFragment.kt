@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
@@ -23,21 +22,19 @@ import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
 import cy.agorise.graphenej.BrainKey
-import cy.agorise.graphenej.api.android.NetworkService
-import cy.agorise.graphenej.api.android.RxBus
+import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.calls.GetDynamicGlobalProperties
 import cy.agorise.graphenej.models.DynamicGlobalProperties
 import cy.agorise.graphenej.models.JsonRpcResponse
 import cy.agorise.graphenej.network.FullNode
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_settings.*
 import java.text.NumberFormat
 
-class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.OnPINPatternEnteredListener {
+class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatternEnteredListener {
 
     companion object {
         private const val TAG = "SettingsFragment"
@@ -46,14 +43,6 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
         private const val ACTION_CHANGE_SECURITY_LOCK = 1
         private const val ACTION_SHOW_BRAINKEY = 2
     }
-
-    private var mDisposables = CompositeDisposable()
-
-    /* Network service connection */
-    private var mNetworkService: NetworkService? = null
-
-    /** Flag used to keep track of the NetworkService binding state */
-    private var mShouldUnbindNetwork: Boolean = false
 
     // Dialog displaying the list of nodes and their latencies
     private var mNodesDialog: MaterialDialog? = null
@@ -117,14 +106,6 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
         tvSecurityLockSelected.setOnClickListener { onSecurityLockTextSelected() }
 
         btnViewBrainKey.setOnClickListener { onShowBrainKeyButtonSelected() }
-
-        // Connect to the RxBus, which receives events from the NetworkService
-        mDisposables.add(
-            RxBus.getBusInstance()
-                .asFlowable()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { handleIncomingMessage(it) }
-        )
     }
 
     /**
@@ -149,17 +130,17 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
         override fun onComplete() {}
     }
 
-    private fun handleIncomingMessage(message: Any?) {
-        if (message is JsonRpcResponse<*>) {
-            if (message.result is DynamicGlobalProperties) {
-                val dynamicGlobalProperties = message.result as DynamicGlobalProperties
-                if (mNodesDialog != null && mNodesDialog?.isShowing == true) {
-                    val blockNumber = NumberFormat.getInstance().format(dynamicGlobalProperties.head_block_number)
-                    mNodesDialog?.message(text = getString(R.string.title__bitshares_nodes_dialog, blockNumber))
-                }
+    override fun handleJsonRpcResponse(response: JsonRpcResponse<*>) {
+        if (response.result is DynamicGlobalProperties) {
+            val dynamicGlobalProperties = response.result as DynamicGlobalProperties
+            if (mNodesDialog != null && mNodesDialog?.isShowing == true) {
+                val blockNumber = NumberFormat.getInstance().format(dynamicGlobalProperties.head_block_number)
+                mNodesDialog?.message(text = getString(R.string.title__bitshares_nodes_dialog, blockNumber))
             }
         }
     }
+
+    override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) {  }
 
     /**
      * Task used to obtain frequent updates on the global dynamic properties object
@@ -374,42 +355,15 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        val intent = Intent(context, NetworkService::class.java)
-        if (context?.bindService(intent, this, Context.BIND_AUTO_CREATE) == true) {
-            mShouldUnbindNetwork = true
-        } else {
-            Log.e(TAG, "Binding to the network service failed.")
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-
-        // Unbinding from network service
-        if (mShouldUnbindNetwork) {
-            context?.unbindService(this)
-            mShouldUnbindNetwork = false
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        if (!mDisposables.isDisposed) mDisposables.dispose()
-    }
-
     override fun onServiceDisconnected(name: ComponentName?) {
+        super.onServiceDisconnected(name)
+
         tvNetworkStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null,
             resources.getDrawable(R.drawable.ic_disconnected, null), null)
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        // We've bound to LocalService, cast the IBinder and get LocalService instance
-        val binder = service as NetworkService.LocalBinder
-        mNetworkService = binder.service
+        super.onServiceConnected(name, service)
 
         tvNetworkStatus.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null,
             resources.getDrawable(R.drawable.ic_connected, null), null)
