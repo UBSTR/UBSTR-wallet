@@ -29,6 +29,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
 import com.afollestad.materialdialogs.MaterialDialog
+import com.crashlytics.android.Crashlytics
 import cy.agorise.bitsybitshareswallet.models.FaucetRequest
 import cy.agorise.bitsybitshareswallet.models.FaucetResponse
 import cy.agorise.bitsybitshareswallet.network.ServiceGenerator
@@ -69,6 +70,8 @@ class CreateAccountFragment : BaseAccountFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        Crashlytics.setString(Constants.CRASHLYTICS_KEY_LAST_SCREEN, TAG)
 
         // Use RxJava Debounce to check the validity and availability of the user's proposed account name
         mDisposables.add(

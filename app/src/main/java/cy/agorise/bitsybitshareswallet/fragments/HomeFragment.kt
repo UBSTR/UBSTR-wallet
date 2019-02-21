@@ -20,9 +20,14 @@ import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
 import androidx.appcompat.app.AppCompatActivity
+import com.crashlytics.android.Crashlytics
 
 
 class HomeFragment : Fragment() {
+
+    companion object {
+        private const val TAG ="HomeFragment"
+    }
 
     private lateinit var mUserAccountViewModel: UserAccountViewModel
 
@@ -55,6 +60,8 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        Crashlytics.setString(Constants.CRASHLYTICS_KEY_LAST_SCREEN, TAG)
 
         // Get version number of the last agreed license version
         val agreedLicenseVersion = PreferenceManager.getDefaultSharedPreferences(context)

@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.navArgs
+import com.crashlytics.android.Crashlytics
 
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.database.joins.TransferDetail
@@ -32,6 +33,8 @@ import java.util.*
 class EReceiptFragment : Fragment() {
 
     companion object {
+        private const val TAG = "EReceiptFragment"
+
         private const val REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION = 100
     }
 
@@ -48,6 +51,8 @@ class EReceiptFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        Crashlytics.setString(Constants.CRASHLYTICS_KEY_LAST_SCREEN, TAG)
 
         mLocale = ConfigurationCompat.getLocales(resources.configuration)[0]
 

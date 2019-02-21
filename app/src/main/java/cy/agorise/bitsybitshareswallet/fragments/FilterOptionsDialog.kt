@@ -14,9 +14,11 @@ import androidx.core.os.ConfigurationCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.Observer
+import com.crashlytics.android.Crashlytics
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.BalancesDetailsAdapter
 import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
+import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.viewmodels.BalanceDetailViewModel
 import cy.agorise.bitsybitshareswallet.views.DatePickerFragment
 import java.text.SimpleDateFormat
@@ -32,6 +34,7 @@ import kotlin.collections.ArrayList
 class FilterOptionsDialog : DialogFragment() {
 
     companion object {
+        private const val TAG = "FilterOptionsDialog"
 
         const val KEY_FILTER_TRANSACTION_DIRECTION = "key_filter_transaction_direction"
         const val KEY_FILTER_DATE_RANGE_ALL = "key_filter_date_range_all"
@@ -166,6 +169,8 @@ class FilterOptionsDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         onAttachToParentFragment(parentFragment!!)
+
+        Crashlytics.setString(Constants.CRASHLYTICS_KEY_LAST_SCREEN, TAG)
 
         // Initialize handler for communication with the DatePicker
         mDatePickerHandler = DatePickerHandler()

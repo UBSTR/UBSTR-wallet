@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
+import com.crashlytics.android.Crashlytics
 import com.jakewharton.rxbinding3.appcompat.queryTextChangeEvents
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.TransfersDetailsAdapter
@@ -33,6 +34,8 @@ import kotlin.collections.ArrayList
 class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSelectedListener {
 
     companion object {
+        private const val TAG = "TransactionsFragment"
+
         private const val REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION = 100
     }
 
@@ -66,6 +69,8 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        Crashlytics.setString(Constants.CRASHLYTICS_KEY_LAST_SCREEN, TAG)
 
         val userId = PreferenceManager.getDefaultSharedPreferences(context)
             .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "") ?: ""
@@ -175,7 +180,7 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
             if (!filterAssetAll && transferDetail.assetSymbol != filterAsset)
                 continue
 
-//            // Filter by equivalent value
+            // Filter by equivalent value
             if (!filterEquivalentValueAll && ((transferDetail.fiatAmount ?: -1 ) < filterFromEquivalentValue
                         || (transferDetail.fiatAmount ?: -1) > filterToEquivalentValue))
                 continue

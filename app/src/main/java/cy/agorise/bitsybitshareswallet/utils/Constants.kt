@@ -121,4 +121,10 @@ object Constants {
 
     /** Name of the external storage folder used to save files like PDF and CSV exports and Backups **/
     const val EXTERNAL_STORAGE_FOLDER = "BiTSy"
+
+
+    /////////////////////// Crashlytics custom keys ///////////////////////
+
+    /** Key used to add the last visited fragment name to the Crashlytics report */
+    const val CRASHLYTICS_KEY_LAST_SCREEN = "crashlytics_key_last_screen"
 }

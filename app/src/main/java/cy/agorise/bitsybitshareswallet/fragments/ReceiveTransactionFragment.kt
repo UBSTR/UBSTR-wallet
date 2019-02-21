@@ -15,6 +15,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.crashlytics.android.Crashlytics
 import com.google.common.primitives.UnsignedLong
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
@@ -100,6 +101,8 @@ class ReceiveTransactionFragment : ConnectedFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        Crashlytics.setString(Constants.CRASHLYTICS_KEY_LAST_SCREEN, TAG)
 
         // Configure UserAccountViewModel to show the current account
         mUserAccountViewModel = ViewModelProviders.of(this).get(UserAccountViewModel::class.java)
