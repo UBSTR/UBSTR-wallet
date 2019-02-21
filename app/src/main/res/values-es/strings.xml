@@ -140,10 +140,11 @@
     <!-- Security Settings -->
     <string name="title__security">Seguridad</string>
     <string name="text__security_lock">Bloqueo de Seguridad</string>
-    <string name="title__security_dialog">Choose Security Lock</string>
+    <string name="title__security_dialog">Elige un Bloqueo de Seguridad</string>
     <string name="text__pin">PIN</string>
     <string name="text__pattern">Patrón</string>
     <string name="text__none">Ninguno</string>
+    <string name="button__choose">Elegir</string>
     <string name="title__re_enter_your_pin">Reingresa tu PIN</string>
     <string name="msg__enter_your_pin">Digita tu PIN de BiTSy para continuar</string>
     <string name="error__wrong_pin">PIN incorrecto</string>
@@ -155,11 +156,11 @@
     <string name="msg__enter_your_pattern">Ingresa tu patrón de BiTSy para continuar</string>
     <string name="msg__set_bitsy_pattern">Por seguridad, crea un patrón para BiTSy</string>
     <string name="msg__release_finger">Suelta tu dedo al terminar</string>
-    <string name="btn__clear">Limpiar</string>
-    <string name="btn__next">Siguiente</string>
+    <string name="button__clear">Limpiar</string>
+    <string name="button__next">Siguiente</string>
     <string name="text__draw_an_unlock_pattern">Dibuja un patrón de desbloqueo</string>
     <string name="msg__draw_pattern_confirm">Dibuja tu patrón de nuevo para confirmar</string>
-    <string name="btn__confirm">Confirmar</string>
+    <string name="button__confirm">Confirmar</string>
     <string name="msg__your_new_unlock_pattern">Tu nuevo patrón de desbloqueo</string>
     <string name="error__wront_pattern">Patrón incorrecto</string>
     <string name="text__pattern_recorded">Patrón registrado</string>

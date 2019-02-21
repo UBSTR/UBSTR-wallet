@@ -179,7 +179,7 @@ class PatternSecurityLockDialog : BaseSecurityLockDialog() {
                 patternLockView.isInputEnabled = true
                 btnClear.visibility = View.INVISIBLE
                 btnNext.isEnabled = false
-                btnNext.text = getString(R.string.btn__confirm)
+                btnNext.text = getString(R.string.button__confirm)
             }
         }
     }

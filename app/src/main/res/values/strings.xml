@@ -141,10 +141,11 @@
     <!-- Security Settings -->
     <string name="title__security">Security</string>
     <string name="text__security_lock">Security Lock</string>
-    <string name="title__security_dialog">Choose Security Lock</string>
+    <string name="title__security_dialog">Choose a Security Lock</string>
     <string name="text__pin">PIN</string>
     <string name="text__pattern">Pattern</string>
     <string name="text__none">None</string>
+    <string name="button__choose">Choose</string>
     <string name="title__re_enter_your_pin">Re-enter your PIN</string>
     <string name="msg__enter_your_pin">Enter your BiTSy PIN to continue</string>
     <string name="error__wrong_pin">Wrong PIN</string>
@@ -156,11 +157,11 @@
     <string name="msg__enter_your_pattern">Enter your BiTSy pattern to continue</string>
     <string name="msg__set_bitsy_pattern">For security, set BiTSy pattern</string>
     <string name="msg__release_finger">Release finger when done</string>
-    <string name="btn__clear">Clear</string>
-    <string name="btn__next">Next</string>
+    <string name="button__clear">Clear</string>
+    <string name="button__next">Next</string>
     <string name="text__draw_an_unlock_pattern">Draw an unlock pattern</string>
     <string name="msg__draw_pattern_confirm">Draw pattern again to confirm</string>
-    <string name="btn__confirm">Confirm</string>
+    <string name="button__confirm">Confirm</string>
     <string name="msg__your_new_unlock_pattern">Your new unlock pattern</string>
     <string name="error__wront_pattern">Wrong pattern</string>
     <string name="text__pattern_recorded">Pattern recorded</string>

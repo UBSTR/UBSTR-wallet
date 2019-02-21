@@ -72,7 +72,7 @@
         style="@style/Widget.Bitsy.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/btn__clear"
+        android:text="@string/button__clear"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
@@ -81,7 +81,7 @@
         style="@style/Widget.Bitsy.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/btn__next"
+        android:text="@string/button__next"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 

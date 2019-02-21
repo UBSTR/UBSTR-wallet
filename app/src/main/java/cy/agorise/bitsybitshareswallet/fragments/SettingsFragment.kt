@@ -14,7 +14,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.customListAdapter
-import com.afollestad.materialdialogs.list.listItems
+import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import cy.agorise.bitsybitshareswallet.BuildConfig
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.FullNodesAdapter
@@ -282,10 +282,18 @@ class SettingsFragment : Fragment(), ServiceConnection, BaseSecurityLockDialog.O
      * Shows a dialog so the user can select its desired Security Lock option.
      */
     private fun showChooseSecurityLockDialog() {
+        // Obtain the current Security Lock Option selected and display it in the screen
+        val securityLockSelected = PreferenceManager.getDefaultSharedPreferences(context)
+            .getInt(Constants.KEY_SECURITY_LOCK_SELECTED, 0)
+        // Security Lock Options
+        // 0 -> None
+        // 1 -> PIN
+        // 2 -> Pattern
+
         context?.let {
             MaterialDialog(it).show {
                 title(R.string.title__security_dialog)
-                listItems(R.array.security_lock_options) {_, index, _ ->
+                listItemsSingleChoice(R.array.security_lock_options, initialSelection = securityLockSelected) {_, index, _ ->
                     // Args used for both PIN and Pattern options
                     val args = Bundle()
                     args.putInt(BaseSecurityLockDialog.KEY_STEP_SECURITY_LOCK,
