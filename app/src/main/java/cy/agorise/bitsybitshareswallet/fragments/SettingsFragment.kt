@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProviders
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
@@ -21,7 +22,9 @@ import cy.agorise.bitsybitshareswallet.adapters.FullNodesAdapter
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
+import cy.agorise.bitsybitshareswallet.viewmodels.SettingsFragmentViewModel
 import cy.agorise.graphenej.BrainKey
+import cy.agorise.graphenej.UserAccount
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.calls.GetDynamicGlobalProperties
 import cy.agorise.graphenej.models.DynamicGlobalProperties
@@ -44,6 +47,10 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
         private const val ACTION_SHOW_BRAINKEY = 2
     }
 
+    private lateinit var mViewModel: SettingsFragmentViewModel
+
+    private var mUserAccount: UserAccount? = null
+
     // Dialog displaying the list of nodes and their latencies
     private var mNodesDialog: MaterialDialog? = null
 
@@ -62,6 +69,19 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
         super.onViewCreated(view, savedInstanceState)
 
         Crashlytics.setString(Constants.CRASHLYTICS_KEY_LAST_SCREEN, TAG)
+
+        val userId = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString(Constants.KEY_CURRENT_ACCOUNT_ID, "") ?: ""
+
+        // Configure ViewModel
+        mViewModel= ViewModelProviders.of(this).get(SettingsFragmentViewModel::class.java)
+
+        mViewModel.getUserAccount(userId).observe(this,
+            androidx.lifecycle.Observer<cy.agorise.bitsybitshareswallet.database.entities.UserAccount>{ userAccount ->
+                if (userAccount != null) {
+                    mUserAccount = UserAccount(userAccount.id, userAccount.name)
+                }
+        })
 
         initAutoCloseSwitch()
 
@@ -106,6 +126,8 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
         tvSecurityLockSelected.setOnClickListener { onSecurityLockTextSelected() }
 
         btnViewBrainKey.setOnClickListener { onShowBrainKeyButtonSelected() }
+
+        btnUpgradeToLTM.setOnClickListener { onUpgradeToLTMButtonSelected() }
     }
 
     /**
@@ -203,7 +225,7 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
     }
 
     /**
-     * Encapsulated the logic required to do actions possibly locked by the Security Lock. If PIN/Pattern is selected
+     * Encapsulates the logic required to do actions possibly locked by the Security Lock. If PIN/Pattern is selected
      * then it prompts for it.
      *
      * @param actionIdentifier      Identifier used to know why a verify security lock was launched
@@ -351,6 +373,19 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
                 customView(R.layout.dialog_copy_brainkey)
                 cancelable(false)
                 positiveButton(R.string.button__copied) { it.dismiss() }
+            }
+        }
+    }
+
+    private fun onUpgradeToLTMButtonSelected() {
+        context?.let { context ->
+            val content = getString(R.string.msg__account_upgrade_dialog, mUserAccount?.name)
+            MaterialDialog(context).show {
+                message(text = content)
+                negativeButton(android.R.string.cancel)
+                positiveButton(android.R.string.ok) {
+
+                }
             }
         }
     }

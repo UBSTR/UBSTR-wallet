@@ -107,6 +107,31 @@
             android:layout_marginTop="@dimen/spacing_same_topic"
             android:text="@string/button__view_and_copy"/>
 
+        <!-- Accounts -->
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_different_section"
+                android:text="@string/title__accounts"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:textStyle="bold"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_different_topic"
+                android:text="@string/msg__upgrade_to_ltm"
+                android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnUpgradeToLTM"
+                style="@style/Widget.Bitsy.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_same_topic"
+                android:text="@string/button__upgrade_to_ltm"/>
+
         <!-- Bugs or Ideas -->
 
         <TextView

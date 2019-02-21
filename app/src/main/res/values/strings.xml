@@ -133,7 +133,11 @@
     <string name="msg__brainkey_description">BrainKey. Account recovery words that can be captured or copied, but not edited.</string>
     <string name="msg__brainkey_info">Write this down! Be sure you have 2 copies of this BrainKey in 2 secure locations in case of fire or loss. Security First! Anyone with access to your BrainKey can access the funds in your account!</string>
     <string name="button__copied">Copied</string>
-    <string name="button__view_and_copy"><![CDATA[View & Copy]]></string>
+    <string name="button__view_and_copy">View &amp; Copy</string>
+    <string name="title__accounts">Accounts</string>
+    <string name="msg__upgrade_to_ltm">Upgrade to LifeTime Membership (LTM). Bitshares\' LTM accounts pay near-zero fees, get 80% cashback and bonuses for referrals.</string>
+    <string name="button__upgrade_to_ltm">Upgrade to LTM</string>
+    <string name="msg__account_upgrade_dialog">The Life Time Membership allows you to trade with a reduced set of network fees.\n\nIt will take effect to the current account "%1$s"\n\nIt does however come with a cost of around 100 USD paid in Bitshares.\n\nAre you sure you want to proceed?</string>
     <string name="title__bugs_or_ideas">Bugs or Ideas?</string>
     <string name="msg__bugs_or_ideas">Telegram: https://t.me/Agorise\nKeybase: https://keybase.io/team/Agorise</string>
     <string name="title__bitshares_nodes_dialog">Block: %1$s</string>
