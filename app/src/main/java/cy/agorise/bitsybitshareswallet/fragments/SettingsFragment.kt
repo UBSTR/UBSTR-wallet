@@ -16,6 +16,7 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.customListAdapter
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.crashlytics.android.Crashlytics
+import com.google.common.primitives.UnsignedLong
 import cy.agorise.bitsybitshareswallet.BuildConfig
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.FullNodesAdapter
@@ -23,19 +24,23 @@ import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
 import cy.agorise.bitsybitshareswallet.viewmodels.SettingsFragmentViewModel
-import cy.agorise.graphenej.BrainKey
-import cy.agorise.graphenej.UserAccount
+import cy.agorise.graphenej.*
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
+import cy.agorise.graphenej.api.calls.BroadcastTransaction
 import cy.agorise.graphenej.api.calls.GetDynamicGlobalProperties
 import cy.agorise.graphenej.models.DynamicGlobalProperties
 import cy.agorise.graphenej.models.JsonRpcResponse
 import cy.agorise.graphenej.network.FullNode
+import cy.agorise.graphenej.operations.AccountUpgradeOperationBuilder
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_settings.*
+import org.bitcoinj.core.DumpedPrivateKey
+import org.bitcoinj.core.ECKey
 import java.text.NumberFormat
+import javax.crypto.AEADBadTagException
 
 class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatternEnteredListener {
 
@@ -45,17 +50,26 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
         // Constants used to perform security locked requests
         private const val ACTION_CHANGE_SECURITY_LOCK = 1
         private const val ACTION_SHOW_BRAINKEY = 2
+
+        // Constants used to organize NetworkService requests
+        private const val RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS = 1
+        private const val RESPONSE_BROADCAST_TRANSACTION = 2
     }
 
     private lateinit var mViewModel: SettingsFragmentViewModel
 
     private var mUserAccount: UserAccount? = null
 
+    private var privateKey: String? = null
+
     // Dialog displaying the list of nodes and their latencies
     private var mNodesDialog: MaterialDialog? = null
 
     /** Adapter that holds the FullNode list used in the Bitshares nodes modal */
     private var nodesAdapter: FullNodesAdapter? = null
+
+    // Map used to keep track of request and response id pairs
+    private val responseMap = HashMap<Long, Int>()
 
     private val mHandler = Handler()
 
@@ -80,8 +94,20 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
             androidx.lifecycle.Observer<cy.agorise.bitsybitshareswallet.database.entities.UserAccount>{ userAccount ->
                 if (userAccount != null) {
                     mUserAccount = UserAccount(userAccount.id, userAccount.name)
+                    btnUpgradeToLTM.isEnabled = !userAccount.isLtm  // Disable button if already LTM
                 }
         })
+
+        mViewModel.getWIF(userId, AuthorityType.ACTIVE.ordinal).observe(this,
+            androidx.lifecycle.Observer<String> { encryptedWIF ->
+                context?.let {
+                    try {
+                        privateKey = CryptoUtils.decrypt(it, encryptedWIF)
+                    } catch (e: AEADBadTagException) {
+                        Log.e(TAG, "AEADBadTagException. Class: " + e.javaClass + ", Msg: " + e.message)
+                    }
+                }
+            })
 
         initAutoCloseSwitch()
 
@@ -153,31 +179,50 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
     }
 
     override fun handleJsonRpcResponse(response: JsonRpcResponse<*>) {
-        if (response.result is DynamicGlobalProperties) {
-            val dynamicGlobalProperties = response.result as DynamicGlobalProperties
+        if (responseMap.containsKey(response.id)) {
+            val responseType = responseMap[response.id]
+            when (responseType) {
+                RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS  -> handleDynamicGlobalProperties(response.result)
+                RESPONSE_BROADCAST_TRANSACTION          -> handleBroadcastTransaction(response)
+            }
+            responseMap.remove(response.id)
+        }
+    }
+
+    override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) {  }
+
+    /** Handles the result of the [GetDynamicGlobalProperties] api call to obtain the current block number and update
+     * it in the Nodes Dialog */
+    private fun handleDynamicGlobalProperties(result: Any?) {
+        if (result is DynamicGlobalProperties) {
             if (mNodesDialog != null && mNodesDialog?.isShowing == true) {
-                val blockNumber = NumberFormat.getInstance().format(dynamicGlobalProperties.head_block_number)
+                val blockNumber = NumberFormat.getInstance().format(result.head_block_number)
                 mNodesDialog?.message(text = getString(R.string.title__bitshares_nodes_dialog, blockNumber))
             }
         }
     }
 
-    override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) {  }
+    /** Handles the result of the [BroadcastTransaction] api call to find out if the Transaction was sent successfully
+     * or not and acts accordingly */
+    private fun handleBroadcastTransaction(message: JsonRpcResponse<*>) {
+        if (message.result == null && message.error == null) {
+//            context?.toast(getString(R.string.text__transaction_sent))
+//
+//            // Return to the main screen
+//            findNavController().navigateUp()
+        } else if (message.error != null) {
+//            context?.toast(message.error.message, Toast.LENGTH_LONG)
+        }
+    }
 
     /**
      * Task used to obtain frequent updates on the global dynamic properties object
      */
     private val mRequestDynamicGlobalPropertiesTask = object : Runnable {
         override fun run() {
-            if (mNetworkService != null) {
-                if (mNetworkService?.isConnected == true) {
-                    mNetworkService?.sendMessage(GetDynamicGlobalProperties(), GetDynamicGlobalProperties.REQUIRED_API)
-                } else {
-                    Log.d(TAG, "NetworkService exists but is not connected")
-                }
-            } else {
-                Log.d(TAG, "NetworkService reference is null")
-            }
+            val id = mNetworkService?.sendMessage(GetDynamicGlobalProperties(), GetDynamicGlobalProperties.REQUIRED_API)
+            if (id != null) responseMap[id] = RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS
+
             mHandler.postDelayed(this, Constants.BLOCK_PERIOD)
         }
     }
@@ -384,7 +429,20 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
                 message(text = content)
                 negativeButton(android.R.string.cancel)
                 positiveButton(android.R.string.ok) {
+                    val operation = AccountUpgradeOperationBuilder()
+                        .setIsUpgrade(true)
+                        .setFee(AssetAmount(UnsignedLong.ZERO, Asset("1.3.0"))) // 0 BTS
+                        .setAccountToUpgrade(mUserAccount).build()
 
+                    val operations = ArrayList<BaseOperation>()
+                    operations.add(operation)
+
+                    val currentPrivateKey = ECKey.fromPrivate(
+                        DumpedPrivateKey.fromBase58(null, privateKey).key.privKeyBytes)
+                    val transaction = Transaction(currentPrivateKey, null, operations)
+
+                    val id = mNetworkService?.sendMessage(BroadcastTransaction(transaction), BroadcastTransaction.REQUIRED_API)
+                    if (id != null) responseMap[id] = RESPONSE_BROADCAST_TRANSACTION
                 }
             }
         }

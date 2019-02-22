@@ -181,7 +181,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
         // Obtain the WifKey from the db, which is used in the Send Transfer procedure
         mDisposables.add(
-            authorityRepository!!.getWIF(userId, AuthorityType.ACTIVE.ordinal)
+            authorityRepository!!.getWIFOld(userId, AuthorityType.ACTIVE.ordinal)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { encryptedWIF ->

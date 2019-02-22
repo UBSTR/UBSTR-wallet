@@ -103,7 +103,7 @@ class TransfersLoader(private var mContext: Context?) {
         if (userId != "") {
             mCurrentAccount = UserAccount(userId)
             mDisposables.add(
-                authorityRepository!!.getWIF(userId, AuthorityType.MEMO.ordinal)
+                authorityRepository!!.getWIFOld(userId, AuthorityType.MEMO.ordinal)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { encryptedWIF ->

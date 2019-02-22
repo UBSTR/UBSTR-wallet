@@ -19,5 +19,8 @@ interface AuthorityDao {
     fun getAll(): LiveData<List<Authority>>
 
     @Query("SELECT encrypted_wif FROM authorities WHERE user_id=:userId AND authority_type=:authorityType")
-    fun getWIF(userId: String, authorityType: Int): Single<String>
+    fun getWIFOld(userId: String, authorityType: Int): Single<String>
+
+    @Query("SELECT encrypted_wif FROM authorities WHERE user_id=:userId AND authority_type=:authorityType")
+    fun getWIF(userId: String, authorityType: Int): LiveData<String>
 }
