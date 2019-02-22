@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProviders
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
@@ -23,6 +24,7 @@ import cy.agorise.bitsybitshareswallet.adapters.FullNodesAdapter
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
+import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.bitsybitshareswallet.viewmodels.SettingsFragmentViewModel
 import cy.agorise.graphenej.*
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
@@ -52,8 +54,9 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
         private const val ACTION_SHOW_BRAINKEY = 2
 
         // Constants used to organize NetworkService requests
-        private const val RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS = 1
-        private const val RESPONSE_BROADCAST_TRANSACTION = 2
+        private const val RESPONSE_GET_DYNAMIC_GLOBAL_PROPERTIES_NODES = 1
+        private const val RESPONSE_GET_DYNAMIC_GLOBAL_PROPERTIES_LTM = 2
+        private const val RESPONSE_BROADCAST_TRANSACTION = 3
     }
 
     private lateinit var mViewModel: SettingsFragmentViewModel
@@ -70,6 +73,9 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
 
     // Map used to keep track of request and response id pairs
     private val responseMap = HashMap<Long, Int>()
+
+    /** Transaction to upgrade to LTM */
+    private var ltmTransaction: Transaction? = null
 
     private val mHandler = Handler()
 
@@ -182,8 +188,9 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
         if (responseMap.containsKey(response.id)) {
             val responseType = responseMap[response.id]
             when (responseType) {
-                RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS  -> handleDynamicGlobalProperties(response.result)
-                RESPONSE_BROADCAST_TRANSACTION          -> handleBroadcastTransaction(response)
+                RESPONSE_GET_DYNAMIC_GLOBAL_PROPERTIES_NODES    -> handleDynamicGlobalPropertiesNodes(response.result)
+                RESPONSE_GET_DYNAMIC_GLOBAL_PROPERTIES_LTM      -> handleDynamicGlobalPropertiesLTM(response.result)
+                RESPONSE_BROADCAST_TRANSACTION                  -> handleBroadcastTransaction(response)
             }
             responseMap.remove(response.id)
         }
@@ -193,7 +200,7 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
 
     /** Handles the result of the [GetDynamicGlobalProperties] api call to obtain the current block number and update
      * it in the Nodes Dialog */
-    private fun handleDynamicGlobalProperties(result: Any?) {
+    private fun handleDynamicGlobalPropertiesNodes(result: Any?) {
         if (result is DynamicGlobalProperties) {
             if (mNodesDialog != null && mNodesDialog?.isShowing == true) {
                 val blockNumber = NumberFormat.getInstance().format(result.head_block_number)
@@ -202,16 +209,26 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
         }
     }
 
+    private fun handleDynamicGlobalPropertiesLTM(result: Any?) {
+        if (result is DynamicGlobalProperties) {
+            val expirationTime = (result.time.time / 1000) + Transaction.DEFAULT_EXPIRATION_TIME
+            val headBlockId = result.head_block_id
+            val headBlockNumber = result.head_block_number
+
+            ltmTransaction?.blockData = BlockData(headBlockNumber, headBlockId, expirationTime)
+
+            val id = mNetworkService?.sendMessage(BroadcastTransaction(ltmTransaction), BroadcastTransaction.REQUIRED_API)
+            if (id != null) responseMap[id] = RESPONSE_BROADCAST_TRANSACTION
+        }
+    }
+
     /** Handles the result of the [BroadcastTransaction] api call to find out if the Transaction was sent successfully
      * or not and acts accordingly */
     private fun handleBroadcastTransaction(message: JsonRpcResponse<*>) {
         if (message.result == null && message.error == null) {
-//            context?.toast(getString(R.string.text__transaction_sent))
-//
-//            // Return to the main screen
-//            findNavController().navigateUp()
+            // TODO test on the testnet the actual LTM upgrade
         } else if (message.error != null) {
-//            context?.toast(message.error.message, Toast.LENGTH_LONG)
+            context?.toast(message.error.message, Toast.LENGTH_LONG)
         }
     }
 
@@ -221,7 +238,7 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
     private val mRequestDynamicGlobalPropertiesTask = object : Runnable {
         override fun run() {
             val id = mNetworkService?.sendMessage(GetDynamicGlobalProperties(), GetDynamicGlobalProperties.REQUIRED_API)
-            if (id != null) responseMap[id] = RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS
+            if (id != null) responseMap[id] = RESPONSE_GET_DYNAMIC_GLOBAL_PROPERTIES_NODES
 
             mHandler.postDelayed(this, Constants.BLOCK_PERIOD)
         }
@@ -439,10 +456,10 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
 
                     val currentPrivateKey = ECKey.fromPrivate(
                         DumpedPrivateKey.fromBase58(null, privateKey).key.privKeyBytes)
-                    val transaction = Transaction(currentPrivateKey, null, operations)
+                    ltmTransaction = Transaction(currentPrivateKey, null, operations)
 
-                    val id = mNetworkService?.sendMessage(BroadcastTransaction(transaction), BroadcastTransaction.REQUIRED_API)
-                    if (id != null) responseMap[id] = RESPONSE_BROADCAST_TRANSACTION
+                    val id = mNetworkService?.sendMessage(GetDynamicGlobalProperties(), GetDynamicGlobalProperties.REQUIRED_API)
+                    if (id != null) responseMap[id] = RESPONSE_GET_DYNAMIC_GLOBAL_PROPERTIES_LTM
                 }
             }
         }

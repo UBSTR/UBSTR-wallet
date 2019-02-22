@@ -66,7 +66,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
         // Constants used to organize NetworkService requests
         private const val RESPONSE_GET_ACCOUNT_BY_NAME = 1
-        private const val RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS = 2
+        private const val RESPONSE_GET_DYNAMIC_GLOBAL_PROPERTIES = 2
         private const val RESPONSE_GET_REQUIRED_FEES = 3
         private const val RESPONSE_BROADCAST_TRANSACTION = 4
 
@@ -239,7 +239,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
             val responseType = responseMap[response.id]
             when (responseType) {
                 RESPONSE_GET_ACCOUNT_BY_NAME            -> handleAccountProperties(response.result)
-                RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS  -> handleDynamicGlobalProperties(response.result)
+                RESPONSE_GET_DYNAMIC_GLOBAL_PROPERTIES  -> handleDynamicGlobalProperties(response.result)
                 RESPONSE_GET_REQUIRED_FEES              -> handleRequiredFees(response.result)
                 RESPONSE_BROADCAST_TRANSACTION          -> handleBroadcastTransaction(response)
             }
@@ -548,7 +548,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
             // Start the send transaction procedure which includes a series of calls
             val id = mNetworkService?.sendMessage(GetDynamicGlobalProperties(),
                 GetDynamicGlobalProperties.REQUIRED_API)
-            if (id != null ) responseMap[id] =  RESPONSE_GET_DYNAMIC_GLOBAL_PARAMETERS
+            if (id != null ) responseMap[id] =  RESPONSE_GET_DYNAMIC_GLOBAL_PROPERTIES
         } else
             Log.d(TAG, "Network Service is not connected")
     }
