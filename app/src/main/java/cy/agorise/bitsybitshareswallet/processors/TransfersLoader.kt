@@ -27,7 +27,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
-import java.lang.IllegalArgumentException
 import java.util.*
 import javax.crypto.AEADBadTagException
 
@@ -257,10 +256,12 @@ class TransfersLoader(private var mContext: Context?) {
 
             val memo = op.memo
             if (memo.byteMessage != null) {
-                val destinationAddress = memo.destination
                 try {
-                    if (destinationAddress.toString() == myAddress.toString()) {
+                    if (memo.destination.equals(myAddress)) {
                         val decryptedMessage = Memo.decryptMessage(memoKey, memo.source, memo.nonce, memo.byteMessage)
+                        memo.plaintextMessage = decryptedMessage
+                    }else if(memo.source.equals(myAddress)){
+                        val decryptedMessage = Memo.decryptMessage(memoKey, memo.destination, memo.nonce, memo.byteMessage)
                         memo.plaintextMessage = decryptedMessage
                     }
                 } catch (e: ChecksumException) {
@@ -270,6 +271,10 @@ class TransfersLoader(private var mContext: Context?) {
                     Log.e(TAG, "NullPointerException. Msg: " + e.message)
                 } catch (e: Exception) {
                     Log.e(TAG, "Exception while decoding memo. Msg: " + e.message)
+                    Log.e(TAG,"Exception type: " + e)
+                    for(element in e.stackTrace){
+                        Log.e(TAG, String.format("%s#%s:%d", element.className, element.methodName, element.lineNumber))
+                    }
                 }
             }
 
