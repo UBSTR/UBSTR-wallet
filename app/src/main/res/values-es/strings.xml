@@ -137,6 +137,10 @@
     <string name="msg__upgrade_to_ltm">Actualiza a la membresía de por vida (LTM). Las cuentas LTM de Bitshares pagan las tarifas más bajas, obtienen un 80% de devolución de dinero y bonificaciones por referencias.</string>
     <string name="button__upgrade_to_ltm">Ascender a LTM</string>
     <string name="msg__account_upgrade_dialog">La membresía de por vida te permite operar con tarifas de red muy reducidas.\n\nTendrá efecto en la cuenta actual "%1$s"\n\nSin embargo, tiene un costo de alrededor de 100 USD pagados en Bitshares.\n\n¿Estás seguro de que deseas continuar?</string>
+    <string name="title__account_upgraded">Cuenta Actualizada</string>
+    <string name="msg__account_upgraded">¡Felicidades! Tu cuenta ahora se ha actualizado a la membresía de por vida (LTM).</string>
+    <string name="title__upgrade_account_error">Error al intentar actualizar la cuenta</string>
+    <string name="msg__upgrade_account_error">Por favor, asegúrate de que tu cuenta tenga un balance suficiente para cubrir los costos.</string>
     <string name="title__bugs_or_ideas">Errores o Ideas?</string>
     <string name="msg__bugs_or_ideas">Telegram: https://t.me/Agorise\nKeybase: https://keybase.io/team/Agorise</string>
     <string name="title__bitshares_nodes_dialog">Bloque: %1$s</string>

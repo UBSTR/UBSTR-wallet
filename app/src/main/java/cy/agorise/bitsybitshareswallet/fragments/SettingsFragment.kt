@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProviders
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
@@ -24,11 +23,11 @@ import cy.agorise.bitsybitshareswallet.adapters.FullNodesAdapter
 import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.CryptoUtils
-import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.bitsybitshareswallet.viewmodels.SettingsFragmentViewModel
 import cy.agorise.graphenej.*
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.calls.BroadcastTransaction
+import cy.agorise.graphenej.api.calls.GetAccounts
 import cy.agorise.graphenej.api.calls.GetDynamicGlobalProperties
 import cy.agorise.graphenej.models.DynamicGlobalProperties
 import cy.agorise.graphenej.models.JsonRpcResponse
@@ -219,16 +218,35 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
 
             val id = mNetworkService?.sendMessage(BroadcastTransaction(ltmTransaction), BroadcastTransaction.REQUIRED_API)
             if (id != null) responseMap[id] = RESPONSE_BROADCAST_TRANSACTION
+
+            // TODO use an indicator to show that a transaction is in progress
         }
     }
 
-    /** Handles the result of the [BroadcastTransaction] api call to find out if the Transaction was sent successfully
-     * or not and acts accordingly */
+    /** Handles the result of the [BroadcastTransaction] api call to find out if the Transaction to upgrade the
+     * current account to LTM was successful or not */
     private fun handleBroadcastTransaction(message: JsonRpcResponse<*>) {
         if (message.result == null && message.error == null) {
-            // TODO test on the testnet the actual LTM upgrade
+            // Looks like the upgrade to LTM was successful, we need to update the current account information from
+            // the blockchain and show a success dialog
+            mNetworkService?.sendMessage(GetAccounts(mUserAccount), GetAccounts.REQUIRED_API)
+
+            context?.let { context ->
+                MaterialDialog(context).show {
+                    title(R.string.title__account_upgraded)
+                    message(R.string.msg__account_upgraded)
+                    positiveButton(android.R.string.ok)
+                }
+            }
         } else if (message.error != null) {
-            context?.toast(message.error.message, Toast.LENGTH_LONG)
+            // The upgrade to LTM wasn't successful, show a dialog to the user explaining the situation
+            context?.let { context ->
+                MaterialDialog(context).show {
+                    title(R.string.title__upgrade_account_error)
+                    message(R.string.msg__upgrade_account_error)
+                    positiveButton(android.R.string.ok)
+                }
+            }
         }
     }
 
