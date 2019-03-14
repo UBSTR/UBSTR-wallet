@@ -51,9 +51,13 @@ class HomeFragment : Fragment() {
         val window = activity?.window
         window?.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
         window?.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-        // Sets the status bar background color to a primaryColorDark
-        window?.statusBarColor = ContextCompat.getColor(context!!,
-            if (!nightMode) R.color.colorPrimaryDark else R.color.colorStatusBarDark)
+        // Sets the status and navigation bars background color to a dark blue or just dark
+        context?.let { context ->
+            val statusBarColor = ContextCompat.getColor(context,
+                    if (!nightMode) R.color.colorPrimaryDark else R.color.colorStatusBarDark)
+            window?.statusBarColor = statusBarColor
+            window?.navigationBarColor = statusBarColor
+        }
 
         return inflater.inflate(R.layout.fragment_home, container, false)
     }

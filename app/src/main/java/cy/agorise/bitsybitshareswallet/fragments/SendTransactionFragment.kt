@@ -122,10 +122,14 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         val toolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
         toolbar?.setBackgroundResource(if (!nightMode) R.color.colorSend else R.color.colorToolbarDark)
 
-        // Sets the status bar background color to a dark red
+        // Sets the status and navigation bars background color to a dark red or just dark
         val window = activity?.window
-        window?.statusBarColor = ContextCompat.getColor(context!!,
-            if (!nightMode) R.color.colorSendDark else R.color.colorStatusBarDark)
+        context?.let { context ->
+            val statusBarColor = ContextCompat.getColor(context,
+                    if (!nightMode) R.color.colorSendDark else R.color.colorStatusBarDark)
+            window?.statusBarColor = statusBarColor
+            window?.navigationBarColor = statusBarColor
+        }
 
         return inflater.inflate(R.layout.fragment_send_transaction, container, false)
     }

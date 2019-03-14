@@ -91,10 +91,14 @@ class ReceiveTransactionFragment : ConnectedFragment() {
         val toolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
         toolbar?.setBackgroundResource(if (!nightMode) R.color.colorReceive else R.color.colorToolbarDark)
 
-        // Sets the status bar background color to a dark green
+        // Sets the status and navigation bars background color to a dark green or just dark
         val window = activity?.window
-        window?.statusBarColor = ContextCompat.getColor(context!!,
-            if (!nightMode) R.color.colorReceiveDark else R.color.colorStatusBarDark)
+        context?.let { context ->
+            val statusBarColor = ContextCompat.getColor(context,
+                    if (!nightMode) R.color.colorReceiveDark else R.color.colorStatusBarDark)
+            window?.statusBarColor = statusBarColor
+            window?.navigationBarColor = statusBarColor
+        }
 
         return inflater.inflate(R.layout.fragment_receive_transaction, container, false)
     }
