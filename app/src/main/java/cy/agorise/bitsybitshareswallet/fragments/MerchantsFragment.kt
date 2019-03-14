@@ -74,7 +74,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
         private const val SUGGEST_COLUMN_IMAGE_RESOURCE = "suggest_image_resource"
     }
 
-    private lateinit var mMap: GoogleMap
+    private var mMap: GoogleMap? = null
 
     private lateinit var mMerchantViewModel: MerchantViewModel
 
@@ -303,7 +303,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
 
         if (lat != null && lon != null) {
             try {
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))
+                mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))
             } catch (e: Exception) {
                 Log.d(TAG, e.message)
             }
@@ -319,8 +319,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
             // Try to show or dismiss the custom popup window with the merchants and tellers switches
             if (mPopupWindow?.isShowing == false) {
                 mPopupWindow?.showAsDropDown(toolbar, screenWidth, 8)
-                if (mMap.isMyLocationEnabled)
-                    mMap.uiSettings?.isMyLocationButtonEnabled = false
+                if (mMap?.isMyLocationEnabled == true)
+                    mMap?.uiSettings?.isMyLocationButtonEnabled = false
             } else
                 dismissPopupWindow()
             return true
@@ -335,7 +335,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
 
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                mMap.isMyLocationEnabled = true
+                mMap?.isMyLocationEnabled = true
             } else {
                 context?.toast(getString(R.string.msg__location_permission_necessary))
             }
@@ -356,7 +356,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
         mMap = googleMap
 
         // Add padding to move the controls out of the toolbar/status bar and navigation bar.
-        mMap.setPadding(0, toolbar.height +  statusBarSize, 0, navigationBarSize)
+        mMap?.setPadding(0, toolbar.height +  statusBarSize, 0, navigationBarSize)
 
         applyMapTheme()
 
@@ -370,17 +370,17 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
         initTellersCluster()
 
         // Point the map's listeners at the listeners implemented by the marker manager.
-        mMap.setOnMarkerClickListener(mMarkerManager)
+        mMap?.setOnMarkerClickListener(mMarkerManager)
 
-        mMap.setOnCameraIdleListener {
+        mMap?.setOnCameraIdleListener {
             mMerchantClusterManager?.onCameraIdle()
             mTellerClusterManager?.onCameraIdle()
         }
 
-        mMap.setInfoWindowAdapter(mMarkerManager)
+        mMap?.setInfoWindowAdapter(mMarkerManager)
 
         // Try to dismiss the
-        mMap.setOnMapClickListener {
+        mMap?.setOnMapClickListener {
             dismissPopupWindow()
         }
     }
@@ -392,13 +392,13 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
         if (nightMode) {
             // Customise the styling of the base map using a JSON object defined
             // in a raw resource file.
-            val success = mMap.setMapStyle(
+            val success = mMap?.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(
                     context, R.raw.map_style_night
                 )
             )
 
-            if (!success) {
+            if (success != null && success != false) {
                 Log.e(TAG, "Style parsing failed.")
             }
         }
@@ -411,7 +411,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
             requestPermissions(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION)
         } else {
             // Permission is already granted
-            mMap.isMyLocationEnabled = true
+            mMap?.isMyLocationEnabled = true
         }
     }
 
@@ -499,7 +499,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
             val bounds = builder.build()
 
             try {
-                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                mMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
             } catch (e: Exception) {
                 Log.d(TAG, e.message)
             }
@@ -600,8 +600,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
     private fun dismissPopupWindow() {
         if (mPopupWindow?.isShowing == true) {
             mPopupWindow?.dismiss()
-            if (mMap.isMyLocationEnabled)
-                mMap.uiSettings?.isMyLocationButtonEnabled = true
+            if (mMap?.isMyLocationEnabled == true)
+                mMap?.uiSettings?.isMyLocationButtonEnabled = true
         }
     }
 
