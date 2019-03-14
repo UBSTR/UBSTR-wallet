@@ -34,4 +34,13 @@
         android:text="@string/msg__tellers_description"
         android:textAppearance="@style/TextAppearance.Bitsy.Body2"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_same_topic"
+        android:autoLink="all"
+        android:lineSpacingExtra="8dp"
+        android:text="@string/msg__bugs_or_ideas"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
 </LinearLayout>
