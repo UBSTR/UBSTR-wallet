@@ -9,6 +9,8 @@
         <!--Custom attributes -->
         <item name="android:fontFamily">@font/p_f_beau_sans_pro</item>
         <item name="themedColorBackgroundFloating">@android:color/white</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
     </style>
     <style name="Theme.Bitsy.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -26,6 +28,8 @@
         <!--Custom attributes -->
         <item name="android:fontFamily">@font/p_f_beau_sans_pro</item>
         <item name="themedColorBackgroundFloating">@color/colorBackgroundFloating</item>
+        <item name="android:statusBarColor">@color/colorStatusBarDark</item>
+        <item name="android:navigationBarColor">@color/colorStatusBarDark</item>
     </style>
     <style name="Theme.Bitsy.Dark.NoActionBar">
         <item name="windowActionBar">false</item>

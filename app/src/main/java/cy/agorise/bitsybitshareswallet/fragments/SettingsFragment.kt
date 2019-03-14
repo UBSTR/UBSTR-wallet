@@ -87,15 +87,9 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
         val nightMode = PreferenceManager.getDefaultSharedPreferences(context)
                 .getBoolean(Constants.KEY_NIGHT_MODE_ACTIVATED, false)
 
-        // Make sure both toolbar and navigation bar show the correct colors in both day and night modes
+        // Make sure the toolbar show the correct colors in both day and night modes
         val toolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
         toolbar?.setBackgroundResource(if (!nightMode) R.color.colorPrimary else R.color.colorToolbarDark)
-
-        val window = activity?.window
-        context?.let { context ->
-            window?.statusBarColor = ContextCompat.getColor(context,
-                if (!nightMode) R.color.colorPrimaryDark else R.color.colorStatusBarDark)
-        }
 
         return inflater.inflate(R.layout.fragment_settings, container, false)
     }
