@@ -11,145 +11,238 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingStart="@dimen/activity_horizontal_margin"
-        android:paddingEnd="@dimen/activity_horizontal_margin"
         android:orientation="vertical">
 
         <!-- General -->
 
-        <TextView
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.MaterialComponents.CardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/title__general"
-            android:textAppearance="@style/TextAppearance.Bitsy.Subtitle1"
-            android:textStyle="bold"/>
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            app:contentPadding="@dimen/activity_vertical_margin"
+            app:cardElevation="2dp"
+            app:cardCornerRadius="@dimen/card_radius">
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/switchAutoClose"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_different_topic"
-            app:switchPadding="12dp"
-            android:text="@string/msg__close_timer"
-            android:textAppearance="@style/TextAppearance.Bitsy.Body1"
-            android:textColor="?android:textColorPrimary"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/switchNightMode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_same_topic"
-            android:text="@string/msg__night_mode"
-            android:textAppearance="@style/TextAppearance.Bitsy.Body1"
-            android:textColor="?android:textColorPrimary"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title__general"
+                    android:textAppearance="@style/TextAppearance.Bitsy.Subtitle1"
+                    android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/tvNetworkStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_same_topic"
-            android:layout_marginEnd="2dp"
-            android:text="@string/text__view_network_status"
-            android:gravity="center_vertical"
-            android:textAppearance="@style/TextAppearance.Bitsy.Body1"
-            android:drawableEnd="@drawable/ic_disconnected"/>
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switchAutoClose"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_different_topic"
+                    app:switchPadding="12dp"
+                    android:text="@string/msg__close_timer"
+                    android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+                    android:textColor="?android:textColorPrimary"/>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switchNightMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_same_topic"
+                    android:text="@string/msg__night_mode"
+                    android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+                    android:textColor="?android:textColorPrimary"/>
+
+                <TextView
+                    android:id="@+id/tvNetworkStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_same_topic"
+                    android:layout_marginEnd="2dp"
+                    android:text="@string/text__view_network_status"
+                    android:gravity="center_vertical"
+                    android:textAppearance="@style/TextAppearance.Bitsy.Body1"
+                    android:drawableEnd="@drawable/ic_disconnected"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Security -->
 
-        <TextView
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.MaterialComponents.CardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_different_section"
-            android:text="@string/title__security"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-            android:textStyle="bold"/>
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            app:contentPadding="@dimen/activity_vertical_margin"
+            app:cardElevation="2dp"
+            app:cardCornerRadius="@dimen/card_radius">
 
-        <TextView
-            android:id="@+id/tvSecurityLock"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_different_topic"
-            android:text="@string/text__security_lock"
-            android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvSecurityLockSelected"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="4dp"
-            tools:text="PIN"
-            android:textSize="16sp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title__security"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tvSecurityLock"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_different_topic"
+                    android:text="@string/text__security_lock"
+                    android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
+                <TextView
+                    android:id="@+id/tvSecurityLockSelected"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    tools:text="PIN"
+                    android:textSize="16sp"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Backup -->
 
-        <TextView
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.MaterialComponents.CardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_different_section"
-            android:text="@string/title__backup"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-            android:textStyle="bold"/>
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            app:contentPadding="@dimen/activity_vertical_margin"
+            app:cardElevation="2dp"
+            app:cardCornerRadius="@dimen/card_radius">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_different_topic"
-            android:text="@string/msg__brainkey_description"
-            android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnViewBrainKey"
-            style="@style/Widget.Bitsy.Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_same_topic"
-            android:text="@string/button__view_and_copy"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title__backup"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_different_topic"
+                    android:text="@string/msg__brainkey_description"
+                    android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnViewBrainKey"
+                    style="@style/Widget.Bitsy.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_same_topic"
+                    android:text="@string/button__view_and_copy"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Accounts -->
 
-        <TextView
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.MaterialComponents.CardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            app:contentPadding="@dimen/activity_vertical_margin"
+            app:cardElevation="2dp"
+            app:cardCornerRadius="@dimen/card_radius">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_different_section"
-                android:text="@string/title__accounts"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-                android:textStyle="bold"/>
+                android:orientation="vertical">
 
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_different_topic"
-                android:text="@string/msg__upgrade_to_ltm"
-                android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title__accounts"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                    android:textStyle="bold"/>
 
-        <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnUpgradeToLTM"
-                style="@style/Widget.Bitsy.Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_same_topic"
-                android:text="@string/button__upgrade_to_ltm"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_different_topic"
+                    android:text="@string/msg__upgrade_to_ltm"
+                    android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnUpgradeToLTM"
+                    style="@style/Widget.Bitsy.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_same_topic"
+                    android:text="@string/button__upgrade_to_ltm"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Bugs or Ideas -->
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_different_section"
-            android:text="@string/title__bugs_or_ideas"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-            android:textStyle="bold"/>
-
-        <TextView
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.MaterialComponents.CardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_same_topic"
-            android:autoLink="all"
-            android:lineSpacingExtra="8dp"
-            android:text="@string/msg__bugs_or_ideas"
-            android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            app:contentPadding="@dimen/activity_vertical_margin"
+            app:cardElevation="2dp"
+            app:cardCornerRadius="@dimen/card_radius">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title__bugs_or_ideas"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_same_topic"
+                    android:autoLink="all"
+                    android:lineSpacingExtra="8dp"
+                    android:text="@string/msg__bugs_or_ideas"
+                    android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 
