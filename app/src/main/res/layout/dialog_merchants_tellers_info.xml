@@ -41,6 +41,6 @@
         android:autoLink="all"
         android:lineSpacingExtra="8dp"
         android:text="@string/msg__bugs_or_ideas"
-        android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+        android:textAppearance="@style/TextAppearance.Bitsy.Body2"/>
 
 </LinearLayout>
