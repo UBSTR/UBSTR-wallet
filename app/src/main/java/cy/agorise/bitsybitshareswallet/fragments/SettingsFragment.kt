@@ -9,6 +9,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProviders
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
@@ -80,6 +83,19 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
+
+        val nightMode = PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(Constants.KEY_NIGHT_MODE_ACTIVATED, false)
+
+        // Make sure both toolbar and navigation bar show the correct colors in both day and night modes
+        val toolbar: Toolbar? = activity?.findViewById(R.id.toolbar)
+        toolbar?.setBackgroundResource(if (!nightMode) R.color.colorPrimary else R.color.colorToolbarDark)
+
+        val window = activity?.window
+        context?.let { context ->
+            window?.statusBarColor = ContextCompat.getColor(context,
+                if (!nightMode) R.color.colorPrimaryDark else R.color.colorStatusBarDark)
+        }
 
         return inflater.inflate(R.layout.fragment_settings, container, false)
     }
