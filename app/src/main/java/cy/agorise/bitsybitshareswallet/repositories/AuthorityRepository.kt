@@ -25,6 +25,7 @@ class AuthorityRepository internal constructor(context: Context) {
         return mAuthorityDao.get(userId)
     }
 
+    // TODO remove when TransfersLoader is removed
     fun getWIFOld(userId: String, authorityType: Int): Single<String> {
         return mAuthorityDao.getWIFOld(userId, authorityType)
     }

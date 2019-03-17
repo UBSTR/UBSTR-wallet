@@ -26,9 +26,9 @@ import com.jakewharton.rxbinding3.widget.textChanges
 import cy.agorise.bitsybitshareswallet.R
 import cy.agorise.bitsybitshareswallet.adapters.BalancesDetailsAdapter
 import cy.agorise.bitsybitshareswallet.database.joins.BalanceDetail
-import cy.agorise.bitsybitshareswallet.repositories.AuthorityRepository
 import cy.agorise.bitsybitshareswallet.utils.*
 import cy.agorise.bitsybitshareswallet.viewmodels.BalanceDetailViewModel
+import cy.agorise.bitsybitshareswallet.viewmodels.SendTransactionViewModel
 import cy.agorise.graphenej.*
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.calls.BroadcastTransaction
@@ -42,7 +42,6 @@ import cy.agorise.graphenej.models.JsonRpcResponse
 import cy.agorise.graphenej.operations.TransferOperation
 import cy.agorise.graphenej.operations.TransferOperationBuilder
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_send_transaction.*
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 import org.bitcoinj.core.DumpedPrivateKey
@@ -77,6 +76,8 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
     // Navigation AAC Safe Args
     private val args: SendTransactionFragmentArgs by navArgs()
 
+    private lateinit var mViewModel: SendTransactionViewModel
+
     /** Variables used in field's validation */
     private var isCameraPreviewVisible = false
     private var isToAccountCorrect = false
@@ -105,9 +106,6 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
     /** Variable holding the current user's private key in the WIF format */
     private var wifKey: String? = null
-
-    /** Repository to access and update Authorities */
-    private var authorityRepository: AuthorityRepository? = null
 
     /** This is one of the recipient account's public key, it will be used for memo encoding */
     private var destinationPublicKey: PublicKey? = null
@@ -145,6 +143,20 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         if (userId != "")
             mUserAccount = UserAccount(userId)
 
+        // Configure ViewModel
+        mViewModel= ViewModelProviders.of(this).get(SendTransactionViewModel::class.java)
+
+        mViewModel.getWIF(userId, AuthorityType.ACTIVE.ordinal).observe(this,
+            androidx.lifecycle.Observer<String> { encryptedWIF ->
+                context?.let {
+                    try {
+                        wifKey = CryptoUtils.decrypt(it, encryptedWIF)
+                    } catch (e: AEADBadTagException) {
+                        Log.e(TAG, "AEADBadTagException. Class: " + e.javaClass + ", Msg: " + e.message)
+                    }
+                }
+            })
+
         // Use Navigation SafeArgs to decide if we should activate or not the camera feed
         if (args.openCamera) {
             // Delay the camera action to avoid flicker in the fragment transition
@@ -180,23 +192,6 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
         fabSendTransaction.setOnClickListener { verifySecurityLockSendTransfer() }
         fabSendTransaction.disable(R.color.lightGray)
-
-        authorityRepository = AuthorityRepository(context!!)
-
-        // Obtain the WifKey from the db, which is used in the Send Transfer procedure
-        mDisposables.add(
-            authorityRepository!!.getWIFOld(userId, AuthorityType.ACTIVE.ordinal)
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { encryptedWIF ->
-                    try {
-                        wifKey = CryptoUtils.decrypt(context!!, encryptedWIF)
-                    } catch (e: AEADBadTagException) {
-                        Log.e(TAG, "AEADBadTagException. Class: " + e.javaClass + ", Msg: " + e.message)
-                    }
-
-                }
-        )
 
         // Use RxJava Debounce to avoid making calls to the NetworkService on every text change event
         mDisposables.add(
