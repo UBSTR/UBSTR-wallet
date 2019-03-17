@@ -80,7 +80,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
     private var selectedInAutoCompleteTextView = false
 
     // Map used to keep track of request and response id pairs
-    private val responseMap = LongSparseArray<Int>()//HashMap<Long, Int>()
+    private val responseMap = LongSparseArray<Int>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -173,6 +173,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
             tietAmount.textChanges()
                 .debounce(1000, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnError { mAsset = null }
                 .subscribe { updateQR() }
         )
 
@@ -188,6 +189,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .map { it.toString().trim().toUpperCase() }
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnError { mAsset = null }
                 .subscribe {
                     if (!selectedInAutoCompleteTextView) {
                         mAsset = null
