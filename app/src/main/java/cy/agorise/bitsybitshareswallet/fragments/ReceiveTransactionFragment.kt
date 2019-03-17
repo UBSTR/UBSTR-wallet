@@ -12,6 +12,7 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.collection.LongSparseArray
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -79,7 +80,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
     private var selectedInAutoCompleteTextView = false
 
     // Map used to keep track of request and response id pairs
-    private val responseMap = HashMap<Long, Int>()
+    private val responseMap = LongSparseArray<Int>()//HashMap<Long, Int>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -196,9 +197,9 @@ class ReceiveTransactionFragment : ConnectedFragment() {
 
                     // Get a list of assets that match the already typed string by the user
                     if (it.length > 1 && mNetworkService != null) {
-                        val id = mNetworkService!!.sendMessage(ListAssets(it, AUTO_SUGGEST_ASSET_LIMIT),
+                        val id = mNetworkService?.sendMessage(ListAssets(it, AUTO_SUGGEST_ASSET_LIMIT),
                             ListAssets.REQUIRED_API)
-                        responseMap[id] = RESPONSE_LIST_ASSETS
+                        if (id != null) responseMap.append(id, RESPONSE_LIST_ASSETS)
                     }
                 }
         )
@@ -297,15 +298,10 @@ class ReceiveTransactionFragment : ConnectedFragment() {
     internal fun encodeAsBitmap(data: String, color: String): Bitmap? {
         val result: BitMatrix
 
-        // Get measured width and height of the ImageView where the QR code will be placed
-        var w = ivQR.width
-        var h = ivQR.height
-
-        // Gets minimum side length and sets both width and height to that value so the final
-        // QR code has a squared shape
-        val minSide = if (w < h) w else h
-        h = minSide
-        w = h
+        // Get measured width and height of the ImageView where the QR code will be placed and make sure
+        // the final QR code has a squared shape
+        val w = Math.min(ivQR.width, ivQR.height)
+        val h = w
 
         try {
             val hints = HashMap<EncodeHintType, Any>()
@@ -326,9 +322,15 @@ class ReceiveTransactionFragment : ConnectedFragment() {
                 pixels[offset + x] = if (result.get(x, y)) Color.parseColor(color) else Color.WHITE
             }
         }
-        val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        bitmap.setPixels(pixels, 0, w, 0, 0, w, h)
-        return bitmap
+
+        return try {
+            val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+            bitmap.setPixels(pixels, 0, w, 0, 0, w, h)
+            bitmap
+        } catch (e: IllegalArgumentException) {
+            Crashlytics.logException(e)
+            null
+        }
     }
 
     /**
