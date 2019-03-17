@@ -51,7 +51,7 @@ abstract class ConnectedFragment : Fragment(), ServiceConnection {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         { handleIncomingMessage(it) } ,
-                        {t -> Crashlytics.log(Log.DEBUG, TAG, t.message) }
+                        { Crashlytics.log(Log.DEBUG, TAG, it.message) }
                 )
         )
     }

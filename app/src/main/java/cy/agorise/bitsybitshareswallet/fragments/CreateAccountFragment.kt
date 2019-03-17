@@ -79,7 +79,10 @@ class CreateAccountFragment : BaseAccountFragment() {
                 .skipInitialValue()
                 .debounce(800, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { validateAccountName(it.toString()) }
+                .subscribe(
+                    { validateAccountName(it.toString()) },
+                    { Crashlytics.log(Log.DEBUG, TAG, it.message) }
+                )
         )
 
         // Use RxJava Debounce to update the PIN error only after the user stops writing for > 500 ms
@@ -88,7 +91,10 @@ class CreateAccountFragment : BaseAccountFragment() {
                 .skipInitialValue()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { validatePIN() }
+                .subscribe(
+                    { validatePIN() },
+                    { Crashlytics.log(Log.DEBUG, TAG, it.message) }
+                )
         )
 
         // Use RxJava Debounce to update the PIN Confirmation error only after the user stops writing for > 500 ms
@@ -97,7 +103,10 @@ class CreateAccountFragment : BaseAccountFragment() {
                 .skipInitialValue()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { validatePINConfirmation() }
+                .subscribe(
+                    { validatePINConfirmation() },
+                    { Crashlytics.log(Log.DEBUG, TAG, it.message) }
+                )
         )
 
         btnCancel.setOnClickListener { findNavController().navigateUp() }
