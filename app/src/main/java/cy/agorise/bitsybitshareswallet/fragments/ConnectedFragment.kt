@@ -8,8 +8,10 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.view.View
+import androidx.core.os.ConfigurationCompat
 import androidx.fragment.app.Fragment
 import com.crashlytics.android.Crashlytics
+import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.graphenej.api.ConnectionStatusUpdate
 import cy.agorise.graphenej.api.android.NetworkService
 import cy.agorise.graphenej.api.android.RxBus
@@ -38,6 +40,9 @@ abstract class ConnectedFragment : Fragment(), ServiceConnection {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val locale = ConfigurationCompat.getLocales(resources.configuration)[0]
+        Crashlytics.setString(Constants.CRASHLYTICS_KEY_LANGUAGE, locale.displayName)
 
         // Connect to the RxBus, which receives events from the NetworkService
         mDisposables.add(

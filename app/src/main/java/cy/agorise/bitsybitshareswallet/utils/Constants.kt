@@ -127,4 +127,7 @@ object Constants {
 
     /** Key used to add the last visited fragment name to the Crashlytics report */
     const val CRASHLYTICS_KEY_LAST_SCREEN = "crashlytics_key_last_screen"
+
+    /** Key used to add the device language to the Crashlytics report */
+    const val CRASHLYTICS_KEY_LANGUAGE = "crashlytics_key_language"
 }

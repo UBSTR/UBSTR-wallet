@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.collection.LongSparseArray
 import androidx.navigation.fragment.findNavController
 import com.jakewharton.rxbinding3.widget.textChanges
 import cy.agorise.bitsybitshareswallet.R
@@ -35,7 +36,6 @@ import cy.agorise.bitsybitshareswallet.models.FaucetResponse
 import cy.agorise.bitsybitshareswallet.network.ServiceGenerator
 import retrofit2.Call
 import retrofit2.Response
-import java.util.*
 
 
 class CreateAccountFragment : BaseAccountFragment() {
@@ -60,7 +60,7 @@ class CreateAccountFragment : BaseAccountFragment() {
     private var isAccountValidAndAvailable = false
 
     // Map used to keep track of request and response id pairs
-    private val responseMap = HashMap<Long, Int>()
+    private val responseMap = LongSparseArray<Int>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -121,7 +121,7 @@ class CreateAccountFragment : BaseAccountFragment() {
             val id = mNetworkService?.sendMessage(GetAccountByName(accountName), GetAccountByName.REQUIRED_API)
 
             if (id != null)
-                responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME_VALIDATION
+                responseMap.append(id, RESPONSE_GET_ACCOUNT_BY_NAME_VALIDATION)
         }
 
         enableDisableCreateButton()
@@ -181,9 +181,7 @@ class CreateAccountFragment : BaseAccountFragment() {
         }
     }
 
-    override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) {
-        // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun handleConnectionStatusUpdate(connectionStatusUpdate: ConnectionStatusUpdate) { }
 
     /**
      * Handles the response from the NetworkService's GetAccountByName call to decide if the user's suggested
@@ -257,7 +255,7 @@ class CreateAccountFragment : BaseAccountFragment() {
                 GetAccountByName.REQUIRED_API)
 
             if (id != null)
-                responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME_CREATED
+                responseMap.append(id, RESPONSE_GET_ACCOUNT_BY_NAME_CREATED)
         } else {
             Log.d(TAG, "Private account creation failed ")
             val content = if (faucetResponse?.error?.base?.size ?: 0 > 0) {
@@ -287,7 +285,7 @@ class CreateAccountFragment : BaseAccountFragment() {
             mBrainKey = BrainKey(brainKeySuggestion, 0)
             val address = Address(ECKey.fromPublicOnly(mBrainKey?.privateKey?.pubKey))
             Log.d(TAG, "brain key: $brainKeySuggestion")
-            Log.d(TAG, "address would be: " + address.toString())
+            Log.d(TAG, "address would be: $address")
             mAddress = address.toString()
             tvBrainKey.text = mBrainKey?.brainKey
 
