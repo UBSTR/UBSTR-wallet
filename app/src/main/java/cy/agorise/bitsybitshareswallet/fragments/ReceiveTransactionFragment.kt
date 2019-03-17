@@ -173,8 +173,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
             tietAmount.textChanges()
                 .debounce(1000, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError { mAsset = null }
-                .subscribe { updateQR() }
+                .subscribe( { updateQR() }, { mAsset = null} )
         )
 
         // Add adapter to the Assets AutoCompleteTextView
@@ -189,8 +188,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .map { it.toString().trim().toUpperCase() }
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError { mAsset = null }
-                .subscribe {
+                .subscribe( {
                     if (!selectedInAutoCompleteTextView) {
                         mAsset = null
                         updateQR()
@@ -203,7 +201,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
                             ListAssets.REQUIRED_API)
                         if (id != null) responseMap.append(id, RESPONSE_LIST_ASSETS)
                     }
-                }
+                }, { mAsset = null } )
         )
 
         actvAsset.setOnItemClickListener { parent, _, position, _ ->
