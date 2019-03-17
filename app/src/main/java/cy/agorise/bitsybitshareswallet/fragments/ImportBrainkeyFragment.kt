@@ -91,7 +91,10 @@ class ImportBrainkeyFragment : BaseAccountFragment() {
                 .skipInitialValue()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { validatePIN() }
+                .subscribe(
+                    { validatePIN() },
+                    { Crashlytics.log(Log.DEBUG, TAG, it.message) }
+                )
         )
 
         // Use RxJava Debounce to update the PIN Confirmation error only after the user stops writing for > 500 ms
@@ -100,7 +103,10 @@ class ImportBrainkeyFragment : BaseAccountFragment() {
                 .skipInitialValue()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { validatePINConfirmation() }
+                .subscribe(
+                    { validatePINConfirmation() },
+                    { Crashlytics.log(Log.DEBUG, TAG, it.message) }
+                )
         )
 
         // Use RxJava Debounce to update the BrainKey error only after the user stops writing for > 500 ms
@@ -110,7 +116,10 @@ class ImportBrainkeyFragment : BaseAccountFragment() {
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .map { it.toString().trim() }
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { validateBrainKey(it) }
+                .subscribe(
+                    { validateBrainKey(it) },
+                    { Crashlytics.log(Log.DEBUG, TAG, it.message) }
+                )
         )
 
         btnImport.isEnabled = false
