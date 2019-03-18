@@ -301,6 +301,12 @@ class CreateAccountFragment : BaseAccountFragment() {
         } catch (e: IOException) {
             Log.e(TAG, "IOException while trying to generate key. Msg: " + e.message)
             context?.toast(getString(R.string.error__read_dict_file))
+            findNavController().navigateUp()
+        } catch (e: IllegalArgumentException) {
+            Crashlytics.logException(e)
+            // TODO if this does happen to real devices, use a proper error message
+            context?.toast(getString(R.string.error__try_again))
+            findNavController().navigateUp()
         } finally {
             if (reader != null) {
                 try {
