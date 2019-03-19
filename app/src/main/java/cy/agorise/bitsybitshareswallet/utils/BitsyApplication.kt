@@ -1,26 +1,35 @@
 package cy.agorise.bitsybitshareswallet.utils
 
 import android.app.Application
+import com.crashlytics.android.Crashlytics
 import cy.agorise.graphenej.api.ApiAccess
 import cy.agorise.graphenej.api.android.NetworkServiceManager
+import io.reactivex.plugins.RxJavaPlugins
+
 
 class BitsyApplication : Application() {
 
-    private val BITSHARES_NODE_URLS = arrayOf(
-        // PP private nodes
-        "wss://nl.palmpay.io/ws",
+    companion object {
+        private val BITSHARES_NODE_URLS = arrayOf(
+            // PP private nodes
+            "wss://nl.palmpay.io/ws",
 
-        // Other public nodes
-        "wss://bitshares.nu/ws",                   // Stockholm, Sweden
-        "wss://bitshares.openledger.info/ws",      // Openledger node
-        "wss://dallas.bitshares.apasia.tech/ws",	// Dallas, USA
-        "wss://atlanta.bitshares.apasia.tech/ws",	// Atlanta, USA
-        "wss://dex.rnglab.org",				// Amsterdam, Netherlands
-        "wss://citadel.li/node"
-    )
+            // Other public nodes
+            "wss://bitshares.nu/ws",                   // Stockholm, Sweden
+            "wss://bitshares.openledger.info/ws",      // Openledger node
+            "wss://dallas.bitshares.apasia.tech/ws",	// Dallas, USA
+            "wss://atlanta.bitshares.apasia.tech/ws",	// Atlanta, USA
+            "wss://dex.rnglab.org",				// Amsterdam, Netherlands
+            "wss://citadel.li/node"
+        )
+    }
 
     override fun onCreate() {
         super.onCreate()
+
+        // Add RxJava error handler to avoid crashes when an error occurs on a RxJava operation, but still log the
+        // exception to Crashlytics so that we can fix the issues
+        RxJavaPlugins.setErrorHandler { throwable -> Crashlytics.logException(throwable)}
 
         // Specifying some important information regarding the connection, such as the
         // credentials and the requested API accesses
