@@ -10,7 +10,6 @@ import android.preference.PreferenceManager
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.collection.LongSparseArray
 import androidx.core.content.ContextCompat
@@ -29,6 +28,7 @@ import cy.agorise.bitsybitshareswallet.adapters.AssetsAdapter
 import cy.agorise.bitsybitshareswallet.adapters.AutoSuggestAssetAdapter
 import cy.agorise.bitsybitshareswallet.utils.Constants
 import cy.agorise.bitsybitshareswallet.utils.Helper
+import cy.agorise.bitsybitshareswallet.utils.toast
 import cy.agorise.bitsybitshareswallet.viewmodels.AssetViewModel
 import cy.agorise.bitsybitshareswallet.viewmodels.UserAccountViewModel
 import cy.agorise.graphenej.*
@@ -153,17 +153,18 @@ class ReceiveTransactionFragment : ConnectedFragment() {
             override fun onNothingSelected(parent: AdapterView<*>?) { }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val asset = mAssetsAdapter!!.getItem(position)!!
+                mAssetsAdapter?.getItem(position)?.let { asset ->
+                    if (asset.id == OTHER_ASSET) {
+                        tilAsset.visibility = View.VISIBLE
+                        mAsset = null
+                    } else {
+                        tilAsset.visibility = View.GONE
+                        selectedAssetSymbol = asset.symbol
 
-                if (asset.id == OTHER_ASSET) {
-                    tilAsset.visibility = View.VISIBLE
-                    mAsset = null
-                } else {
-                    tilAsset.visibility = View.GONE
-                    selectedAssetSymbol = asset.symbol
-
-                    mAsset = Asset(asset.id, asset.toString(), asset.precision)
+                        mAsset = Asset(asset.id, asset.toString(), asset.precision)
+                    }
                 }
+
                 updateQR()
             }
         }
@@ -284,6 +285,10 @@ class ReceiveTransactionFragment : ConnectedFragment() {
             updateAmountAddressUI(amount, asset.symbol, asset.precision, mUserAccount!!.name)
         } catch (e: WriterException) {
             Log.e(TAG, "WriterException. Msg: " + e.message)
+            Crashlytics.logException(e)
+        } catch (e: NullPointerException) {
+            Log.e(TAG, "NullPointerException. Msg: " + e.message)
+            Crashlytics.logException(e)
         }
     }
 
@@ -386,7 +391,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 shareQRScreenshot()
             } else {
-                Toast.makeText(context!!, getString(R.string.msg__storage_permission_necessary_share), Toast.LENGTH_SHORT).show()
+                context?.toast(getString(R.string.msg__storage_permission_necessary_share))
             }
             return
         }
