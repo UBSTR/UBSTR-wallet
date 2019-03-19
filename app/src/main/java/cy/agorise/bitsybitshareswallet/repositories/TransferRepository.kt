@@ -27,7 +27,7 @@ class TransferRepository internal constructor(context: Context) {
     init {
         val db = BitsyDatabase.getDatabase(context)
         mTransferDao = db!!.transferDao()
-        mEquivalentValuesDao = db!!.equivalentValueDao()
+        mEquivalentValuesDao = db.equivalentValueDao()
     }
 
     fun insertAll(transfers: List<Transfer>) {
@@ -92,13 +92,13 @@ class TransferRepository internal constructor(context: Context) {
      * Creates an equivalent value for a given transaction.
      *
      * Function used to perform a request to the Coingecko's price API trying to obtain the
-     * equivalent value of a specific [Transaction].
+     * equivalent value of a specific [Transfer].
      *
      * @param   transfer    The transfer whose equivalent value we want to obtain
      * @param   symbol      The symbol of the fiat that the equivalent value should be calculated in
      * @return              An instance of the [EquivalentValue] class, ready to be inserted into the database.
      */
-    fun obtainFiatValue(transfer: Transfer, symbol: String): EquivalentValue {
+    private fun obtainFiatValue(transfer: Transfer, symbol: String): EquivalentValue {
         val sg = ServiceGenerator(Constants.COINGECKO_URL)
         val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.ROOT)
         val date = Date(transfer.timestamp * 1000)
