@@ -10,12 +10,14 @@
         android:id="@+id/tvSymbol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="123.45"/>
+        tools:text="BTS"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
     <TextView
         android:id="@+id/tvAmount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        tools:text="BTS"
-        android:textAlignment="viewEnd"/>
+        tools:text="123.45"
+        android:textAlignment="viewEnd"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
 </LinearLayout>
