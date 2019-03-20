@@ -39,7 +39,7 @@ class PINSecurityLockDialog : BaseSecurityLockDialog() {
 
         // Request focus to the PIN EditText and automatically show the keyboard when the dialog appears.
         tietPIN.requestFocus()
-        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
         setupScreen()
 

@@ -173,7 +173,7 @@ abstract class BaseSecurityLockDialog : DialogFragment() {
         super.onResume()
 
         // Force dialog fragment to use the full width of the screen
-        val dialogWindow = dialog.window
+        val dialogWindow = dialog?.window
         dialogWindow?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     }
 

@@ -72,7 +72,7 @@ dependencies {
     // Google
     implementation 'com.google.zxing:core:3.3.1'
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.android.material:material:1.1.0-alpha04'
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
     implementation 'com.google.maps.android:android-maps-utils:0.5'
     // AAC Lifecycle
@@ -103,6 +103,7 @@ dependencies {
     implementation 'com.itextpdf:itextpdf:5.5.13'
     implementation 'com.opencsv:opencsv:3.7'
     // Others
+    api 'com.google.guava:guava:27.0.1-android'
     implementation 'org.bitcoinj:bitcoinj-core:0.14.3'
     implementation 'com.moldedbits.r2d2:r2d2:1.0.1'
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
@@ -120,4 +121,16 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     androidTestImplementation 'com.jraska.livedata:testing-ktx:1.0.0'
+}
+
+// Added to avoid the compilation problem due to a duplicate ListenableFuture library
+afterEvaluate {
+    configurations.all {
+        def group = 'com.google.guava', name = 'guava', version = '27.0.1-android'
+        resolutionStrategy.eachDependency { details ->
+            if (requested.group == group && requested.name == name) {
+                details.useTarget group: details.requested.group, name: name, version: version
+            }
+        }
+    }
 }

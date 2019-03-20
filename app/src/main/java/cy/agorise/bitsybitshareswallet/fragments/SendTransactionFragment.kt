@@ -574,8 +574,8 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         inflater.inflate(R.menu.menu_send_transaction, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == R.id.menu_info) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.menu_info) {
             MaterialDialog(context!!).show {
                 customView(R.layout.dialog_send_transaction_info, scrollable = true)
                 positiveButton(android.R.string.ok) { dismiss() }

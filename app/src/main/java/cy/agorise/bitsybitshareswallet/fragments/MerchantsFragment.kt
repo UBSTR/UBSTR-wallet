@@ -314,8 +314,8 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == R.id.menu_filter) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.menu_filter) {
             // Try to show or dismiss the custom popup window with the merchants and tellers switches
             if (mPopupWindow?.isShowing == false) {
                 mPopupWindow?.showAsDropDown(toolbar, screenWidth, 8)

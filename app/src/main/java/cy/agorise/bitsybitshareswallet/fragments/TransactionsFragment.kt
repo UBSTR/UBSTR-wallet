@@ -121,8 +121,8 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
         searchView.maxWidth = getScreenWidth(activity) * 3 / 5
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
             R.id.menu_filter -> {
                 val filterOptionsDialog = FilterOptionsDialog.newInstance(
                     filterTransactionsDirection, filterDateRangeAll, filterStartDate * 1000,

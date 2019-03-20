@@ -31,7 +31,6 @@
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabReceiveTransaction"
-                style="@style/Widget.MaterialComponents.FloatingActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:fabSize="auto"
@@ -39,8 +38,8 @@
                 app:maxImageSize="70dp"
                 app:elevation="@dimen/fab_elevation"
                 app:borderWidth="0dp"
+                app:srcCompat="@drawable/ic_receive"
                 android:backgroundTint="@color/colorReceive"
-                android:src="@drawable/ic_receive"
                 app:layout_constraintHorizontal_bias="0.6"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -64,7 +63,6 @@
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabSendTransaction"
-                style="@style/Widget.MaterialComponents.FloatingActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:fabSize="auto"
@@ -72,8 +70,8 @@
                 app:maxImageSize="70dp"
                 app:elevation="@dimen/fab_elevation"
                 app:borderWidth="0dp"
+                app:srcCompat="@drawable/ic_send"
                 android:backgroundTint="@color/colorSend"
-                android:src="@drawable/ic_send"
                 app:layout_constraintHorizontal_bias="0.4"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toEndOf="@id/centeredVerticalGuideline"
@@ -84,7 +82,6 @@
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabSendTransactionCamera"
-                style="@style/Widget.MaterialComponents.FloatingActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="52dp"
@@ -92,10 +89,10 @@
                 app:fabSize="auto"
                 app:fabCustomSize="64dp"
                 app:maxImageSize="40dp"
-                app:backgroundTint="?attr/themedColorBackgroundFloating"
-                android:src="@drawable/ic_camera"
                 app:elevation="@dimen/fab_elevation"
                 app:borderWidth="2dp"
+                app:srcCompat="@drawable/ic_camera"
+                app:backgroundTint="?attr/themedColorBackgroundFloating"
                 android:backgroundTint="@color/colorSend"
                 app:layout_constraintTop_toTopOf="@id/fabSendTransaction"
                 app:layout_constraintBottom_toBottomOf="@id/fabSendTransaction"

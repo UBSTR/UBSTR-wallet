@@ -127,8 +127,8 @@ class EReceiptFragment : Fragment() {
         inflater.inflate(R.menu.menu_e_receipt, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == R.id.menu_share) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.menu_share) {
             verifyStoragePermission()
             return true
         }
