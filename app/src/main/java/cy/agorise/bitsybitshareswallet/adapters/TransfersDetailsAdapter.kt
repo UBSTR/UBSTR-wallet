@@ -74,7 +74,7 @@ class TransfersDetailsAdapter(private val context: Context) :
 
     init {
         val locale = ConfigurationCompat.getLocales(context.resources.configuration)[0]
-        dateFormat = SimpleDateFormat("dd MMM", locale)
+        dateFormat = SimpleDateFormat("dd MMM, yyyy", locale)
         timeFormat = SimpleDateFormat("HH:mm:ss z", locale)
     }
 
