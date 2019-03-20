@@ -15,11 +15,11 @@ class BitsyApplication : Application() {
             "wss://nl.palmpay.io/ws",
 
             // Other public nodes
-            "wss://bitshares.nu/ws",                   // Stockholm, Sweden
+//            "wss://bitshares.nu/ws",                   // Stockholm, Sweden
             "wss://bitshares.openledger.info/ws",      // Openledger node
-            "wss://dallas.bitshares.apasia.tech/ws",	// Dallas, USA
-            "wss://atlanta.bitshares.apasia.tech/ws",	// Atlanta, USA
-            "wss://dex.rnglab.org",				// Amsterdam, Netherlands
+//            "wss://dallas.bitshares.apasia.tech/ws",	// Dallas, USA
+//            "wss://atlanta.bitshares.apasia.tech/ws",	// Atlanta, USA
+//            "wss://dex.rnglab.org",				// Amsterdam, Netherlands
             "wss://citadel.li/node"
         )
     }
