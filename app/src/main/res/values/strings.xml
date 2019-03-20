@@ -47,6 +47,7 @@
     <string name="title_search">Search</string>
     <string name="title_filter">Filter</string>
     <string name="title_export">Export</string>
+    <string name="text__no_transactions">No Transactions</string>
 
     <!-- Transactions filter options -->
     <string name="title_filter_options">Filter options</string>

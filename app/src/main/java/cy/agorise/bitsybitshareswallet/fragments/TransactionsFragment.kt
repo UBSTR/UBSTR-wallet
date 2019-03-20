@@ -86,6 +86,14 @@ class TransactionsFragment : Fragment(), FilterOptionsDialog.OnFilterOptionsSele
             this.transfersDetails.clear()
             this.transfersDetails.addAll(transfersDetails)
             applyFilterOptions(false)
+
+            if (transfersDetails.isEmpty()) {
+                rvTransactions.visibility = View.GONE
+                tvEmpty.visibility = View.VISIBLE
+            } else {
+                rvTransactions.visibility = View.VISIBLE
+                tvEmpty.visibility = View.GONE
+            }
         })
 
         // Set custom touch listener to handle bounce/stretch effect
