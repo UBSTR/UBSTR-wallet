@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Message
 import android.widget.DatePicker
 import androidx.fragment.app.DialogFragment
+import com.google.android.material.picker.MaterialDatePickerDialog
 import cy.agorise.bitsybitshareswallet.fragments.FilterOptionsDialog
 import java.util.*
 
@@ -58,7 +59,7 @@ class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSetListener 
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
         // Create a new instance of DatePickerDialog and return it
-        val datePicker = DatePickerDialog(activity!!, this, year, month, day)
+        val datePicker = MaterialDatePickerDialog(activity!!, this, year, month, day)
 
         // Set maximum date allowed to today
         datePicker.datePicker.maxDate = maxTime

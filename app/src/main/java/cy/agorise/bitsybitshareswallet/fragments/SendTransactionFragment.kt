@@ -354,8 +354,8 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         cameraPreview.setFormats(listOf(BarcodeFormat.QR_CODE))
         cameraPreview.setAspectTolerance(0.5f)
         cameraPreview.setAutoFocus(true)
-        cameraPreview.setLaserColor(R.color.colorAccent)
-        cameraPreview.setMaskColor(R.color.colorAccent)
+        cameraPreview.setLaserColor(R.color.colorSecondary)
+        cameraPreview.setMaskColor(R.color.colorSecondary)
         cameraPreview.setResultHandler(this)
         cameraPreview.startCamera()
 

@@ -54,7 +54,7 @@ class HomeFragment : Fragment() {
         // Sets the status and navigation bars background color to a dark blue or just dark
         context?.let { context ->
             val statusBarColor = ContextCompat.getColor(context,
-                    if (!nightMode) R.color.colorPrimaryDark else R.color.colorStatusBarDark)
+                    if (!nightMode) R.color.colorPrimaryVariant else R.color.colorStatusBarDark)
             window?.statusBarColor = statusBarColor
             window?.navigationBarColor = statusBarColor
         }

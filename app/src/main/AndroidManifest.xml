@@ -40,7 +40,7 @@
         <activity
             android:name=".activities.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Bitsy.NoActionBar"
+            android:theme="@style/Theme.Bitsy"
             android:windowSoftInputMode="adjustPan"/>
         <!-- Used to share Images like the QR code and the eReceipt -->
         <provider

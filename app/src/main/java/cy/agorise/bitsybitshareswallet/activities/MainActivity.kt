@@ -32,7 +32,7 @@ class MainActivity : ConnectedActivity() {
         // Sets the theme to night mode if it has been selected by the user
         if (PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean(Constants.KEY_NIGHT_MODE_ACTIVATED, false)) {
-            setTheme(R.style.Theme_Bitsy_Dark_NoActionBar)
+            setTheme(R.style.Theme_Bitsy_Dark)
         }
         setContentView(R.layout.activity_main)
 
