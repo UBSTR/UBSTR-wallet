@@ -219,7 +219,27 @@ class CreateAccountFragment : BaseAccountFragment() {
             onAccountSelected(result, tietPin.text.toString())
         } else {
             context?.toast(getString(R.string.error__created_account_not_found))
+            setStateError()
         }
+    }
+
+    /**
+     * Sets the state to Loading, when the app is trying to create an account and waiting for the response.
+     */
+    private fun setStateLoading() {
+        btnCancel.isEnabled = false
+        btnCreate.isEnabled = false
+        progressBar.visibility = View.VISIBLE
+    }
+
+    /**
+     * Sets the state to Error, when the app is unable to create the account or unable to retrieve
+     * the information from the newly created account.
+     */
+    private fun setStateError() {
+        btnCancel.isEnabled = true
+        btnCreate.isEnabled = false
+        progressBar.visibility = View.GONE
     }
 
     /**
@@ -227,6 +247,8 @@ class CreateAccountFragment : BaseAccountFragment() {
      * Only account name and public address is sent here.
      */
     private fun createAccount() {
+        setStateLoading()
+
         val accountName = tietAccountName.text.toString()
         val faucetRequest = FaucetRequest(accountName, mAddress, Constants.FAUCET_REFERRER)
 
@@ -249,11 +271,15 @@ class CreateAccountFragment : BaseAccountFragment() {
 
             override fun onFailure(call: Call<FaucetResponse>, t: Throwable) {
                 // the network call was a failure
-                MaterialDialog(context!!)
-                    .title(R.string.title_error)
-                    .message(cy.agorise.bitsybitshareswallet.R.string.error__faucet)
-                    .negativeButton(android.R.string.ok)
-                    .show()
+                context?.let { context ->
+                    MaterialDialog(context)
+                        .title(R.string.title_error)
+                        .message(cy.agorise.bitsybitshareswallet.R.string.error__faucet)
+                        .negativeButton(android.R.string.ok)
+                        .show()
+                }
+
+                setStateError()
             }
         })
     }
@@ -273,10 +299,14 @@ class CreateAccountFragment : BaseAccountFragment() {
                 getString(R.string.error__faucet_template, "None")
             }
 
-            MaterialDialog(context!!)
-                .title(R.string.title_error)
-                .message(text = content)
-                .show()
+            context?.let {context ->
+                MaterialDialog(context)
+                    .title(R.string.title_error)
+                    .message(text = content)
+                    .show()
+            }
+
+            setStateError()
         }
     }
 
