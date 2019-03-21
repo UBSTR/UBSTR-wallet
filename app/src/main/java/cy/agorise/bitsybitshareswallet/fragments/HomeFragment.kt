@@ -6,7 +6,6 @@ import android.preference.PreferenceManager
 import android.view.*
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -118,17 +117,6 @@ class HomeFragment : Fragment() {
         tabLayout.setupWithViewPager(viewPager)
         // Set the pie chart icon for the third tab
         tabLayout.getTabAt(2)?.setIcon(R.drawable.ic_pie_chart)
-
-        var icon = tabLayout.getTabAt(2)?.icon
-        if (icon != null) {
-            val colors = context?.let {context ->
-                ContextCompat.getColorStateList(
-                    context, R.color.tab_icon_selector)
-            }
-
-            icon = DrawableCompat.wrap(icon)
-            DrawableCompat.setTintList(icon, colors)
-        }
     }
 
     /**

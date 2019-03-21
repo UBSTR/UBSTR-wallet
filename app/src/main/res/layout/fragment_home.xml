@@ -29,9 +29,26 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.5"/>
 
+            <!-- This Dummy FAB is used to create a darker drop shadow -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fabReceiveDummy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:fabSize="auto"
+                    app:fabCustomSize="120dp"
+                    app:maxImageSize="70dp"
+                    app:elevation="@dimen/fab_elevation"
+                    app:borderWidth="0dp"
+                    android:backgroundTint="?attr/themedColorBackgroundFloating"
+                    app:layout_constraintHorizontal_bias="0.6"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/centeredVerticalGuideline"
+                    app:layout_constraintBottom_toTopOf="@+id/tvReceiveTransaction"
+                    app:layout_constraintVertical_chainStyle="packed"/>
+
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabReceiveTransaction"
-                style="@style/Widget.MaterialComponents.FloatingActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:fabSize="auto"
@@ -41,26 +58,40 @@
                 app:borderWidth="0dp"
                 app:srcCompat="@drawable/ic_receive"
                 android:backgroundTint="@color/colorReceive"
-                app:layout_constraintHorizontal_bias="0.6"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/centeredVerticalGuideline"
-                app:layout_constraintBottom_toTopOf="@+id/tvReceiveTransaction"
-                app:layout_constraintVertical_chainStyle="packed"/>
+                app:layout_constraintTop_toTopOf="@id/fabReceiveDummy"
+                app:layout_constraintStart_toStartOf="@id/fabReceiveDummy"/>
 
             <TextView
                 android:id="@+id/tvReceiveTransaction"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp"
+                android:layout_marginTop="8dp"
                 android:text="@string/title_receive"
                 android:textAllCaps="true"
                 android:textAppearance="@style/TextAppearance.Bitsy.Body1"
                 android:textAlignment="center"
-                app:layout_constraintTop_toBottomOf="@+id/fabReceiveTransaction"
-                app:layout_constraintStart_toStartOf="@id/fabReceiveTransaction"
-                app:layout_constraintEnd_toEndOf="@id/fabReceiveTransaction"
+                app:layout_constraintTop_toBottomOf="@+id/fabReceiveDummy"
+                app:layout_constraintStart_toStartOf="@id/fabReceiveDummy"
+                app:layout_constraintEnd_toEndOf="@id/fabReceiveDummy"
                 app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <!-- This Dummy FAB is used to create a darker drop shadow -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fabSendDummy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:fabSize="auto"
+                    app:fabCustomSize="120dp"
+                    app:maxImageSize="70dp"
+                    app:elevation="@dimen/fab_elevation"
+                    app:borderWidth="0dp"
+                    android:backgroundTint="?attr/themedColorBackgroundFloating"
+                    app:layout_constraintHorizontal_bias="0.4"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/centeredVerticalGuideline"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/tvSendTransaction"
+                    app:layout_constraintVertical_chainStyle="packed"/>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabSendTransaction"
@@ -73,43 +104,55 @@
                 app:borderWidth="0dp"
                 app:srcCompat="@drawable/ic_send"
                 android:backgroundTint="@color/colorSend"
-                app:layout_constraintHorizontal_bias="0.4"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@id/centeredVerticalGuideline"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/tvSendTransaction"
-                app:layout_constraintVertical_chainStyle="packed"/>
+                app:layout_constraintTop_toTopOf="@id/fabSendDummy"
+                app:layout_constraintStart_toStartOf="@id/fabSendDummy"/>
+
+            <!-- This Dummy FAB is used to show a white border around the Camera FAB and
+                 also to create a darker drop shadow -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fabCameraDummy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="52dp"
+                    android:layout_marginEnd="76dp"
+                    app:fabSize="auto"
+                    app:fabCustomSize="64dp"
+                    app:maxImageSize="40dp"
+                    app:elevation="@dimen/fab_elevation"
+                    app:borderWidth="0dp"
+                    android:backgroundTint="?attr/themedColorBackgroundFloating"
+                    app:layout_constraintTop_toTopOf="@id/fabSendTransaction"
+                    app:layout_constraintBottom_toBottomOf="@id/fabSendTransaction"
+                    app:layout_constraintEnd_toEndOf="@id/fabSendTransaction"/>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabSendTransactionCamera"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="52dp"
-                android:layout_marginEnd="76dp"
                 app:fabSize="auto"
-                app:fabCustomSize="64dp"
+                app:fabCustomSize="60dp"
                 app:maxImageSize="40dp"
                 app:elevation="@dimen/fab_elevation"
-                app:borderWidth="2dp"
+                app:borderWidth="0dp"
                 app:srcCompat="@drawable/ic_camera"
-                app:backgroundTint="?attr/themedColorBackgroundFloating"
                 android:backgroundTint="@color/colorSend"
-                app:layout_constraintTop_toTopOf="@id/fabSendTransaction"
-                app:layout_constraintBottom_toBottomOf="@id/fabSendTransaction"
-                app:layout_constraintEnd_toEndOf="@id/fabSendTransaction"/>
+                app:layout_constraintTop_toTopOf="@id/fabCameraDummy"
+                app:layout_constraintBottom_toBottomOf="@id/fabCameraDummy"
+                app:layout_constraintStart_toStartOf="@id/fabCameraDummy"
+                app:layout_constraintEnd_toEndOf="@id/fabCameraDummy"/>
 
             <TextView
                 android:id="@+id/tvSendTransaction"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp"
+                android:layout_marginTop="8dp"
                 android:text="@string/title_send"
                 android:textAllCaps="true"
                 android:textAppearance="@style/TextAppearance.Bitsy.Body1"
                 android:textAlignment="center"
-                app:layout_constraintTop_toBottomOf="@+id/fabSendTransaction"
-                app:layout_constraintStart_toStartOf="@id/fabSendTransaction"
-                app:layout_constraintEnd_toEndOf="@id/fabSendTransaction"
+                app:layout_constraintTop_toBottomOf="@+id/fabSendDummy"
+                app:layout_constraintStart_toStartOf="@id/fabSendDummy"
+                app:layout_constraintEnd_toEndOf="@id/fabSendDummy"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -147,6 +190,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="@color/semiTransparent"
+                app:tabIconTint="@color/tab_icon_selector"
                 app:tabTextColor="?android:colorControlNormal"
                 app:tabSelectedTextColor="?android:textColorPrimary"
                 app:tabIndicatorColor="?attr/themedColorBackgroundFloating"
