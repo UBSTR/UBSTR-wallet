@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    card_view:cardElevation="4dp"
-    card_view:cardCornerRadius="@dimen/card_radius"
+    app:cardElevation="@dimen/card_elevation"
+    app:cardCornerRadius="@dimen/card_radius"
     android:layout_margin="@dimen/card_margin">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -114,9 +113,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="gone"
-            card_view:layout_constraintTop_toBottomOf="@id/vSeparator"
-            card_view:layout_constraintStart_toEndOf="@id/firstVerticalGuideline"
-            card_view:layout_constraintEnd_toStartOf="@id/fourthVerticalGuideline">
+            app:layout_constraintTop_toBottomOf="@id/vSeparator"
+            app:layout_constraintStart_toEndOf="@id/firstVerticalGuideline"
+            app:layout_constraintEnd_toStartOf="@id/fourthVerticalGuideline">
 
             <TextView
                 android:id="@+id/tvMemo"

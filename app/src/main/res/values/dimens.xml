@@ -19,6 +19,7 @@
     <dimen name="logo_size">180dp</dimen>
 
     <!-- Transactions -->
+    <dimen name="card_elevation">6dp</dimen>
     <dimen name="card_margin">4dp</dimen>
     <dimen name="card_radius">4dp</dimen>
 
