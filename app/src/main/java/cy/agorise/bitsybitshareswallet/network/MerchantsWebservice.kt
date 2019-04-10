@@ -8,7 +8,7 @@ import retrofit2.http.Query
 
 interface MerchantsWebservice {
 
-    @GET("/api/v1/merchants")
+    @GET("/api/v2/merchants")
     fun getMerchants(@Query(value = "\$skip") skip: Int,
                      @Query(value = "\$limit") limit: Int = 50):
             Call<FeathersResponse<Merchant>>
