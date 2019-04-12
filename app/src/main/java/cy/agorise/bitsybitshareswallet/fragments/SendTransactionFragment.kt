@@ -200,8 +200,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .map { it.toString().trim() }
                 .subscribe {
-                    val id = mNetworkService?.sendMessage(GetAccountByName(it!!), GetAccountByName.REQUIRED_API)
-                    if (id != null) responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME
+                    validateAccount(it)
                 }
         )
 
@@ -213,6 +212,15 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { validateAmount() }
         )
+
+        // Populates the To field if a Deep Link was used
+        if (args.to != " " && args.asset != " " && args.amount > 0 && args.memo != " ") {
+            val items = arrayOf(LineItem("transfer", 1, args.amount.toDouble()))
+            val invoice = Invoice(args.to, "", args.memo, args.asset, items, "", "")
+            Handler().postDelayed({
+                populatePropertiesFromQRCodeString(Invoice.toQrCode(invoice))
+            }, 2000) // Wait to let the other elements of the fragment initialize
+        }
     }
 
     /** Handles the selection of items in the Asset spinner, to keep track of the selectedAssetSymbol and show the
@@ -369,11 +377,16 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         cameraPreview.stopCamera()
     }
 
-    /** Handles the result of the QR code read from the camera and tries to populate the Account, Amount and Memo fields
-     * and the Asset spinner with the obtained information */
+    /** Handles the result of the QR code read from the camera **/
     override fun handleResult(result: Result?) {
+        populatePropertiesFromQRCodeString(result!!.text)
+    }
+
+    /** Tries to populate the Account, Amount and Memo fields
+    * and the Asset spinner with the obtained information */
+    private fun populatePropertiesFromQRCodeString(qrString: String) {
         try {
-            val invoice = Invoice.fromQrCode(result!!.text)
+            val invoice = Invoice.fromQrCode(qrString)
 
             Log.d(TAG, "QR Code read: " + invoice.toJsonString())
 
@@ -420,6 +433,16 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         }catch (e: Exception) {
             Log.d(TAG, "Invoice error: " + e.message)
         }
+    }
+
+    /**
+     * Sends a request to the node through the NetworkService to validate that accountName is a valid
+     * BitShares account.
+     */
+    private fun validateAccount(accountName: String) {
+        isToAccountCorrect = false
+        val id = mNetworkService?.sendMessage(GetAccountByName(accountName), GetAccountByName.REQUIRED_API)
+        if (id != null) responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME
     }
 
     private fun validateAmount() {

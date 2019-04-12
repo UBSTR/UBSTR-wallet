@@ -83,8 +83,8 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-rxjava2:$room_version" // RxJava support for Room
     // AAC Navigation
-    implementation "android.arch.navigation:navigation-fragment-ktx:$nav_version"
-    implementation "android.arch.navigation:navigation-ui-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     // RxBindings
     implementation "com.jakewharton.rxbinding3:rxbinding:$rx_bindings_version"
     implementation "com.jakewharton.rxbinding3:rxbinding-material:$rx_bindings_version" // Material Components widgets

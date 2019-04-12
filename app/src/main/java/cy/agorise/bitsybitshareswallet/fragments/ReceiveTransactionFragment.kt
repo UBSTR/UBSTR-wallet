@@ -256,6 +256,7 @@ class ReceiveTransactionFragment : ConnectedFragment() {
         }
     }
 
+    // TODO use coroutines to move this process to a background thread
     private fun updateQR() {
         if (mAsset == null) {
             ivQR.setImageDrawable(null)

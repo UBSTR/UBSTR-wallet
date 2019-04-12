@@ -33,7 +33,7 @@
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
+                <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -41,7 +41,10 @@
             android:name=".activities.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Bitsy"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan">
+
+            <nav-graph android:value="@navigation/mobile_navigation" />
+        </activity>
         <!-- Used to share Images like the QR code and the eReceipt -->
         <provider
             android:name="androidx.core.content.FileProvider"
