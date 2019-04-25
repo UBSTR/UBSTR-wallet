@@ -9,9 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProviders
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
@@ -54,6 +52,7 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
         // Constants used to perform security locked requests
         private const val ACTION_CHANGE_SECURITY_LOCK = 1
         private const val ACTION_SHOW_BRAINKEY = 2
+        private const val ACTION_UPGRADE_TO_LTM = 3
 
         // Constants used to organize NetworkService requests
         private const val RESPONSE_GET_DYNAMIC_GLOBAL_PROPERTIES_NODES = 1
@@ -355,10 +354,10 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
     }
 
     override fun onPINPatternEntered(actionIdentifier: Int) {
-        if (actionIdentifier == ACTION_CHANGE_SECURITY_LOCK) {
-            showChooseSecurityLockDialog()
-        } else if (actionIdentifier == ACTION_SHOW_BRAINKEY) {
-            getBrainkey()
+        when (actionIdentifier) {
+            ACTION_CHANGE_SECURITY_LOCK -> showChooseSecurityLockDialog()
+            ACTION_SHOW_BRAINKEY        -> getBrainkey()
+            ACTION_UPGRADE_TO_LTM       -> showUpgradeToLTMDialog()
         }
     }
 
@@ -425,6 +424,11 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
             getBrainkey()
     }
 
+    private fun onUpgradeToLTMButtonSelected() {
+        if (!verifySecurityLock(ACTION_UPGRADE_TO_LTM))
+            showUpgradeToLTMDialog()
+    }
+
     /**
      * Obtains the brainKey from the authorities db table for the current user account and if it is not null it passes
      * the brainKey to a method to show it in a nice MaterialDialog
@@ -467,7 +471,7 @@ class SettingsFragment : ConnectedFragment(), BaseSecurityLockDialog.OnPINPatter
         }
     }
 
-    private fun onUpgradeToLTMButtonSelected() {
+    private fun showUpgradeToLTMDialog() {
         context?.let { context ->
             val content = getString(R.string.msg__account_upgrade_dialog, mUserAccount?.name)
             MaterialDialog(context).show {
