@@ -1,6 +1,5 @@
 package cy.agorise.bitsybitshareswallet.fragments
 
-import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
@@ -10,6 +9,7 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.collection.LongSparseArray
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -99,7 +99,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
     private var mSelectedUserAccount: UserAccount? = null
 
     // Map used to keep track of request and response id pairs
-    private val responseMap = HashMap<Long, Int>()
+    private val responseMap = LongSparseArray<Int>()
 
     /** Transaction being built */
     private var transaction: Transaction? = null
@@ -147,7 +147,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
         mViewModel= ViewModelProviders.of(this).get(SendTransactionViewModel::class.java)
 
         mViewModel.getWIF(userId, AuthorityType.ACTIVE.ordinal).observe(this,
-            androidx.lifecycle.Observer<String> { encryptedWIF ->
+            Observer<String> { encryptedWIF ->
                 context?.let {
                     try {
                         wifKey = CryptoUtils.decrypt(it, encryptedWIF)
@@ -243,8 +243,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
     override fun handleJsonRpcResponse(response: JsonRpcResponse<*>) {
         if (responseMap.containsKey(response.id)) {
-            val responseType = responseMap[response.id]
-            when (responseType) {
+            when (responseMap[response.id]) {
                 RESPONSE_GET_ACCOUNT_BY_NAME            -> handleAccountProperties(response.result)
                 RESPONSE_GET_DYNAMIC_GLOBAL_PROPERTIES  -> handleDynamicGlobalProperties(response.result)
                 RESPONSE_GET_REQUIRED_FEES              -> handleRequiredFees(response.result)
@@ -285,7 +284,17 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
      * calls the next step which is [GetRequiredFees] else it shows an error */
     private fun handleDynamicGlobalProperties(result: Any?) {
         if (result is DynamicGlobalProperties) {
-            val expirationTime = (result.time.time / 1000) + Transaction.DEFAULT_EXPIRATION_TIME
+
+            val now = System.currentTimeMillis() / 1000
+            val time = result.time.time / 1000
+
+            // Show an error if the current connected node is out of sync
+            if (now - time > Constants.CHECK_NODE_OUT_OF_SYNC) {
+                context?.toast(getString(R.string.msg__transaction_not_sent))
+                return
+            }
+
+            val expirationTime = time + Transaction.DEFAULT_EXPIRATION_TIME
             val headBlockId = result.head_block_id
             val headBlockNumber = result.head_block_number
 
@@ -294,7 +303,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
             val asset = Asset(mBalancesDetailsAdapter!!.getItem(spAsset.selectedItemPosition)!!.id)
 
             val id = mNetworkService?.sendMessage(GetRequiredFees(transaction!!, asset), GetRequiredFees.REQUIRED_API)
-            if (id != null) responseMap[id] = RESPONSE_GET_REQUIRED_FEES
+            if (id != null) responseMap.append(id, RESPONSE_GET_REQUIRED_FEES)
         } else {
             context?.toast(getString(R.string.msg__transaction_not_sent))
         }
@@ -308,7 +317,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
             transaction!!.setFees(result as List<AssetAmount>) // TODO find how to remove this warning
 
             val id = mNetworkService?.sendMessage(BroadcastTransaction(transaction), BroadcastTransaction.REQUIRED_API)
-            if (id != null) responseMap[id] = RESPONSE_BROADCAST_TRANSACTION
+            if (id != null) responseMap.append(id, RESPONSE_BROADCAST_TRANSACTION)
         } else {
             context?.toast(getString(R.string.msg__transaction_not_sent))
         }
@@ -329,7 +338,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
 
     /** Verifies if the user has already granted the Camera permission, if not the asks for it */
     private fun verifyCameraPermission() {
-        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.CAMERA)
+        if (ContextCompat.checkSelfPermission(activity!!, android.Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED) {
             // Permission is not already granted
             requestPermissions(arrayOf(android.Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
@@ -442,7 +451,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
     private fun validateAccount(accountName: String) {
         isToAccountCorrect = false
         val id = mNetworkService?.sendMessage(GetAccountByName(accountName), GetAccountByName.REQUIRED_API)
-        if (id != null) responseMap[id] = RESPONSE_GET_ACCOUNT_BY_NAME
+        if (id != null) responseMap.append(id, RESPONSE_GET_ACCOUNT_BY_NAME)
     }
 
     private fun validateAmount() {
@@ -570,7 +579,7 @@ class SendTransactionFragment : ConnectedFragment(), ZXingScannerView.ResultHand
             // Start the send transaction procedure which includes a series of calls
             val id = mNetworkService?.sendMessage(GetDynamicGlobalProperties(),
                 GetDynamicGlobalProperties.REQUIRED_API)
-            if (id != null ) responseMap[id] =  RESPONSE_GET_DYNAMIC_GLOBAL_PROPERTIES
+            if (id != null ) responseMap.append(id,  RESPONSE_GET_DYNAMIC_GLOBAL_PROPERTIES)
         } else
             Log.d(TAG, "Network Service is not connected")
     }

@@ -122,6 +122,9 @@ object Constants {
     /** Name of the external storage folder used to save files like PDF and CSV exports and Backups **/
     const val EXTERNAL_STORAGE_FOLDER = "BiTSy"
 
+    /** Constant used to check if the current connected node is out of sync */
+    const val CHECK_NODE_OUT_OF_SYNC = 10 // 10 seconds
+
 
     /////////////////////// Crashlytics custom keys ///////////////////////
 
