@@ -16,6 +16,10 @@ data class Teller(
     @ColumnInfo(name = "lon") val lon: Double,
     @ColumnInfo(name = "phone") val phone: String?,
     @ColumnInfo(name = "telegram") val telegram: String?,
+    @ColumnInfo(name = "keybase") val keybase: String?,
+    @ColumnInfo(name = "whatsapp") val whatsapp: String?,
+    @ColumnInfo(name = "viber") val viber: String?,
+    @ColumnInfo(name = "email") val email: String?,
     @ColumnInfo(name = "website") val url: String?
 ) : ClusterItem {
     override fun getSnippet(): String {

@@ -157,7 +157,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
     }
 
     private fun setupPopupWindow() {
-        val popupView = layoutInflater?.inflate(R.layout.popup_menu_merchants, null, false)
+        val popupView = layoutInflater.inflate(R.layout.popup_menu_merchants, null, false)
 
         val switchMerchants = popupView?.findViewById<SwitchCompat>(R.id.switchMerchants)
         switchMerchants?.isChecked = showMerchantsMarkers
@@ -512,7 +512,7 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
 
         override fun getInfoWindow(marker: Marker?): View {
             val infoWindowLayout: View = LayoutInflater.from(context).inflate(
-                R.layout.marker_info_window, null)
+                R.layout.marker_merch_info_window, null)
             val tvName      = infoWindowLayout.findViewById<TextView>(R.id.tvName)
             val tvAddress   = infoWindowLayout.findViewById<TextView>(R.id.tvAddress)
             val tvPhone     = infoWindowLayout.findViewById<TextView>(R.id.tvPhone)
@@ -557,11 +557,15 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
 
         override fun getInfoWindow(marker: Marker?): View {
             val infoWindowLayout: View = LayoutInflater.from(context).inflate(
-                R.layout.marker_info_window, null)
+                R.layout.marker_teller_info_window, null)
             val tvName      = infoWindowLayout.findViewById<TextView>(R.id.tvName)
             val tvAddress   = infoWindowLayout.findViewById<TextView>(R.id.tvAddress)
             val tvPhone     = infoWindowLayout.findViewById<TextView>(R.id.tvPhone)
             val tvTelegram  = infoWindowLayout.findViewById<TextView>(R.id.tvTelegram)
+            val tvKeybase   = infoWindowLayout.findViewById<TextView>(R.id.tvKeybase)
+            val tvWhatsapp  = infoWindowLayout.findViewById<TextView>(R.id.tvWhatsapp)
+            val tvViber     = infoWindowLayout.findViewById<TextView>(R.id.tvViber)
+            val tvEmail   = infoWindowLayout.findViewById<TextView>(R.id.tvEmail)
             val tvWebsite   = infoWindowLayout.findViewById<TextView>(R.id.tvWebsite)
 
             if (selectedTeller != null) {
@@ -582,6 +586,30 @@ class MerchantsFragment : Fragment(), OnMapReadyCallback, SearchView.OnSuggestio
                     tvTelegram.text = telegram
                 } else
                     tvTelegram.visibility = View.GONE
+
+                if (!selectedTeller?.keybase.equals("")) {
+                    val keybase = "Keybase: ${selectedTeller?.keybase}"
+                    tvKeybase.text = keybase
+                } else
+                    tvKeybase.visibility = View.GONE
+
+                if (!selectedTeller?.whatsapp.equals("")) {
+                    val whatsapp = "WhatsApp: ${selectedTeller?.whatsapp}"
+                    tvWhatsapp.text = whatsapp
+                } else
+                    tvWhatsapp.visibility = View.GONE
+
+                if (!selectedTeller?.viber.equals("")) {
+                    val viber = "Viber: ${selectedTeller?.viber}"
+                    tvViber.text = viber
+                } else
+                    tvViber.visibility = View.GONE
+
+                if (!selectedTeller?.email.equals("")) {
+                    val email = "Email: ${selectedTeller?.email}"
+                    tvEmail.text = email
+                } else
+                    tvEmail.visibility = View.GONE
 
                 if (!selectedTeller?.url.equals(""))
                     tvWebsite.text = selectedTeller?.url

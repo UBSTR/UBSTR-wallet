@@ -21,7 +21,7 @@ import cy.agorise.bitsybitshareswallet.database.joins.TransferDetailDao
         Merchant::class,
         Teller::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = true)
 abstract class BitsyDatabase : RoomDatabase() {
     abstract fun assetDao(): AssetDao
@@ -49,6 +49,7 @@ abstract class BitsyDatabase : RoomDatabase() {
                         BitsyDatabase::class.java, "BiTSyWallet.db"
                     ).addMigrations(MIGRATION_1_2)
                     .addMigrations(MIGRATION_2_3)
+                    .addMigrations(MIGRATION_3_4)
                     .build()
                 }
             }
@@ -74,6 +75,13 @@ abstract class BitsyDatabase : RoomDatabase() {
 
                 database.execSQL("DROP TABLE assets")
                 database.execSQL("CREATE TABLE IF NOT EXISTS assets (`id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `precision` INTEGER NOT NULL, `description` TEXT NOT NULL, `issuer` TEXT NOT NULL, PRIMARY KEY(`id`))")
+            }
+        }
+
+        val MIGRATION_3_4 = object : Migration(3,4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE tellers")
+                database.execSQL("CREATE TABLE IF NOT EXISTS tellers (id TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, address TEXT, lat REAL NOT NULL, lon REAL NOT NULL, phone TEXT, telegram TEXT, keybase TEXT, whatsapp TEXT, viber TEXT, email TEXT, website TEXT)")
             }
         }
     }

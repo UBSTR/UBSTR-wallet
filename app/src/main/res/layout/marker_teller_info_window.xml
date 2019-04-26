@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp"
+    android:background="@drawable/marker_info_window_background">
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Hareem Haque"
+        android:textAppearance="@style/TextAppearance.Bitsy.Body1"/>
+
+    <TextView
+        android:id="@+id/tvAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        tools:text="Toronto, Ontario, Canada"/>
+
+    <TextView
+        android:id="@+id/tvPhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        tools:text="1-647-518-4916"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+    <TextView
+        android:id="@+id/tvTelegram"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        tools:text="Telegram: \@gridcenter"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+    <TextView
+            android:id="@+id/tvKeybase"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            tools:text="Viber: \@gridcenter"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+    <TextView
+            android:id="@+id/tvWhatsapp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            tools:text="Whatsapp: 1-647-518-4916"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+    <TextView
+            android:id="@+id/tvViber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            tools:text="Telegram: \@gridcenter"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+    <TextView
+            android:id="@+id/tvEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            tools:text="Email: hareem.haque\@outlook.com"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+    <TextView
+        android:id="@+id/tvWebsite"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        tools:text="Bambuddha.com.mx"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+</LinearLayout>
