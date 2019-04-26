@@ -1,1 +1,1 @@
-# bitsy-wallet
+# UBSTR-wallet
